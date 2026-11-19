@@ -1,0 +1,883 @@
+// EduBridge database schema.
+//
+// Target database: PostgreSQL (production and local development).
+// Local development uses an embedded PGlite server that speaks the PostgreSQL
+// wire protocol, so migrations and queries exercise real PostgreSQL semantics
+// without requiring a system install. See docs/DATABASE.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Identity and access
+// ---------------------------------------------------------------------------
+
+enum Role {
+  STUDENT
+  REVIEWER
+  ADMIN
+}
+
+enum TokenPurpose {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  GUARDIAN_CONSENT
+}
+
+enum ConsentType {
+  TERMS
+  PRIVACY
+  GUARDIAN
+  MARKETING
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  emailVerifiedAt DateTime?
+  passwordHash    String?
+  name            String
+  role            Role      @default(STUDENT)
+  dateOfBirth     DateTime? @db.Date
+  locale          String    @default("en")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  profile                StudentProfile?
+  sessions               Session[]
+  googleAccount          GoogleAccount?
+  tokens                 AuthToken[]
+  consents               ConsentRecord[]
+  auditEvents            AuditEvent[]            @relation("ActorAuditEvents")
+  citations              SourceCitation[]        @relation("CitationAuthor")
+  catalogReviews         CatalogReview[]         @relation("CatalogReviews")
+  universityFavorites    UniversityFavorite[]
+  scholarshipFavorites   ScholarshipFavorite[]
+  applications           Application[]
+  documents              StudentDocument[]
+  notifications          StudentNotification[]
+  notificationPreference NotificationPreference?
+  advisorConversations   AdvisorConversation[]
+  advisorUsage           AdvisorUsage[]
+  comparison             UniversityComparison?
+  studyNotes             StudyNote[]
+
+  @@index([role])
+  @@index([deletedAt])
+}
+
+model GoogleAccount {
+  id        String   @id @default(cuid())
+  subject   String   @unique
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum GoogleOAuthIntent {
+  SIGN_IN
+  SIGN_UP
+}
+
+model GoogleOAuthAttempt {
+  stateHash       String            @id
+  codeVerifier    String
+  intent          GoogleOAuthIntent
+  dateOfBirth     DateTime?         @db.Date
+  guardianName    String?
+  guardianEmail   String?
+  termsAcceptedAt DateTime?
+  expiresAt       DateTime
+  usedAt          DateTime?
+  createdAt       DateTime          @default(now())
+
+  @@index([expiresAt])
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  userAgent  String?
+  ipHash     String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+/// Single-use, hashed-at-rest tokens for email verification, password reset,
+/// and guardian consent. The raw token only ever exists in the email link.
+model AuthToken {
+  id        String       @id @default(cuid())
+  userId    String
+  purpose   TokenPurpose
+  tokenHash String       @unique
+  email     String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+model ConsentRecord {
+  id        String      @id @default(cuid())
+  userId    String
+  type      ConsentType
+  version   String
+  grantedAt DateTime    @default(now())
+  revokedAt DateTime?
+  ipHash    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  ipHash     String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("ActorAuditEvents", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Student profile
+// ---------------------------------------------------------------------------
+
+enum DegreeLevel {
+  BACHELOR
+  MASTER
+  PHD
+  DIPLOMA
+  CERTIFICATE
+}
+
+model StudentProfile {
+  id                     String       @id @default(cuid())
+  userId                 String       @unique
+  nationality            String?
+  residenceCountry       String?
+  currentDegree          DegreeLevel?
+  targetDegree           DegreeLevel?
+  fieldsOfStudy          String[]     @default([])
+  englishTest            String?
+  englishScore           String?
+  /// Whole units of `budgetCurrency` (for example 12000 USD). Stored as an
+  /// integer because fractional budgets are not meaningful for planning.
+  budgetAmount           Int?
+  budgetCurrency         String?
+  guardianName           String?
+  guardianEmail          String?
+  guardianConsentAt      DateTime?
+  guardianConsentVersion String?
+  onboardingCompletedAt  DateTime?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([nationality])
+}
+
+// ---------------------------------------------------------------------------
+// Abuse prevention
+// ---------------------------------------------------------------------------
+
+/// Fixed-window counters shared across server instances. Keys are hashed so
+/// raw email addresses and IP addresses are never stored.
+model RateLimitCounter {
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime
+  expiresAt   DateTime
+
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// Source-linked catalog
+// ---------------------------------------------------------------------------
+
+enum VerificationStatus {
+  VERIFIED
+  PARTIALLY_VERIFIED
+  INFORMATION_UNAVAILABLE
+  NEEDS_REVIEW
+  UNVERIFIED
+  EXPIRED
+  ARCHIVED
+}
+
+/// User-facing confidence for an individual catalog field. This is separate
+/// from the record-level review status because one university can have a
+/// sourced ranking and an explicitly unavailable deadline.
+enum FieldVerificationStatus {
+  VERIFIED
+  PARTIALLY_VERIFIED
+  NOT_VERIFIED
+  INFORMATION_UNAVAILABLE
+}
+
+enum FundingType {
+  FULLY_FUNDED
+  PARTIAL
+  TUITION_WAIVER
+  STIPEND
+  OTHER
+}
+
+/// Whether a scholarship applies to every nationality/field, an explicit list,
+/// or an unknown scope. Empty arrays alone cannot distinguish "everyone" from
+/// "not yet documented", so the scope is stored explicitly.
+enum EligibilityScope {
+  ALL
+  LISTED
+  UNKNOWN
+}
+
+enum RequirementKind {
+  ACADEMIC
+  ENGLISH_LANGUAGE
+  DOCUMENT
+  PORTFOLIO
+  WORK_EXPERIENCE
+  OTHER
+}
+
+enum CostKind {
+  LIVING_COST
+  APPLICATION_FEE
+}
+
+enum IntakeTerm {
+  SPRING
+  SUMMER
+  AUTUMN
+  WINTER
+}
+
+enum CatalogEntityType {
+  UNIVERSITY
+  PROGRAM
+  SCHOLARSHIP
+}
+
+enum ReviewDecision {
+  IMPORT
+  EDIT
+  APPROVE
+  REQUEST_CHANGES
+  EXPIRE
+  RESTORE
+  ARCHIVE
+  MARK_PARTIAL
+  MARK_UNAVAILABLE
+  FLAG_STALE
+}
+
+enum ApplicationStatus {
+  INTERESTED
+  RESEARCHING
+  PREPARING_DOCUMENTS
+  READY_TO_APPLY
+  SUBMITTED
+  INTERVIEW
+  ACCEPTED
+  REJECTED
+  WAITLISTED
+}
+
+enum StudentDocumentCategory {
+  PASSPORT
+  ACADEMIC_TRANSCRIPT
+  IELTS_CERTIFICATE
+  SAT_SCORE_REPORT
+  RECOMMENDATION_LETTER
+  PERSONAL_STATEMENT
+  CV
+  OTHER
+}
+
+enum StudentNotificationType {
+  DEADLINE
+  APPLICATION_STATUS
+  MISSING_DOCUMENT
+  SCHOLARSHIP_ANNOUNCEMENT
+}
+
+/// A source document. Facts point at the document they came from; the URL is
+/// unique so re-importing the same page updates one citation rather than
+/// creating duplicates. A published record always has a source with a
+/// `verifiedAt` date.
+model SourceCitation {
+  id          String    @id @default(cuid())
+  url         String    @unique
+  publisher   String
+  title       String
+  accessedAt  DateTime  @db.Date
+  verifiedAt  DateTime? @db.Date
+  notes       String?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy User? @relation("CitationAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  universities        University[]         @relation("UniversityPrimarySource")
+  programs            Program[]            @relation("ProgramPrimarySource")
+  scholarships        Scholarship[]        @relation("ScholarshipPrimarySource")
+  requirements        Requirement[]
+  tuitionFacts        TuitionFact[]
+  deadlineFacts       DeadlineFact[]
+  costs               ProgramCost[]
+  intakes             ProgramIntake[]
+  programScholarships ProgramScholarship[]
+  rankedUniversities  University[]         @relation("UniversityRankingSource")
+  fieldFacts          CatalogFieldFact[]
+
+  @@index([verifiedAt])
+}
+
+model University {
+  id                  String             @id @default(cuid())
+  slug                String             @unique
+  name                String
+  shortName           String?
+  city                String
+  countryCode         String
+  /// Null means the official website could not be verified; never invent one.
+  websiteUrl          String?
+  continent           String?
+  institutionType     String?
+  logoUrl             String?
+  description         String?            @db.Text
+  rankingOrganization String?
+  rankingEdition      String?
+  rankingPosition     Int?
+  /// Exact published rank string, including "=" ties and ranges.
+  rankingDisplay      String?
+  rankingTied         Boolean            @default(false)
+  rankingIsRange      Boolean            @default(false)
+  qsNid               Int?               @unique
+  verificationStatus  VerificationStatus @default(UNVERIFIED)
+  lastVerifiedAt      DateTime?          @db.Date
+  nextReviewAt        DateTime?          @db.Date
+  primarySourceId     String
+  rankingSourceId     String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  primarySource SourceCitation       @relation("UniversityPrimarySource", fields: [primarySourceId], references: [id], onDelete: Restrict)
+  rankingSource SourceCitation?      @relation("UniversityRankingSource", fields: [rankingSourceId], references: [id], onDelete: SetNull)
+  programs      Program[]
+  favorites     UniversityFavorite[]
+  applications  Application[]
+  fieldFacts    CatalogFieldFact[]
+  studyNotes    StudyNote[]
+
+  @@index([countryCode, verificationStatus])
+  @@index([verificationStatus, nextReviewAt])
+  @@index([name])
+  @@index([countryCode, rankingPosition])
+}
+
+model Program {
+  id                 String             @id @default(cuid())
+  universityId       String
+  slug               String
+  name               String
+  degreeLevel        DegreeLevel
+  field              String
+  language           String?
+  durationMonths     Int?
+  credits            Int?
+  startMonths        Int[]              @default([])
+  /// Exact provider wording when the start is described without calendar
+  /// months, for example "Winter and summer semester". Never converted into
+  /// invented month numbers.
+  startNote          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  lastVerifiedAt     DateTime?          @db.Date
+  nextReviewAt       DateTime?          @db.Date
+  primarySourceId    String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  university    University           @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  primarySource SourceCitation       @relation("ProgramPrimarySource", fields: [primarySourceId], references: [id], onDelete: Restrict)
+  requirements  Requirement[]
+  tuitionFacts  TuitionFact[]
+  deadlineFacts DeadlineFact[]
+  costs         ProgramCost[]
+  intakes       ProgramIntake[]
+  scholarships  ProgramScholarship[]
+  studyNotes    StudyNote[]
+
+  @@unique([universityId, slug])
+  @@index([degreeLevel, field])
+  @@index([verificationStatus, nextReviewAt])
+}
+
+model Scholarship {
+  id                    String             @id @default(cuid())
+  slug                  String             @unique
+  name                  String
+  providerName          String
+  providerUrl           String
+  hostCountryCode       String?
+  fundingType           FundingType
+  degreeLevels          DegreeLevel[]
+  nationalityScope      EligibilityScope   @default(UNKNOWN)
+  eligibleNationalities String[]           @default([])
+  fieldScope            EligibilityScope   @default(UNKNOWN)
+  fields                String[]           @default([])
+  summary               String
+  verificationStatus    VerificationStatus @default(UNVERIFIED)
+  lastVerifiedAt        DateTime?          @db.Date
+  nextReviewAt          DateTime?          @db.Date
+  primarySourceId       String
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  primarySource SourceCitation        @relation("ScholarshipPrimarySource", fields: [primarySourceId], references: [id], onDelete: Restrict)
+  requirements  Requirement[]
+  deadlineFacts DeadlineFact[]
+  favorites     ScholarshipFavorite[]
+  programs      ProgramScholarship[]
+  studyNotes    StudyNote[]
+
+  @@index([hostCountryCode, verificationStatus])
+  @@index([fundingType, verificationStatus])
+  @@index([verificationStatus, nextReviewAt])
+}
+
+model UniversityFavorite {
+  id           String   @id @default(cuid())
+  userId       String
+  universityId String
+  createdAt    DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, universityId])
+  @@index([userId, createdAt])
+}
+
+model ScholarshipFavorite {
+  id            String   @id @default(cuid())
+  userId        String
+  scholarshipId String
+  createdAt     DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, scholarshipId])
+  @@index([userId, createdAt])
+}
+
+model Application {
+  id           String            @id @default(cuid())
+  userId       String
+  universityId String
+  status       ApplicationStatus @default(INTERESTED)
+  notes        String            @default("")
+  deadline     DateTime?         @db.Date
+  progress     Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  university   University               @relation(fields: [universityId], references: [id], onDelete: Restrict)
+  statusEvents ApplicationStatusEvent[]
+  documents    ApplicationDocument[]
+
+  @@unique([userId, universityId])
+  @@index([userId, status, updatedAt])
+  @@index([userId, deadline])
+}
+
+model ApplicationStatusEvent {
+  id            String             @id @default(cuid())
+  applicationId String
+  fromStatus    ApplicationStatus?
+  toStatus      ApplicationStatus
+  createdAt     DateTime           @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, createdAt])
+}
+
+model StudentDocument {
+  id         String                  @id @default(cuid())
+  userId     String
+  name       String
+  category   StudentDocumentCategory
+  storageKey String                  @unique
+  mimeType   String
+  sizeBytes  Int
+  isComplete Boolean                 @default(false)
+  createdAt  DateTime                @default(now())
+  updatedAt  DateTime                @updatedAt
+
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications ApplicationDocument[]
+
+  @@index([userId, category, createdAt])
+}
+
+model ApplicationDocument {
+  applicationId String
+  documentId    String
+  createdAt     DateTime @default(now())
+
+  application Application     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  document    StudentDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@id([applicationId, documentId])
+  @@index([documentId])
+}
+
+model NotificationPreference {
+  userId                   String   @id
+  deadlines                Boolean  @default(true)
+  applicationStatus        Boolean  @default(true)
+  missingDocuments         Boolean  @default(true)
+  scholarshipAnnouncements Boolean  @default(true)
+  updatedAt                DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudentNotification {
+  id        String                  @id @default(cuid())
+  userId    String
+  type      StudentNotificationType
+  title     String
+  body      String
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime                @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@index([userId, type, createdAt])
+}
+
+model Requirement {
+  id                 String             @id @default(cuid())
+  programId          String?
+  scholarshipId      String?
+  kind               RequirementKind
+  summary            String
+  verificationStatus VerificationStatus @default(VERIFIED)
+  sourceId           String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  program     Program?       @relation(fields: [programId], references: [id], onDelete: Cascade)
+  scholarship Scholarship?   @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+  source      SourceCitation @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@index([programId])
+  @@index([scholarshipId])
+}
+
+model TuitionFact {
+  id                 String             @id @default(cuid())
+  programId          String
+  /// Minor units of `currency` (for example 600000 for EUR 6,000).
+  amountMinor        Int
+  currency           String
+  period             String
+  /// Who the amount applies to, for example "International students from
+  /// third countries". Tuition frequently differs by nationality and campus,
+  /// so an amount without its group is not a publishable fact.
+  applicantGroup     String?
+  note               String?
+  verificationStatus VerificationStatus @default(VERIFIED)
+  sourceId           String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  program Program        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  source  SourceCitation @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@index([programId])
+}
+
+model ProgramCost {
+  id                 String             @id @default(cuid())
+  programId          String
+  kind               CostKind
+  /// Minor units of `currency`; period is explicit (for example "per month").
+  amountMinor        Int
+  currency           String
+  period             String
+  applicantGroup     String?
+  note               String?
+  verificationStatus VerificationStatus @default(VERIFIED)
+  sourceId           String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  program Program        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  source  SourceCitation @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@index([programId, kind])
+}
+
+model ProgramIntake {
+  id                 String             @id @default(cuid())
+  programId          String
+  term               IntakeTerm
+  note               String?
+  verificationStatus VerificationStatus @default(VERIFIED)
+  sourceId           String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  program Program        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  source  SourceCitation @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@unique([programId, term, sourceId])
+  @@index([programId, term])
+}
+
+model ProgramScholarship {
+  programId          String
+  scholarshipId      String
+  verificationStatus VerificationStatus @default(VERIFIED)
+  sourceId           String
+  createdAt          DateTime           @default(now())
+
+  program     Program        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  scholarship Scholarship    @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+  source      SourceCitation @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@id([programId, scholarshipId])
+  @@index([scholarshipId])
+}
+
+model DeadlineFact {
+  id                 String             @id @default(cuid())
+  programId          String?
+  scholarshipId      String?
+  cycle              String
+  applicantGroup     String?
+  opensOn            DateTime?          @db.Date
+  deadlineOn         DateTime?          @db.Date
+  /// Recurring month/day for pages that publish "1 February – 31 May" without
+  /// a year. Format: MM-DD. Never converted into an invented calendar date.
+  opensMonthDay      String?
+  deadlineMonthDay   String?
+  note               String?
+  verificationStatus VerificationStatus @default(VERIFIED)
+  sourceId           String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  program     Program?       @relation(fields: [programId], references: [id], onDelete: Cascade)
+  scholarship Scholarship?   @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+  source      SourceCitation @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  @@index([programId])
+  @@index([scholarshipId])
+  @@index([deadlineOn])
+}
+
+/// Append-only reviewer history. Kept separate from AuditEvent so the review
+/// queue and data-quality report can query decisions without parsing metadata.
+model CatalogReview {
+  id         String              @id @default(cuid())
+  entityType CatalogEntityType
+  entityId   String
+  decision   ReviewDecision
+  fromStatus VerificationStatus?
+  toStatus   VerificationStatus
+  note       String?
+  reviewerId String?
+  createdAt  DateTime            @default(now())
+
+  reviewer User? @relation("CatalogReviews", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([reviewerId, createdAt])
+  @@index([decision, createdAt])
+}
+
+/// Field-level provenance. One row per exposed fact per catalog entity. The
+/// status is the user-facing confidence for that value, not the review state of
+/// the whole record.
+model CatalogFieldFact {
+  id           String                  @id @default(cuid())
+  entityType   CatalogEntityType
+  entityId     String
+  fieldKey     String
+  label        String
+  /// Serialised display value; null is paired with INFORMATION_UNAVAILABLE.
+  value        String?                 @db.Text
+  status       FieldVerificationStatus
+  sourceId     String?
+  /// Kept as a convenience so a UI can cite a fact even before a citation row
+  /// is created; the source row remains authoritative when present.
+  sourceUrl    String?
+  sourceTitle  String?
+  verifiedAt   DateTime?               @db.Date
+  academicYear String?
+  intake       String?
+  currency     String?
+  unit         String?
+  note         String?                 @db.Text
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  source       SourceCitation? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  university   University?     @relation(fields: [universityId], references: [id])
+  universityId String?
+
+  @@unique([entityType, entityId, fieldKey])
+  @@index([entityType, status])
+  @@index([entityId])
+}
+
+/// A user's private four-way shortlist. The four-item maximum is enforced by
+/// the action layer as well as the UI.
+model UniversityComparison {
+  userId        String   @id
+  universityIds String[] @default([])
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudyNote {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  body          String   @db.Text
+  universityId  String?
+  programId     String?
+  scholarshipId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  university  University?  @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  program     Program?     @relation(fields: [programId], references: [id], onDelete: SetNull)
+  scholarship Scholarship? @relation(fields: [scholarshipId], references: [id], onDelete: SetNull)
+
+  @@index([userId, updatedAt])
+  @@index([universityId])
+}
+
+// ---------------------------------------------------------------------------
+// AI advisor
+// ---------------------------------------------------------------------------
+
+enum AdvisorMessageRole {
+  USER
+  ASSISTANT
+}
+
+enum AdvisorFeedback {
+  HELPFUL
+  UNHELPFUL
+}
+
+enum AdvisorRequestOutcome {
+  SUCCESS
+  PROVIDER_ERROR
+  TIMEOUT
+  RATE_LIMITED
+  BLOCKED
+}
+
+/// A private, user-owned advisor conversation. Messages cascade on delete so
+/// clearing history removes the content rather than hiding it.
+model AdvisorConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("New conversation")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AdvisorMessage[]
+  usage    AdvisorUsage[]
+
+  @@index([userId, updatedAt])
+}
+
+model AdvisorMessage {
+  id             String             @id @default(cuid())
+  conversationId String
+  role           AdvisorMessageRole
+  content        String             @db.Text
+  model          String?
+  /// Validated source URLs, titles, and verification dates returned by tools.
+  /// Never free-form model output.
+  citations      Json?
+  toolNames      String[]           @default([])
+  feedback       AdvisorFeedback?
+  feedbackAt     DateTime?
+  createdAt      DateTime           @default(now())
+
+  conversation AdvisorConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+/// Metadata-only usage ledger. Deliberately contains no prompt or response
+/// content so cost monitoring does not duplicate private conversations.
+model AdvisorUsage {
+  id                  String                @id @default(cuid())
+  userId              String
+  conversationId      String?
+  provider            String
+  model               String
+  promptTokens        Int                   @default(0)
+  completionTokens    Int                   @default(0)
+  totalTokens         Int                   @default(0)
+  estimatedCostMicros Int                   @default(0)
+  outcome             AdvisorRequestOutcome
+  createdAt           DateTime              @default(now())
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation AdvisorConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
