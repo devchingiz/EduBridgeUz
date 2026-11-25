@@ -1,5 +1,7 @@
 FROM node:22-bookworm-slim AS dependencies
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
 RUN npm ci
@@ -22,6 +24,8 @@ ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
 
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 1001 nextjs \
   && useradd --system --uid 1001 --gid nextjs nextjs
 COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
