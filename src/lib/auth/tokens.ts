@@ -9,6 +9,8 @@ export const TOKEN_TTL = {
   EMAIL_VERIFICATION: 24 * 60 * 60 * 1000,
   PASSWORD_RESET: 30 * 60 * 1000,
   GUARDIAN_CONSENT: 7 * 24 * 60 * 60 * 1000,
+  /** Short-lived, single-use second-factor challenge. */
+  MFA_CHALLENGE: 5 * 60 * 1000,
 } as const;
 
 export type IssuedToken = {

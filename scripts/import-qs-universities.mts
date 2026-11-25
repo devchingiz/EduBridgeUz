@@ -1,16 +1,19 @@
 /**
  * Imports the cached QS 2027 research dataset into EduBridge.
  *
- * This script makes NO network calls. It reads `data/qs-2027-universities.json`,
- * validates it, upserts source citations/universities/programs/field facts, and
- * writes `data/qs-2027-import-report.json`. Existing hand-verified universities
- * are never downgraded: their official values and VERIFIED status are kept, and
- * only genuinely new QS ranking facts are attached.
+ * This script makes NO network calls. By default it reads
+ * `data/qs-2027-universities.json` and writes `data/qs-2027-import-report.json`;
+ * both paths can be overridden with `--dataset=` and `--report=` for later
+ * batches. Existing hand-verified universities are never downgraded: their
+ * official values and VERIFIED status are kept, and only genuinely new QS
+ * ranking facts are attached.
  *
  * Run with `npm run db:import:qs` while the local database is running.
  */
 
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { PrismaClient } from "@prisma/client";
 
 import {
@@ -25,14 +28,16 @@ import {
 } from "../src/lib/catalog/qs-import-mapping.ts";
 
 const prisma = new PrismaClient();
-const DATASET_PATH = new URL(
-  "../data/qs-2027-universities.json",
-  import.meta.url,
-);
-const REPORT_PATH = new URL(
-  "../data/qs-2027-import-report.json",
-  import.meta.url,
-);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+function cliPath(flag: string, fallback: string): string {
+  const argument = process.argv.find((value) => value.startsWith(`--${flag}=`));
+  const value = argument ? argument.slice(flag.length + 3) : fallback;
+  return path.resolve(ROOT, value);
+}
+
+const DATASET_PATH = cliPath("dataset", "data/qs-2027-universities.json");
+const REPORT_PATH = cliPath("report", "data/qs-2027-import-report.json");
 const EXPECTED_COUNT = 500;
 const REVIEW_WINDOW_DAYS = 180;
 const IMPORT_NOTE =
@@ -797,6 +802,7 @@ async function main(): Promise<void> {
   }
 
   report.finishedAt = new Date().toISOString();
+  fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
   fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   console.log(JSON.stringify(report, null, 2));
 

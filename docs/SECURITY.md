@@ -6,7 +6,7 @@
 
 ### Catalog review authorization
 
-- The review workspace (`/dashboard/review`, `/dashboard/review/new`, `/dashboard/review/[entityType]/[id]`) requires `REVIEWER` or `ADMIN`. The page calls `requireRole` and every Server Action calls it again; a hidden link is never the boundary.
+- The review workspace (`/dashboard/review`, `/dashboard/review/new`, `/dashboard/review/[entityType]/[id]`) requires `REVIEWER`, `ADMIN`, or `SUPER_ADMIN`. The page calls `requireRole` and every Server Action calls it again; a hidden link is never the boundary.
 - Catalog writes are only reachable through staff Server Actions. Public catalog pages import read-only query functions and never a write service.
 - Every review action calls `assertSameOrigin()` in addition to the session and role check.
 - Reviewer pages and the staff overview set `robots: { index: false, follow: false }`.
@@ -19,7 +19,7 @@
 
 Auth, profile, and consent actions are rate-limited because they are reachable by anonymous or self-service users. Catalog review actions are not rate-limited in Milestone 3. The rationale:
 
-- They require an authenticated `REVIEWER` or `ADMIN` account; there is no public path to them.
+- They require an authenticated `REVIEWER`, `ADMIN`, or `SUPER_ADMIN` account; there is no public path to them.
 - Reviewer throughput is intentionally manual and low-volume; a fixed-window limit could block a legitimate bulk re-verification session.
 - Every write is attributable to a staff account and recorded in both `CatalogReview` and `AuditEvent`, which is a stronger control than throttling for this threat model.
 - If staff accounts become self-service or the reviewer pool grows, add a per-user write limit before that change ships. This is tracked as a follow-up, not silently accepted.
@@ -38,7 +38,7 @@ Auth, profile, and consent actions are rate-limited because they are reachable b
 - Passwords are hashed with **Argon2id** through `@node-rs/argon2` using the OWASP baseline: 19 MiB memory, 2 iterations, parallelism 1, 32-byte output. Parameters are stored in the hash string, so they can be raised later without invalidating existing passwords.
 - Minimum length is 12 characters; maximum is 128. The policy rejects a small local denylist of common passwords, highly repetitive passwords, and passwords containing the user's email local-part or name.
 - Failed logins verify a dummy hash when the account does not exist or has no password, keeping response timing closer to the success path.
-- A full breached-password check using the Have I Been Pwned k-anonymity range API is a documented launch gate, not a runtime dependency yet.
+- Registration, password reset, and password change also query the Have I Been Pwned k-anonymity range API. Only the first five characters of the SHA-1 digest are sent; the password and full digest never leave the process. Responses are parsed strictly, cached by prefix for 12 hours with a fixed 256-prefix bound, and requested with a 2.5-second timeout. Production fails closed: a network error, non-200 response, or oversized body rejects the password. Outside production the check is opt-in with `HIBP_ENABLED=true`.
 
 ### Registration and email verification
 
@@ -46,20 +46,31 @@ Auth, profile, and consent actions are rate-limited because they are reachable b
 - A verification email is sent immediately. The link contains a random 32-byte token; only its SHA-256 hash is stored.
 - Verification tokens expire after **24 hours** and are single-use. Issuing a new token invalidates older unused tokens for the same purpose.
 - The verification link renders a confirmation page. The token is consumed by a **POST Server Action**, not by opening the link, so email scanners and link previews cannot redeem it.
-- Email verification is optional and does not gate workspace access. Google sign-in accepts only Google identities with a verified email; email/password accounts may use optional verification links.
+- The confirmation page sends `Referrer-Policy: no-referrer`, removes the token from the current browser history entry with `history.replaceState`, and loads no third-party scripts or analytics. Tokens are never written to structured logs or included in user-facing errors.
+- Email verification gates workspace access. `getVerificationRequirement()` derives one fixed deadline from `EMAIL_VERIFICATION_ENFORCEMENT_START` plus a 30-day grace window; unverified accounts created after the start, or still unverified after the deadline, are redirected to `/verify-email`. A missing or malformed start value fails closed (verification required), and production readiness rejects an invalid value. Google sign-in accepts only Google identities with a verified email.
+- The dashboard shows a non-blocking verification banner derived directly from `User.emailVerifiedAt` on the server. It reuses the existing resend action and its rate limits, and successful verification invalidates the dashboard layout cache so the banner disappears without adding another verification flag.
 - Google OAuth uses a single-use, hashed server-side state record, an HttpOnly state cookie, PKCE, a ten-minute attempt expiry, and a server-to-server userinfo request. Only the Google subject is stored as the provider identifier; access tokens are not persisted.
 - New Google registrations require terms acceptance and a valid date of birth; the existing minimum-age and guardian-consent rules still apply.
 
 ### Login, sessions, and logout
 
-- Login responses are generic (`Invalid email or password.`) whether the email is unknown, deleted, or the password is wrong.
-- Application-level IP and email rate limits are intentionally disabled for email/password and Google sign-in, at the user's request, to avoid lockouts after repeated attempts. This leaves credential-stuffing and password-guessing attempts less constrained; production deployments should add edge/WAF protections and monitor failed sign-ins before public launch.
+- Login responses are generic (`Email or password is incorrect.` or the shared throttling message) whether the email is unknown, deleted, or the password is wrong.
+- Email/password sign-in is throttled by email and IP after failed credential checks. A non-consuming counter read stops further password guesses once a limit is reached, while a correct password still signs in during a lockout. Google sign-in uses single-use OAuth state, PKCE, and Google's verified email check instead of password counters.
 - Sessions use opaque 32-byte tokens. Only a SHA-256 hash is stored in `Session.tokenHash`.
 - Cookie: `edubridge_session`, `httpOnly`, `SameSite=Lax`, `Secure` in production, `Path=/`, `Priority=high`.
 - Idle expiry is **7 days** and slides while the user is active. The absolute cap is **30 days** from session creation, regardless of activity.
 - Session validation rejects revoked, expired, absolutely expired, and soft-deleted users. `lastUsedAt` is written at most once per hour.
 - Logout revokes the current session in the database and clears the cookie.
 - Account settings list active sessions and allow revoking one session or all other sessions.
+
+### Multi-factor authentication (MFA)
+
+- MFA is opt-in for every account in Account settings (`/dashboard/settings`). Enrollment generates a random 160-bit TOTP secret and eight recovery codes; the plaintext is returned once to the enrolling user and is never written to a URL, log, or the database. Only AES-256-GCM ciphertext of the secret and SHA-256 hashes of the recovery codes are persisted.
+- Enrollment is not active until a live six-digit code from the authenticator is confirmed. Re-enrollment is rejected while MFA is enabled, so a cross-site request cannot silently replace a second factor.
+- With MFA enabled, a correct password issues only a five-minute, single-use challenge stored as a SHA-256 hash in the existing `AuthToken` table. The raw challenge travels in an HttpOnly, `SameSite=Lax`, `Secure`-in-production cookie (`edubridge_mfa_challenge`) and never appears in a URL, referrer, or browser history. No session is created until `/mfa` verifies a TOTP or unused recovery code.
+- The challenge is consumed only after a valid factor; failed codes are audited and rate limited (IPv4/IPv6 address plus a hashed challenge identifier) but do not burn the challenge. Recovery codes are single-use and their use is audited. A recovery code may also disable MFA.
+- Disabling MFA requires a current TOTP or recovery code, then removes the secret and all recovery codes. Enrollment, confirmation, disablement, successful verification, failed verification, and recovery use all emit audit events.
+- `MFA_ENCRYPTION_KEY` (32+ characters) is required in production readiness. It is separate from `AUTH_SECRET` so rotating sessions does not invalidate enrolled secrets; losing or changing it without a migration plan locks enrolled accounts out. MFA mandatory enforcement is deliberately **not** enabled yet, and Google sign-in currently bypasses the password challenge — both must be resolved before MFA can be treated as a mandatory control.
 
 ### Password reset
 
@@ -70,18 +81,25 @@ Auth, profile, and consent actions are rate-limited because they are reachable b
 
 ### Rate limiting
 
-Limits for the actions below are database-backed fixed-window counters. Keys are `scope:HMAC-SHA256(identifier)` using `AUTH_SECRET`, so the table never stores raw emails, IPs, or user IDs. The counter update is one atomic upsert shared across server instances. If the database is unavailable, the limiter fails closed with a short retry interval and emits a redacted operational event. This does not apply to sign-in: email/password and Google sign-in currently have no application-level throttling.
+Limits for the actions below are database-backed fixed-window counters. Keys are `scope:HMAC-SHA256(identifier)` using `AUTH_SECRET`, so the table never stores raw emails, IPs, or user IDs. The counter update is one atomic upsert shared across server instances. If the database is unavailable, the limiter fails closed with a short retry interval and emits a redacted operational event.
 
-Registration counters are applied only after server-side validation and password-policy checks, so correcting a form error no longer consumes an attempt. Registration uses versioned scope names so stale counters from older, stricter limits cannot block a current sign-up, and the shared `unknown` IP sentinel is never used as a counter key. The same IP limit also applies when starting Google sign-up.
+Sign-in checks counters before verifying a password, but only writes a counter after a failed credential check. Successful sign-ins and malformed form submissions do not consume attempts. This avoids both easy account lockouts and expensive hash verification after a limit is reached. Edge/WAF protections and failed-login monitoring are still recommended before public launch.
+
+Registration counters are applied only after server-side validation and password-policy checks, so correcting a form error no longer consumes an attempt. Registration uses versioned scope names so stale counters from older, stricter limits cannot block a current sign-up. The same IP limit also applies when starting Google sign-up.
+
+IP-derived limits use only syntactically valid IPv4/IPv6 values. Missing, whitespace-only, `"unknown"`, and malformed addresses are treated as unavailable: the IP counter is skipped, but email and reset-token counters still apply. Forwarded headers are best-effort; application code cannot prove they were set by a trusted proxy, so the ingress must overwrite client-supplied forwarded headers as described in `docs/DEPLOYMENT.md`.
 
 | Action              | Identifier          | Limit | Window     |
 | ------------------- | ------------------- | ----- | ---------- |
+| Sign-in             | IP (when available) | 30    | 15 minutes |
+| Sign-in             | Email               | 10    | 15 minutes |
 | Registration        | IP (when available) | 20    | 15 minutes |
 | Registration        | Email               | 10    | 15 minutes |
-| Forgot password     | IP                  | 10    | 1 hour     |
+| Forgot password     | IP (when available) | 10    | 1 hour     |
 | Forgot password     | Email               | 5     | 1 hour     |
-| Reset password      | IP                  | 10    | 1 hour     |
-| Resend verification | IP                  | 10    | 1 hour     |
+| Reset password      | IP (when available) | 10    | 1 hour     |
+| Reset password      | Token (hashed)      | 5     | 1 hour     |
+| Resend verification | IP (when available) | 10    | 1 hour     |
 | Resend verification | User                | 5     | 1 hour     |
 | Guardian decision   | IP                  | 20    | 1 hour     |
 | Profile update      | User                | 30    | 1 hour     |
@@ -90,19 +108,20 @@ Registration counters are applied only after server-side validation and password
 
 ### Authorization and RBAC
 
-- Roles are `STUDENT`, `REVIEWER`, and `ADMIN`, stored server-side. Roles are never accepted from the client.
+- Roles are `STUDENT`, `REVIEWER`, `ADMIN`, `SUPER_ADMIN`, `CONTENT_MANAGER`, `UNIVERSITY_MANAGER`, `SCHOLARSHIP_MANAGER`, and `SUPPORT_MANAGER`, stored server-side in PostgreSQL. Roles are never accepted from the client or trusted from a session DTO.
 - `requireUser()` validates the session against the database on every protected page and action.
-- `requireRole([...])` protects staff surfaces. `/dashboard/admin` is limited to reviewers and administrators; `/dashboard/admin/users` and role/session mutations are administrator-only.
-- The first administrator can be bootstrapped with the server-only `BOOTSTRAP_ADMIN_EMAILS` environment variable. A listed email is promoted on successful registration or sign-in, the grant is audited, and the value is never exposed to the browser. It is a deployment/operator control, not a self-service role selector; remove the value before demoting that account through the panel.
-- Role changes re-read the actor's role from the database, reject self-demotion and removal of the last administrator, and write append-only audit events. Reviewer sessions are not sufficient to grant roles.
+- The administration panel is a separate `/admin` surface. `requireAdminPermission(capability)` re-reads the account's role, `emailVerifiedAt`, `deletedAt`, and explicit `AdminPermissionGrant` rows on every request. Unverified emails, deleted accounts, and non-admin roles are rejected with a redirect to `/admin-access-denied`.
+- Every admin page and Server Action names the capability it needs (`ADMIN_ACCESS`, `USERS_READ`, `UNIVERSITIES_MANAGE`, and so on). Hidden navigation is never the boundary. Role defaults are declared in `src/lib/admin/permissions.ts`; grants can add capabilities but can never grant Super Admin role management to another account.
+- The first Super Admin can be bootstrapped with the server-only `BOOTSTRAP_ADMIN_EMAILS` environment variable. A listed account is promoted only after its email is verified and it signs in successfully; the grant is audited and the value is never exposed to the browser. Production readiness rejects placeholder addresses in this list. It is a deployment/operator control, not a self-service role selector; remove the value before demoting that account through the panel.
+- Only a Super Admin can create or promote administrators and grant or revoke individual capabilities. Services re-read the actor from the database, reject self-changes, reject granting admin roles to unverified accounts, and protect the last administrator and last Super Admin. All changes write append-only audit events.
 - `requireWorkspace()` additionally requires recorded guardian consent for minors before private workspace access and writes.
-- Layouts are not a security boundary. Each page and Server Action re-checks; `src/proxy.ts` only redirects requests with no session cookie and is documented as a UX optimisation.
+- Layouts are not a security boundary. Each page and Server Action re-checks; `src/proxy.ts` only redirects requests with no session cookie on `/dashboard/*` and `/admin/*` and is documented as a UX optimisation.
 
 ### CSRF and request origin
 
 - Session cookies are `SameSite=Lax`.
-- Every Server Action calls `assertSameOrigin()`, which compares the `Origin` header host with `X-Forwarded-Host`/`Host` and rejects mismatches.
-- Next.js also checks the Origin header for Server Actions. Both checks are defence in depth.
+- Every Server Action and cookie-authenticated Route Handler calls `assertSameOrigin()`. It compares the `Origin` host against the configured public app origin and the browser-controlled `Host` header. `X-Forwarded-Host` is deliberately not trusted, because a client can set it when the ingress forwards headers unchanged. A configured HTTPS origin also rejects HTTP `Origin` values.
+- Next.js also checks the Origin header for Server Actions. Both checks are defence in depth. Forwarded-IP and forwarded-host headers still require ingress sanitisation as documented in `docs/DEPLOYMENT.md`; application-side syntax validation cannot prove their authenticity.
 
 ## Implemented in Milestone 4 — student workspace
 
@@ -131,7 +150,7 @@ Registration counters are applied only after server-side validation and password
 
 - Minimum age is **13**. The date of birth is validated on the server and used only for age rules.
 - Students under 18 must provide a guardian name and a different email address at registration.
-- A single-use guardian token (7-day expiry) is emailed to the guardian. The guardian page explains what is stored and offers approve/decline actions.
+- A single-use guardian token (7-day expiry) is emailed to the guardian. The guardian page explains what is stored and offers approve/decline actions. The token lives in the path, but the route sends `Referrer-Policy: no-referrer` and the client replaces the token with a non-secret path in the address bar and current history entry after the hidden form field has captured it. Tokens are never logged or stored in plaintext.
 - Approval records `guardianConsentAt`, `guardianConsentVersion`, and a `ConsentRecord` with the policy version. The workspace unlocks on the next request.
 - Decline is recorded as an audit event. The workspace stays locked.
 - Consent links are consumed by POST, not by opening the link.
@@ -140,7 +159,8 @@ Registration counters are applied only after server-side validation and password
 ### Account deletion
 
 - Deletion requires the current password and typing `DELETE`.
-- Private objects are removed before the database transaction. If cleanup fails, the operation stops and database metadata remains; after object cleanup succeeds, sessions are revoked, related rows are removed, and the user row is anonymised.
+- Private objects are removed before the database transaction. If cleanup fails, the operation stops and database metadata remains; after object cleanup succeeds, a single transaction revokes sessions and deletes all user-owned rows: tokens, MFA recovery codes, Google account links, consent records, favourites, applications (with their status events and document links), documents, notifications, preferences, profile, comparison, study notes, advisor usage, advisor conversations and their messages, and this user's admin permission grants. Grants this administrator gave to other users survive with `grantedById` detached, so deletion cannot silently remove someone else's access.
+- The retained `User` row is anonymised (opaque email in `.invalid`, generic name, no password hash, date of birth, verification timestamp, TOTP secret, or MFA enablement) and reset to `STUDENT`, so a deleted administrator cannot retain privileges. Append-only audit and catalog-review history are retained with opaque IDs; the catalog decisions remain attributable to an anonymised record rather than being rewritten.
 - An audit event records the deletion without personal identifiers.
 - A scheduled hard delete and export path remain planned for a future privacy milestone.
 
@@ -155,12 +175,13 @@ Registration counters are applied only after server-side validation and password
 
 - Development uses the `console` transport, which writes JSON messages to `.data/mail/` (git-ignored).
 - Production requires SMTP; `EMAIL_TRANSPORT=console` throws at request time in production so verification and reset mail cannot be silently dropped.
-- Email delivery failures do not roll back a correctly created account or password change.
+- SMTP sends use bounded exponential retries for transient failures and reuse the same prepared message, so retries never generate a new verification or reset token. Permanent errors and failures after the SMTP body phase are not retried to avoid duplicate delivery.
+- Retry and final failure events are structured and contain only safe metadata such as the message tag, attempt, delay, and error code. Email delivery failures do not roll back a correctly created account or password change.
 
 ### Account enumeration trade-off
 
 - **Login** and **password reset** return generic responses and are timing-equalised, so they do not reveal whether an email is registered.
-- **Registration** returns an explicit `email_taken` response and sends an "account already exists" email to the address. This is a deliberate usability trade-off: a student who forgot they registered should be told to sign in or reset their password rather than being silently dropped. The response still does not disclose any account details.
+- **Registration** sends an "account already exists" email with sign-in and password-reset links, then returns the same redirect as a successful registration. Recovery instructions are delivered by email rather than in the response, so the public response, status code, and redirect target do not disclose whether the address was registered.
 - **Guardian consent resend** reveals only the guardian address already stored on the signed-in student's own profile.
 
 ## Implemented in Milestone 1
@@ -171,6 +192,7 @@ Registration counters are applied only after server-side validation and password
   - `Referrer-Policy: strict-origin-when-cross-origin`
   - `Permissions-Policy` disables camera, microphone, geolocation, and browsing topics
   - `Strict-Transport-Security` in production
+  - An enforcing `Content-Security-Policy` (see "Known gaps to close before launch" for its current limitations)
 - `poweredByHeader: false`.
 - No secrets in the repository. `.env*` is ignored; `.env.example` contains placeholders only.
 - External links use `rel="noopener noreferrer"` and open in a new tab.
@@ -179,12 +201,12 @@ Registration counters are applied only after server-side validation and password
 
 ## Known gaps to close before launch
 
-- A Content-Security-Policy is not set yet. Next.js inline scripts and the current styling pipeline need a nonce/hash strategy; add it in the hardening milestone with report-only rollout.
-- Breached-password checking (HIBP k-anonymity) is not called at runtime.
-- MFA (TOTP, then passkeys) is not implemented. It should ship for administrators and reviewers first.
+- An enforcing Content-Security-Policy is now sent on every response. It blocks plugins, base-tag hijacking, framing, and unexpected cross-origin connections, but `script-src`/`style-src` still include `'unsafe-inline'` because Next.js injects inline runtime code and the catalog pages embed inline JSON-LD data blocks. A strict nonce-based policy remains open: it would require forcing every page to dynamic rendering and threading a per-request nonce into those data blocks. No CSP report collector is configured, so no report-only rollout telemetry is available yet.
+- Breached-password checking requires outbound HTTPS access to `api.pwnedpasswords.com`; production blocks password changes if that egress is unavailable. Confirm the provider's acceptable-use terms and monitoring before launch.
+- MFA is opt-in and its challenge path is tested, but mandatory enforcement is not enabled and the Google sign-in path does not yet require a second factor. Administrators and reviewers should enroll first; mandatory enforcement and provider sign-in coverage remain deployment policy decisions. Passkeys are not implemented.
 - Email address change is not implemented yet. When it is, it must require re-authentication and re-verification of both addresses.
-- No automated dependency or secret scanning in CI yet.
-- No security contact or disclosure policy is published yet.
+- CI now runs dependency, secret, SAST, and container scans, but branch protection, repository-host scanner settings, and a managed-provider restore drill remain external requirements (see `docs/DEPLOYMENT.md`).
+- Security and privacy contacts are published at `/security` from `SECURITY_CONTACT_EMAIL` and `PRIVACY_CONTACT_EMAIL`; the operator must verify the mailboxes are monitored and approve response targets and safe-harbour terms.
 - Production PostgreSQL was not available in this environment. Migrations and queries were verified against PGlite; a managed PostgreSQL verification remains a deployment step.
 - Rate-limit counters are fixed-window, so a small burst at a window boundary is possible. This is acceptable for authentication throttling and is documented above.
 
@@ -201,7 +223,7 @@ Registration counters are applied only after server-side validation and password
 - Every service function takes the authenticated actor and enforces ownership or role. Route handlers and pages do not rely on middleware alone.
 - Students can only read and mutate their own profile, sessions, applications, documents, notifications, and preferences.
 - Reviewers can import, edit, and review catalog records and sources, but must not read student documents or conversations.
-- Admins can manage roles and revoke sessions in `/dashboard/admin/users`, with every change written to an append-only audit log. Break-glass access to student data requires a documented reason and is audited.
+- Super Admins manage roles and capability grants in `/admin/access`; administrators can search accounts and revoke sessions in `/admin/users`. Every change is written to an append-only audit log. Passwords, password hashes, and authentication tokens are never displayed. Break-glass access to student data requires a documented reason and is audited.
 - Unauthorized resource access returns `404` to avoid existence leaks.
 
 ## Input, output, and injection
@@ -218,7 +240,7 @@ Registration counters are applied only after server-side validation and password
 - Files are stored outside the web root under private `quarantine/` and `documents/` prefixes using opaque server-generated keys; type/signature checks and a 5 MiB limit are enforced before storage.
 - Clean uploads are scanned before promotion; scanner errors never permit an upload. Download is proxied through the authenticated owner-checked route, never through an object URL.
 - S3-compatible storage requests use encryption and do not set public ACLs. The provider must enforce bucket privacy, TLS, least privilege, lifecycle retention, and audit logging as described above.
-- Backup/restore commands are implemented, but a production provider and recovery drill remain required before launch. Image metadata stripping and automated orphan-object cleanup remain follow-up controls.
+- Backup/restore commands are implemented. Restore requires explicit confirmation, a named recovery database whose normalised URL differs from the production database, a different empty destination bucket, manifest/UUID validation, dump checksum verification, and object hash verification. Two hostnames could still point to the same database, so provider-side IAM/network separation is required; a production provider and recovery drill remain required before launch. Image metadata stripping and automated orphan-object cleanup remain follow-up controls.
 - See [FILE-OPERATIONS.md](FILE-OPERATIONS.md) for provider setup, scheduler configuration, retention, scanner configuration, and the isolated-target restore procedure.
 - Staff have no route or service to browse student files. Support access remains prohibited without a documented consent/legal process.
 
@@ -241,16 +263,17 @@ Registration counters are applied only after server-side validation and password
 - No public student profiles, leaderboards, or social features.
 - No behavioural advertising or sale of personal data. Analytics, if added, are privacy-preserving and documented.
 - Data minimization for AI: send a bounded profile/workspace summary needed for planning, never file contents or another student's data; full history is limited by `AI_MAX_CONTEXT_MESSAGES`.
-- Deletion and export rights apply to minors and guardians.
-- The privacy notice must be reviewed for GDPR, UK GDPR, and applicable Uzbek data-protection requirements before launch. Legal review is an explicit launch gate.
+- Deletion rights apply to minors and guardians through the in-app flow. A self-service export path is not implemented yet; the published privacy contact handles access requests.
+- `/privacy` and `/terms` now describe the implemented account, document, MFA, HIBP, guardian-consent, backup, and AI-advisor behaviour instead of claiming accounts do not exist. Provider retention, transfer mechanisms, and final liability/governing-law terms are explicitly marked as operator decisions.
+- The privacy notice and terms must still be reviewed for GDPR, UK GDPR, and applicable Uzbek data-protection requirements before launch. Legal review is an explicit launch gate; updating the pages is not a substitute for that review.
 
 ## Logging and monitoring
 
 - Structured JSON logs use allowlisted fields and omit error messages, passwords, tokens, session cookies, document contents, AI prompts/answers containing personal data, user identifiers, and full IP addresses. Advisor events include only provider, model, outcome, latency, tool count, token counts, and estimated cost.
 - IP addresses are hashed with `AUTH_SECRET` where abuse prevention requires them.
 - Audit events record actor, action, entity, timestamp, and redacted metadata.
-- Next.js request-error hooks and OpenTelemetry request spans are implemented. Configure the external collector/backend to retain traces and logs and alert on 5xx responses, auth failures, rate-limit storage failures, file-processing failures, readiness failures, and missed backups; alert routing is platform-specific.
-- Backups are encrypted, access-controlled, and restore-tested. Define RPO/RTO before production.
+- Next.js request-error hooks and OpenTelemetry request spans are implemented. Header-derived span attributes are disabled and a processor strips query strings, fragments, token/credential keys, and exception details before export, so emailed links cannot leak through traces. Configure the external collector/backend to retain traces and logs and alert on 5xx responses, auth failures, rate-limit storage failures, file-processing failures, readiness failures, and missed backups; alert routing is platform-specific.
+- Backup scripts write versioned artifacts to the private backup bucket, but a managed-provider restore drill has not been performed in this environment. Define RPO/RTO and complete the drill before production.
 
 ## Secrets and environments
 
@@ -258,8 +281,9 @@ Registration counters are applied only after server-side validation and password
 - `NEXT_PUBLIC_*` values are public by definition; no secret may use that prefix.
 - `AUTH_SECRET` must be at least 32 characters. Rotating it invalidates HMAC-based rate-limit keys and signs users out only if it is also used for session hashing; sessions use unkeyed SHA-256 of high-entropy tokens.
 - Separate development, preview, and production credentials. Rotate after any suspected exposure.
-- CI runs typecheck, lint, unit/integration tests, formatting, production build, container build, and a high-severity dependency audit. Secret scanning and branch-protection enforcement remain repository-host configuration tasks.
-- The lockfile pins patched transitive `deepmerge-ts` and `minimatch` releases to address the current Prisma-config and ESLint-tree advisories; `npm audit` is run without severity filtering in CI.
+- `.github/workflows/ci.yml` and `.github/workflows/codeql.yml` run typecheck, lint, unit/integration tests, formatting, production build, container build, high-severity `npm audit` for both the full and production-only trees, Gitleaks secret scanning, CodeQL SAST, dependency review on pull requests, and a Trivy container scan with SARIF upload. `.github/dependabot.yml` proposes weekly npm and GitHub Actions updates. All action references are pinned to commit SHAs.
+- Branch protection, a required-check policy, Dependabot enablement for private repositories, `GITLEAKS_LICENSE` for organisation repositories, Advanced Security features for dependency review/SARIF on private repositories, and a policy for unfixed Trivy findings are repository-host tasks listed in `docs/DEPLOYMENT.md`.
+- `package.json` overrides the transitive `effect` dependency to `3.22.1` because no same-line Prisma release fixes the advisory; `npm audit --audit-level=high` and `npm audit --omit=dev --audit-level=high` both report zero vulnerabilities.
 
 ## Incident response
 
@@ -272,11 +296,12 @@ Registration counters are applied only after server-side validation and password
 ## Security checklist
 
 - [x] Argon2id password hashing with a documented baseline
-- [x] Auth rate limits for registration, reset, resend, guardian decisions, profile writes, password changes, and deletion
-- [ ] Sign-in rate limiting or equivalent edge protection (intentionally disabled; production risk documented above)
+- [x] Auth rate limits for sign-in, registration, reset, resend, guardian decisions, profile writes, password changes, and deletion
+- [x] Sign-in throttling with generic denial messages and no permanent account lockout
 - [x] Session hashing, idle and absolute expiry, revocation
 - [x] Single-use hashed tokens with per-purpose expiry
 - [x] Server-side session and role checks on every protected page and action
+- [x] Database-backed admin capabilities with verified-email gating, grant/revoke controls, and Super Admin-only privilege changes
 - [x] Reviewer-only catalog writes with same-origin checks on every action
 - [x] Same-origin checks on mutations
 - [x] Guardian consent flow tested end to end
@@ -285,15 +310,18 @@ Registration counters are applied only after server-side validation and password
 - [x] Ownership tests for profile and session operations
 - [x] Audit events for security-relevant actions
 - [x] Account deletion with PII scrubbing
-- [ ] Breached-password check at registration and reset
-- [ ] MFA for staff and opt-in for students
+- [x] Breached-password check at registration, reset, and password change with bounded timeout/cache and fail-closed production behaviour
+- [x] Opt-in TOTP MFA with single-use recovery codes, encrypted secrets, hashed challenges, rate limits, and audit events
+- [ ] Mandatory MFA enforcement for staff and coverage on the Google sign-in path
 - [ ] Email change with dual verification
-- [ ] CSP with nonces and report-only rollout
+- [x] Enforcing baseline Content-Security-Policy on every response
+- [ ] Strict nonce-based CSP with a report-only rollout and violation collector
 - [x] Private S3-compatible object operations, fail-closed malware scanning/quarantine, and authenticated owner-checked downloads
 - [x] Advisor tool-scoping, ownership, timeout, and source-allowlisting tests
 - [x] Server-side delimiting of student context and tool output; client link revalidation
 - [ ] Dedicated adversarial prompt-injection evaluation set and live-provider red team
 - [x] High-severity dependency audit and application checks in CI
-- [ ] Secret scanning and required branch-protection rules
+- [x] Secret scanning and static analysis in CI
+- [ ] Required branch-protection rules (repository host configuration)
 - [ ] Backup restore drill on managed PostgreSQL and the production object-storage provider
-- [ ] Published security contact and disclosure policy
+- [x] Published security contact and disclosure policy from validated configuration

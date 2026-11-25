@@ -57,7 +57,7 @@ export default async function ReviewPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requireRole(["REVIEWER", "ADMIN"]);
+  await requireRole(["REVIEWER", "ADMIN", "SUPER_ADMIN"]);
   const params = await searchParams;
   const [queue, quality, records] = await Promise.all([
     getReviewQueue(),

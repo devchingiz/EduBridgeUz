@@ -4,19 +4,15 @@ import type { Prisma, Role } from "@prisma/client";
 
 import { db } from "@/lib/db";
 import { recordAuditEvent } from "@/lib/auth/audit";
+import {
+  ADMIN_ROLES,
+  ASSIGNABLE_ROLES,
+  hasRolePermission,
+  isAdminRole,
+  isSuperAdmin,
+} from "@/lib/admin/permissions";
 
-/**
- * Administrator-only user management. Every function receives an actor ID and
- * re-reads that actor's role from the database, so a stale session DTO cannot
- * authorise a privilege change. Client callers only ever receive the small DTOs
- * declared here, never raw Prisma records.
- */
-
-export const ASSIGNABLE_ROLES: readonly Role[] = [
-  "STUDENT",
-  "REVIEWER",
-  "ADMIN",
-];
+export { ASSIGNABLE_ROLES };
 
 const PAGE_SIZE = 20;
 
@@ -33,6 +29,7 @@ export type AdminUser = {
 export type ListAdminUsersInput = {
   query?: string;
   role?: Role | null;
+  roles?: readonly Role[];
   page?: number;
 };
 
@@ -49,16 +46,28 @@ export type RoleChangeResult =
   | {
       ok: false;
       reason:
-        "forbidden" | "not_found" | "self" | "last_admin" | "invalid_role";
+        | "forbidden"
+        | "not_found"
+        | "self"
+        | "last_admin"
+        | "last_super_admin"
+        | "invalid_role"
+        | "email_unverified";
     };
 
 export type RevokeSessionsResult =
   | { ok: true; count: number }
   | { ok: false; reason: "forbidden" | "not_found" | "self" };
 
+/**
+ * Administrator-only user management. Every function re-reads the actor from
+ * the database, so a stale session DTO cannot authorize a privilege change.
+ * Only a Super Admin may assign or change administration roles.
+ */
 export async function listAdminUsers({
   query = "",
   role = null,
+  roles,
   page = 1,
 }: ListAdminUsersInput = {}): Promise<ListAdminUsersResult> {
   const search = query.trim().slice(0, 100);
@@ -66,6 +75,7 @@ export async function listAdminUsers({
   const where: Prisma.UserWhereInput = {
     deletedAt: null,
     ...(role ? { role } : {}),
+    ...(!role && roles?.length ? { role: { in: [...roles] } } : {}),
     ...(search
       ? {
           OR: [
@@ -143,11 +153,11 @@ export async function changeUserRole({
     }),
     db.user.findUnique({
       where: { id: userId },
-      select: { role: true, deletedAt: true },
+      select: { role: true, deletedAt: true, emailVerifiedAt: true },
     }),
   ]);
 
-  if (!actor || actor.deletedAt || actor.role !== "ADMIN") {
+  if (!actor || actor.deletedAt || !isSuperAdmin(actor.role)) {
     return { ok: false, reason: "forbidden" };
   }
   if (!target || target.deletedAt) return { ok: false, reason: "not_found" };
@@ -155,12 +165,24 @@ export async function changeUserRole({
   if (target.role === role) {
     return { ok: true, previousRole: target.role, changed: false };
   }
+  if (isAdminRole(role) && !target.emailVerifiedAt) {
+    return { ok: false, reason: "email_unverified" };
+  }
 
-  if (target.role === "ADMIN" && role !== "ADMIN") {
+  if (isAdminRole(target.role) && !isAdminRole(role)) {
     const adminCount = await db.user.count({
-      where: { role: "ADMIN", deletedAt: null },
+      where: { role: { in: [...ADMIN_ROLES] }, deletedAt: null },
     });
     if (adminCount <= 1) return { ok: false, reason: "last_admin" };
+  }
+
+  if (target.role === "SUPER_ADMIN" && role !== "SUPER_ADMIN") {
+    const superAdminCount = await db.user.count({
+      where: { role: "SUPER_ADMIN", deletedAt: null },
+    });
+    if (superAdminCount <= 1) {
+      return { ok: false, reason: "last_super_admin" };
+    }
   }
 
   await db.user.update({ where: { id: userId }, data: { role } });
@@ -196,7 +218,12 @@ export async function revokeUserSessions({
     }),
   ]);
 
-  if (!actor || actor.deletedAt || actor.role !== "ADMIN") {
+  if (
+    !actor ||
+    actor.deletedAt ||
+    !isAdminRole(actor.role) ||
+    !hasRolePermission(actor.role, "USERS_MANAGE")
+  ) {
     return { ok: false, reason: "forbidden" };
   }
   if (!target || target.deletedAt) return { ok: false, reason: "not_found" };

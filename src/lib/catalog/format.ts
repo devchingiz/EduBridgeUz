@@ -180,3 +180,150 @@ export function formatCheckedOn(verifiedAt: string | null): string {
   }).format(new Date(`${verifiedAt}T00:00:00Z`));
   return `Checked ${formatted}`;
 }
+
+const HTML_ENTITIES: Record<string, string> = {
+  amp: "&",
+  apos: "'",
+  quot: '"',
+  lt: "<",
+  gt: ">",
+  nbsp: " ",
+  ndash: "–",
+  mdash: "—",
+  hellip: "…",
+  laquo: "«",
+  raquo: "»",
+  lsquo: "‘",
+  rsquo: "’",
+  ldquo: "“",
+  rdquo: "”",
+  copy: "©",
+  reg: "®",
+  trade: "™",
+  deg: "°",
+};
+
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&#(x[\da-f]+|\d+);/gi, (match, encoded: string) => {
+      const codePoint =
+        encoded[0]?.toLowerCase() === "x"
+          ? Number.parseInt(encoded.slice(1), 16)
+          : Number.parseInt(encoded, 10);
+      if (
+        !Number.isFinite(codePoint) ||
+        codePoint < 0 ||
+        codePoint > 0x10ffff
+      ) {
+        return match;
+      }
+      try {
+        return String.fromCodePoint(codePoint);
+      } catch {
+        return match;
+      }
+    })
+    .replace(/&([a-z][a-z0-9]+);/gi, (match, name: string) => {
+      return HTML_ENTITIES[name.toLowerCase()] ?? match;
+    });
+}
+
+/** Removes markup without a DOM so the helper also works in Server Components. */
+function stripHtml(value: string): string {
+  let output = "";
+  let index = 0;
+  let skipUntil: string | null = null;
+  const lower = value.toLowerCase();
+
+  while (index < value.length) {
+    if (skipUntil) {
+      const skipIndex = lower.indexOf(skipUntil, index);
+      if (skipIndex === -1) break;
+      const closeEnd = value.indexOf(">", skipIndex);
+      index = closeEnd === -1 ? skipIndex + skipUntil.length : closeEnd + 1;
+      output += " ";
+      continue;
+    }
+
+    if (value.startsWith("<!--", index)) {
+      const commentEnd = value.indexOf("-->", index);
+      index = commentEnd === -1 ? value.length : commentEnd + 3;
+      output += " ";
+      continue;
+    }
+
+    if (value[index] !== "<" || !/[a-z!/]/i.test(value[index + 1] ?? "")) {
+      output += value[index];
+      index += 1;
+      continue;
+    }
+
+    const tagStart = index;
+    let quote: '"' | "'" | null = null;
+    let tagName = "";
+    let tagNameDone = false;
+    let lastSignificant = "";
+    let closed = false;
+    index += 1;
+
+    while (index < value.length) {
+      const char = value[index];
+      if (quote) {
+        if (char === quote) quote = null;
+        index += 1;
+        continue;
+      }
+      if (char === '"' || char === "'") {
+        quote = char;
+        index += 1;
+        continue;
+      }
+      if (char === ">") {
+        index += 1;
+        closed = true;
+        break;
+      }
+      if (!tagNameDone && /[a-z]/i.test(char)) {
+        tagName += char.toLowerCase();
+      } else if (tagName && /\s/.test(char)) {
+        tagNameDone = true;
+      }
+      if (!/\s/.test(char)) lastSignificant = char;
+      index += 1;
+    }
+
+    // QS snippets can end mid-tag. A dangling tag fragment is still markup;
+    // a bare "<" (for example "fewer than < 3 km") is ordinary content.
+    if (!closed) {
+      const fragment = value.slice(tagStart);
+      output += /^<\/?[a-z][a-z0-9-]*(?=[\s/>]|$)/i.test(fragment)
+        ? " "
+        : fragment;
+      break;
+    }
+
+    output += " ";
+    const name = tagName.replace(/^\//, "");
+    if (
+      !tagName.startsWith("/") &&
+      (name === "script" || name === "style") &&
+      lastSignificant !== "/"
+    ) {
+      skipUntil = `</${name}`;
+    }
+  }
+
+  return output;
+}
+
+/**
+ * QS pastes rich-text into its index. This strips that markup at render time so
+ * stored source records and their provenance remain untouched.
+ */
+export function plainText(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const cleaned = decodeHtmlEntities(stripHtml(value))
+    .replace(/\s+/g, " ")
+    .trim();
+  return cleaned || null;
+}

@@ -268,6 +268,7 @@ export type UniversityDiscoveryCard = {
   institutionType: string | null;
   logoUrl: string | null;
   rankingDisplay: string | null;
+  featured: boolean;
   status: string;
   lastVerifiedAt: string | null;
   tuitionAmountMinor: number | null;
@@ -367,7 +368,7 @@ export async function listUniversityDiscovery(
   const rows = await db.university.findMany({
     where,
     include: discoveryListInclude,
-    orderBy: { name: "asc" },
+    orderBy: [{ featured: "desc" }, { name: "asc" }],
     ...(filters.sort === "name"
       ? {
           skip: (page - 1) * DISCOVERY_PAGE_SIZE,
@@ -391,6 +392,7 @@ export async function listUniversityDiscovery(
         institutionType: row.institutionType,
         logoUrl: row.logoUrl,
         rankingDisplay: row.rankingDisplay,
+        featured: row.featured,
         status: row.verificationStatus,
         lastVerifiedAt: row.lastVerifiedAt?.toISOString().slice(0, 10) ?? null,
         tuitionAmountMinor: tuition?.amountMinor ?? null,
@@ -414,6 +416,7 @@ export async function listUniversityDiscovery(
     sortedItems.sort((left, right) => {
       const a = left.item;
       const b = right.item;
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
       if (a.tuitionAmountMinor === null)
         return b.tuitionAmountMinor === null ? 0 : 1;
       if (b.tuitionAmountMinor === null) return -1;
@@ -425,6 +428,7 @@ export async function listUniversityDiscovery(
   } else if (filters.sort === "deadline") {
     sortedItems.sort((a, b) => {
       return (
+        Number(b.item.featured) - Number(a.item.featured) ||
         a.sortDeadline - b.sortDeadline ||
         a.item.name.localeCompare(b.item.name)
       );
@@ -531,6 +535,7 @@ export type UniversityDiscoveryDetail = {
       slug: string;
       name: string;
       summary: string;
+      featured: boolean;
       source: ReturnType<typeof citation>;
       linkSource: ReturnType<typeof citation>;
     }>;
@@ -629,6 +634,7 @@ export async function getUniversityDiscoveryDetail(
         slug: link.scholarship.slug,
         name: link.scholarship.name,
         summary: link.scholarship.summary,
+        featured: link.scholarship.featured,
         source: citation(link.scholarship.primarySource),
         linkSource: citation(link.source),
       })),

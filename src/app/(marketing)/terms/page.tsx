@@ -8,23 +8,31 @@ import {
 
 export const metadata: Metadata = {
   title: "Terms of use",
-  description:
-    "Terms for using the EduBridge pre-launch preview and future platform.",
+  description: "Terms for using the EduBridge application and catalog.",
 };
 
 export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of use"
-      description="These terms govern the EduBridge pre-launch preview. They will be replaced by complete platform terms before accounts and paid services open."
-      updated="12 November 2026"
+      description="These terms govern use of the EduBridge application, including accounts, private workspace features, and the source-linked catalog."
+      updated="24 November 2026"
     >
-      <LegalSection title="1. Preview scope">
+      <div className="rounded-xl border border-amber-600/20 bg-amber-50/60 p-4 text-[13px] leading-6 text-amber-950 dark:border-amber-400/20 dark:bg-amber-400/5 dark:text-amber-100">
+        <strong className="font-semibold">Before launch:</strong> this build
+        implements account creation, document uploads, application tracking, and
+        an optional AI advisor. The operator must complete legal review and
+        publish final liability, consumer-protection, and governing-law terms
+        before production traffic. Those items are not decided here.
+      </div>
+
+      <LegalSection title="1. Scope and account acceptance">
         <p>
-          EduBridge is currently a product preview. Accounts, document uploads,
-          AI conversations, application tracking, and personalized
-          recommendations are not yet available. Features shown on the marketing
-          site are illustrative of the intended product.
+          Registration requires accurate account details, acceptance of these
+          terms and the privacy notice, and a valid date of birth. Acceptance is
+          recorded with a timestamp and policy version. Minors require guardian
+          approval before their workspace unlocks. We may suspend accounts that
+          threaten the service or other users.
         </p>
       </LegalSection>
 
@@ -42,17 +50,22 @@ export default function TermsPage() {
         <p>
           EduBridge does not guarantee admission, a scholarship, a visa, or any
           particular funding outcome. Match and eligibility explanations are
-          informational. The AI advisor does not make final admissions
-          decisions.
+          informational. The AI advisor does not make final admissions decisions
+          and its output must not be presented as official guidance.
         </p>
       </LegalSection>
 
-      <LegalSection title="4. Data accuracy">
+      <LegalSection title="4. Catalog accuracy and provenance">
         <p>
-          We aim to publish only source-linked, dated information. Some content
-          on this preview is explicitly labeled as sample data and must not be
-          relied on as current. If you believe a record is incorrect, a
-          correction process will be published before the live catalog opens.
+          Published catalog records carry a human-verified source and
+          verification date, and changes are kept in an append-only review
+          history. Records explicitly labeled as sample data must not be relied
+          on as current. If you believe a record is incorrect, use the published
+          contact on our{" "}
+          <a href="/security" className="underline underline-offset-2">
+            security and disclosure page
+          </a>
+          .
         </p>
       </LegalSection>
 
@@ -70,13 +83,25 @@ export default function TermsPage() {
 
       <LegalSection title="6. Accounts and security">
         <p>
-          When accounts open, you must provide accurate information, keep your
-          credentials private, and notify us of suspected unauthorized access.
-          We may suspend accounts that threaten the service or other users.
+          Keep your credentials private, enable two-factor authentication where
+          available, and notify us of suspected unauthorized access. You can
+          review active sessions and revoke them in Account settings. Email
+          verification, guardian consent, rate limits, and audit logging are
+          used to protect accounts; they are not a guarantee against all misuse.
         </p>
       </LegalSection>
 
-      <LegalSection title="7. Intellectual property">
+      <LegalSection title="7. Your files and data">
+        <p>
+          You retain responsibility for documents you upload and for ensuring
+          you have the right to share them. You can delete documents and your
+          account in the application; deletion and retention details are
+          described in the privacy notice. Do not put another person&apos;s
+          private information into the service without their permission.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="8. Intellectual property">
         <p>
           The EduBridge name, interface, and original content are protected by
           applicable intellectual property laws. University names, logos,
@@ -85,28 +110,23 @@ export default function TermsPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="8. Third-party links">
+      <LegalSection title="9. Third-party links and providers">
         <p>
           Official university and scholarship links are provided for your
           convenience. We do not control third-party sites and are not
           responsible for their content, availability, or privacy practices.
+          Optional features such as Google sign-in, AI guidance, and email
+          delivery depend on external providers configured by the operator.
         </p>
       </LegalSection>
 
-      <LegalSection title="9. Availability and changes">
+      <LegalSection title="10. Availability and changes">
         <p>
-          The preview may change or be unavailable without notice. We may update
+          Features may change or be unavailable without notice. We may update
           these terms as the product develops. Continued use after an update
-          means you accept the revised terms.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="10. Liability and governing law">
-        <p>
-          The preview is provided on an &ldquo;as is&rdquo; and &ldquo;as
-          available&rdquo; basis to the extent permitted by law. Final
-          liability, consumer-protection, and governing-law provisions will be
-          published before accounts open.
+          means you accept the revised terms. Final liability,
+          consumer-protection, and governing-law provisions must be published by
+          the operator before production launch.
         </p>
       </LegalSection>
     </LegalPage>

@@ -30,6 +30,7 @@ export const siteConfig = {
     trust: [
       { label: "Privacy notice", href: "/privacy" },
       { label: "Terms of use", href: "/terms" },
+      { label: "Security & disclosure", href: "/security" },
       { label: "Data sources", href: "/data-sources" },
     ],
   },

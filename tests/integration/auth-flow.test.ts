@@ -1,6 +1,10 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { readFile, readdir } from "node:fs/promises";
+import path from "node:path";
+
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { db } from "@/lib/db";
+import { getAppUrl } from "@/lib/env";
 import { POLICY_VERSION } from "@/lib/auth/constants";
 import { isMinor } from "@/lib/auth/age";
 import {
@@ -19,12 +23,40 @@ import {
   type RegistrationOutcome,
 } from "@/lib/auth/service";
 import { validateSessionToken } from "@/lib/auth/session";
+import { findToken } from "@/lib/auth/tokens";
 import { getWorkspaceStatus } from "@/lib/auth/dal";
+import { getVerificationRequirement } from "@/lib/auth/verification-policy";
 import { rateLimit, rateLimitKey } from "@/lib/security/rate-limit";
 import type { ProfileInput, RegisterInput } from "@/lib/validation/auth";
 
 const PASSWORD = "Correct-Horse-Battery-9";
 const NEW_PASSWORD = "Another-Strong-Passphrase-42";
+const WEAK_PASSWORD = "Amina-Strong-Passphrase-42";
+const MAIL_DIR = path.join(process.cwd(), ".data", "mail");
+
+type MailRecord = {
+  to: string;
+  tag: string;
+  text: string;
+  html: string;
+};
+
+async function mailFileNames(): Promise<string[]> {
+  try {
+    return await readdir(MAIL_DIR);
+  } catch {
+    return [];
+  }
+}
+
+async function newMailRecords(before: Set<string>): Promise<MailRecord[]> {
+  const names = (await mailFileNames()).filter((name) => !before.has(name));
+  return Promise.all(
+    names.map(async (name) =>
+      JSON.parse(await readFile(path.join(MAIL_DIR, name), "utf8")),
+    ),
+  );
+}
 
 function dateYearsAgo(years: number): string {
   const date = new Date();
@@ -186,6 +218,56 @@ describe("registration and sign-in", () => {
     expect(resend).toEqual({ ok: true, alreadyVerified: true });
   });
 
+  it("rejects invalid and expired verification tokens without logging them", async () => {
+    const result = await registerAdult();
+    const invalidToken = "not-a-real-verification-token-value";
+
+    const logSpies = [
+      vi.spyOn(console, "log").mockImplementation(() => {}),
+      vi.spyOn(console, "info").mockImplementation(() => {}),
+      vi.spyOn(console, "warn").mockImplementation(() => {}),
+      vi.spyOn(console, "error").mockImplementation(() => {}),
+    ];
+
+    try {
+      expect(await findToken(invalidToken, "EMAIL_VERIFICATION")).toBeNull();
+      await expect(verifyEmailToken(invalidToken)).resolves.toEqual({
+        ok: false,
+      });
+
+      const tokenRecord = await db.authToken.findFirstOrThrow({
+        where: {
+          userId: result.userId,
+          purpose: "EMAIL_VERIFICATION",
+          usedAt: null,
+        },
+        select: { id: true },
+      });
+      await db.authToken.update({
+        where: { id: tokenRecord.id },
+        data: { expiresAt: new Date(Date.now() - 1_000) },
+      });
+
+      expect(
+        await findToken(result.verificationToken, "EMAIL_VERIFICATION"),
+      ).toBeNull();
+      await expect(verifyEmailToken(result.verificationToken)).resolves.toEqual(
+        { ok: false },
+      );
+
+      const user = await db.user.findUniqueOrThrow({
+        where: { id: result.userId },
+        select: { emailVerifiedAt: true },
+      });
+      expect(user.emailVerifiedAt).toBeNull();
+    } finally {
+      const output = JSON.stringify(logSpies.flatMap((spy) => spy.mock.calls));
+      expect(output).not.toContain(result.verificationToken);
+      expect(output).not.toContain(invalidToken);
+      logSpies.forEach((spy) => spy.mockRestore());
+    }
+  });
+
   it("rejects duplicate emails, wrong passwords, and unknown accounts", async () => {
     await registerAdult();
 
@@ -211,6 +293,104 @@ describe("registration and sign-in", () => {
     expect(correct.ok).toBe(true);
   });
 
+  it("sends recovery links without changing a verified account", async () => {
+    const result = await registerAdult();
+    const verified = await verifyEmailToken(result.verificationToken);
+    expect(verified.ok).toBe(true);
+
+    const before = new Set(await mailFileNames());
+    const duplicate = await registerAccount(adultInput());
+    expect(duplicate).toEqual({ ok: false, reason: "email_taken" });
+
+    const user = await db.user.findUniqueOrThrow({
+      where: { id: result.userId },
+      select: { emailVerifiedAt: true },
+    });
+    expect(user.emailVerifiedAt).toBeInstanceOf(Date);
+    expect(
+      await db.authToken.count({
+        where: {
+          userId: result.userId,
+          purpose: "EMAIL_VERIFICATION",
+          usedAt: null,
+        },
+      }),
+    ).toBe(0);
+
+    const messages = await newMailRecords(before);
+    const accountExists = messages.filter(
+      (message) =>
+        message.tag === "account-exists" && message.to === "amina@example.com",
+    );
+    expect(accountExists).toHaveLength(1);
+    const message = accountExists[0];
+    expect(message).toBeDefined();
+    if (!message) return;
+
+    const appUrl = getAppUrl().replace(/\/+$/, "");
+    expect(message.text).toContain(`${appUrl}/login`);
+    expect(message.text).toContain(`${appUrl}/forgot-password`);
+    expect(message.html).toContain(`${appUrl}/forgot-password`);
+  });
+
+  it("does not resend verification for an existing unverified account", async () => {
+    const result = await registerAdult();
+    expect(
+      await db.authToken.count({
+        where: {
+          userId: result.userId,
+          purpose: "EMAIL_VERIFICATION",
+          usedAt: null,
+        },
+      }),
+    ).toBe(1);
+
+    const before = new Set(await mailFileNames());
+    const duplicate = await registerAccount(adultInput());
+    expect(duplicate).toEqual({ ok: false, reason: "email_taken" });
+
+    const user = await db.user.findUniqueOrThrow({
+      where: { id: result.userId },
+      select: { emailVerifiedAt: true },
+    });
+    expect(user.emailVerifiedAt).toBeNull();
+    expect(
+      await db.authToken.count({
+        where: {
+          userId: result.userId,
+          purpose: "EMAIL_VERIFICATION",
+          usedAt: null,
+        },
+      }),
+    ).toBe(1);
+
+    const messages = await newMailRecords(before);
+    expect(messages.filter((mail) => mail.tag === "verify-email")).toHaveLength(
+      0,
+    );
+    expect(
+      messages.filter(
+        (mail) =>
+          mail.tag === "account-exists" && mail.to === "amina@example.com",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("does not create duplicate accounts on repeated registration attempts", async () => {
+    await registerAdult();
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      await expect(registerAccount(adultInput())).resolves.toEqual({
+        ok: false,
+        reason: "email_taken",
+      });
+    }
+
+    expect(await db.user.count({ where: { email: "amina@example.com" } })).toBe(
+      1,
+    );
+  });
+
   it("rejects passwords that contain the account name or email", async () => {
     const result = await registerAccount(
       adultInput({
@@ -224,13 +404,30 @@ describe("registration and sign-in", () => {
     expect(result.reason).toBe("password_rejected");
   });
 
-  it("allows an unverified adult to use the workspace", async () => {
+  it("requires verification for a newly registered unverified adult", async () => {
     const result = await registerAdult();
     const session = await validateSessionToken(result.sessionToken);
 
     expect(session).not.toBeNull();
+    expect(getVerificationRequirement(session!.user)).toEqual({
+      state: "required",
+      reason: "new_account",
+    });
+    expect(session!.user.emailVerifiedAt).toBeNull();
+
     const status = await getWorkspaceStatus(session!.user);
     expect(status.canUseWorkspace).toBe(true);
+  });
+
+  it("keeps an existing verified session usable", async () => {
+    const result = await registerAdult();
+    expect((await verifyEmailToken(result.verificationToken)).ok).toBe(true);
+
+    const session = await validateSessionToken(result.sessionToken);
+    expect(session).not.toBeNull();
+    expect(getVerificationRequirement(session!.user)).toEqual({
+      state: "verified",
+    });
   });
 });
 
@@ -443,11 +640,21 @@ describe("password reset", () => {
     const reset = await requestPasswordReset("amina@example.com");
     expect(reset.token).toBeTruthy();
 
-    const outcome = await resetPasswordWithToken(reset.token!, NEW_PASSWORD);
+    const outcome = await resetPasswordWithToken(
+      reset.token!,
+      NEW_PASSWORD,
+      NEW_PASSWORD,
+    );
     expect(outcome.ok).toBe(true);
 
+    const updatedUser = await db.user.findUniqueOrThrow({
+      where: { id: result.userId },
+      select: { emailVerifiedAt: true },
+    });
+    expect(updatedUser.emailVerifiedAt).toBeInstanceOf(Date);
+
     expect(await validateSessionToken(result.sessionToken)).toBeNull();
-    if (secondLogin.ok) {
+    if (secondLogin.ok && !secondLogin.mfaRequired) {
       expect(await validateSessionToken(secondLogin.sessionToken)).toBeNull();
     }
 
@@ -463,13 +670,118 @@ describe("password reset", () => {
     });
     expect(newPassword.ok).toBe(true);
 
-    const reused = await resetPasswordWithToken(reset.token!, NEW_PASSWORD);
+    const reused = await resetPasswordWithToken(
+      reset.token!,
+      NEW_PASSWORD,
+      NEW_PASSWORD,
+    );
     expect(reused).toEqual({ ok: false, reason: "invalid_token" });
   });
 
-  it("returns no token for an unknown address", async () => {
+  it("keeps the token usable when the new password fails policy validation", async () => {
+    await registerAdult();
+
+    const reset = await requestPasswordReset("amina@example.com");
+    expect(reset.token).toBeTruthy();
+
+    const weak = await resetPasswordWithToken(
+      reset.token!,
+      WEAK_PASSWORD,
+      WEAK_PASSWORD,
+    );
+    if (weak.ok) throw new Error("expected the weak password to be rejected");
+    expect(weak.reason).toBe("password_rejected");
+    expect(await findToken(reset.token!, "PASSWORD_RESET")).not.toBeNull();
+
+    const strong = await resetPasswordWithToken(
+      reset.token!,
+      NEW_PASSWORD,
+      NEW_PASSWORD,
+    );
+    expect(strong.ok).toBe(true);
+    expect(await findToken(reset.token!, "PASSWORD_RESET")).toBeNull();
+  });
+
+  it("keeps the token usable when password confirmation does not match", async () => {
+    await registerAdult();
+
+    const reset = await requestPasswordReset("amina@example.com");
+    expect(reset.token).toBeTruthy();
+
+    const mismatch = await resetPasswordWithToken(
+      reset.token!,
+      NEW_PASSWORD,
+      "Another-Strong-Passphrase-43",
+    );
+    expect(mismatch).toEqual({ ok: false, reason: "password_mismatch" });
+    expect(await findToken(reset.token!, "PASSWORD_RESET")).not.toBeNull();
+
+    const strong = await resetPasswordWithToken(
+      reset.token!,
+      NEW_PASSWORD,
+      NEW_PASSWORD,
+    );
+    expect(strong.ok).toBe(true);
+  });
+
+  it("rejects expired reset tokens", async () => {
+    const result = await registerAdult();
+
+    const reset = await requestPasswordReset("amina@example.com");
+    expect(reset.token).toBeTruthy();
+
+    const tokenRecord = await db.authToken.findFirst({
+      where: {
+        userId: result.userId,
+        purpose: "PASSWORD_RESET",
+        usedAt: null,
+      },
+      select: { id: true },
+    });
+    expect(tokenRecord).not.toBeNull();
+
+    await db.authToken.update({
+      where: { id: tokenRecord!.id },
+      data: { expiresAt: new Date(Date.now() - 1_000) },
+    });
+
+    await expect(
+      resetPasswordWithToken(reset.token!, NEW_PASSWORD, NEW_PASSWORD),
+    ).resolves.toEqual({ ok: false, reason: "invalid_token" });
+  });
+
+  it("allows only one concurrent request to consume a reset token", async () => {
+    await registerAdult();
+
+    const reset = await requestPasswordReset("amina@example.com");
+    expect(reset.token).toBeTruthy();
+
+    const results = await Promise.all([
+      resetPasswordWithToken(reset.token!, NEW_PASSWORD, NEW_PASSWORD),
+      resetPasswordWithToken(reset.token!, NEW_PASSWORD, NEW_PASSWORD),
+    ]);
+
+    expect(results.filter((result) => result.ok)).toHaveLength(1);
+    expect(
+      results.filter(
+        (result) => !result.ok && result.reason === "invalid_token",
+      ),
+    ).toHaveLength(1);
+    expect(await findToken(reset.token!, "PASSWORD_RESET")).toBeNull();
+  });
+
+  it("returns no token and creates no reset side effects for an unknown address", async () => {
+    const before = new Set(await mailFileNames());
+
     const result = await requestPasswordReset("nobody@example.com");
     expect(result.token).toBeNull();
+    expect(await db.authToken.count()).toBe(0);
+    expect(await db.auditEvent.count()).toBe(0);
+
+    const messages = await newMailRecords(before);
+    expect(
+      messages.filter((message) => message.to === "nobody@example.com"),
+    ).toHaveLength(0);
   });
 });
 
@@ -524,7 +836,7 @@ describe("account security", () => {
     expect(outcome.ok).toBe(true);
 
     expect(await validateSessionToken(result.sessionToken)).not.toBeNull();
-    if (otherLogin.ok) {
+    if (otherLogin.ok && !otherLogin.mfaRequired) {
       expect(await validateSessionToken(otherLogin.sessionToken)).toBeNull();
     }
   });

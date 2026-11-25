@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 
 import { CatalogBenchmarkPanel } from "@/components/catalog/catalog-benchmark-panel";
+import { DashboardScholarships } from "@/components/dashboard/dashboard-scholarships";
 import { GateBanner } from "@/components/dashboard/gate-banner";
 import { Badge } from "@/components/ui/badge";
 import { Alert } from "@/components/ui/alert";
@@ -26,8 +27,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getWorkspaceStatus, requireUser } from "@/lib/auth/dal";
+import { requireEmailVerification } from "@/lib/auth/verification-policy";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { getCatalogBenchmarks } from "@/lib/catalog/benchmarks";
+import {
+  dashboardScholarshipSearchHref,
+  hasActiveScholarshipFilters,
+  parseScholarshipFilters,
+} from "@/lib/catalog/filters";
+import { listScholarships } from "@/lib/catalog/queries";
 import { countryName } from "@/lib/data/countries";
 import { degreeLabel } from "@/lib/data/fields";
 import {
@@ -156,9 +164,10 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ registered?: string }>;
 }) {
+  const session = await requireUser();
+  requireEmailVerification(session.user);
   const params = await searchParams;
   const benchmarksPromise = getCatalogBenchmarks();
-  const session = await requireUser();
   const status = await getWorkspaceStatus(session.user);
   const benchmarks = await benchmarksPromise;
   const profile = status.profile;
@@ -170,12 +179,26 @@ export default async function DashboardPage({
       Boolean(profile?.fieldsOfStudy.length),
     ].filter(Boolean).length * 25,
   );
+
+  const scholarshipFilters = parseScholarshipFilters({});
+  if (profile?.nationality)
+    scholarshipFilters.nationality = profile.nationality;
+  if (profile?.targetDegree) scholarshipFilters.degree = profile.targetDegree;
+  if (profile?.fieldsOfStudy.length) {
+    scholarshipFilters.field = profile.fieldsOfStudy[0];
+  }
+  const scholarshipPromise = listScholarships(
+    scholarshipFilters,
+    session.user.id,
+  );
+
   const [analytics, calendarApplications] = status.canUseWorkspace
     ? await Promise.all([
         getWorkspaceAnalytics(session.user.id),
         getCalendarApplications(session.user.id),
       ])
     : [null, []];
+  const scholarships = await scholarshipPromise;
   const now = new Date();
   const todayUtc = new Date(now);
   todayUtc.setUTCHours(0, 0, 0, 0);
@@ -628,6 +651,13 @@ export default async function DashboardPage({
         />
         <CatalogBenchmarkPanel benchmarks={benchmarks} variant="compact" />
       </section>
+
+      <DashboardScholarships
+        items={scholarships.items.slice(0, 3)}
+        total={scholarships.total}
+        searchHref={dashboardScholarshipSearchHref(scholarshipFilters)}
+        personalized={hasActiveScholarshipFilters(scholarshipFilters)}
+      />
 
       <Card>
         <CardHeader className="flex flex-wrap items-start justify-between gap-3">

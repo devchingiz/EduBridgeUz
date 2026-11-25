@@ -1,4 +1,4 @@
-# 500-university catalog — milestone progress
+# 500-university catalog — milestone progress (expanded to 1,000)
 
 ## Milestone 1 — architecture and plan
 
@@ -440,7 +440,7 @@
 
 ## Final handoff
 
-**Status:** Complete — all 10 milestones delivered.
+**Status:** Complete — all 10 original milestones delivered. The exact-500 constraint below is superseded by the batch-2 follow-up at the end of this ledger.
 
 ### Delivered
 
@@ -544,3 +544,111 @@ npm run build
 **Fixes**
 
 - Removed a duplicate initial status-history write when application creation moved to the shared status-change helper.
+
+## Follow-up — batch 2 expansion to 1,000 universities
+
+**Status:** Complete
+
+**Completed work**
+
+- Superseded the original “exactly 500” constraint after the user chose “Add another 500”.
+- Added `--batch=N` to the QS research script. Batch 2 excludes every batch-1 institution by QS nid, slug, legacy `the-` slug and normalized name, and records the exclusion count in dataset metadata.
+- Added `--dataset=` and `--report=` CLI overrides to the offline importer; each batch still validates against exactly 500 records, so a partial batch cannot be imported.
+- Reworked the verification script to discover and verify all `data/qs-2027-universities*.json` datasets, accept `--dataset=` / `--expected=`, check ranking source URLs as well as QS rank strings, and report duplicate names, slugs and QS nids.
+- Made verification reads sequential because the shared local PGlite socket serves one Prisma query at a time.
+- Added repeatable `research:qs:batch2`, `db:import:qs:batch2` and `db:verify:qs:all` npm scripts.
+- Preserved all hand-verified `VERIFIED` records and every existing catalog/provenance rule; no scholarship award amounts or numerical scholarship averages were introduced.
+
+**Modified files**
+
+- `scripts/research-qs-universities.mjs`
+- `scripts/import-qs-universities.mts`
+- `scripts/verify-qs-import.mts`
+- `package.json`
+- `data/qs-2027-universities-batch-2.json` (new)
+- `data/qs-2027-import-report-batch-2.json` (new)
+- `data/.cache/qs-2027/` (extended with batch-2 website/programme cache entries)
+- `docs/500-UNIVERSITIES-PROGRESS.md`
+
+**Verified record count**
+
+- Batch-2 dataset: **500** records, 500 unique names, 500 unique QS node ids, 500 unique slugs.
+- Overlap with batch 1: **0** by QS nid, slug, legacy slug or normalized name. Combined datasets: **1,000**.
+- Batch-2 QS coverage: 31 country codes; 331 official websites resolved, 169 without a confident Wikidata `P856` claim; 200 universities with QS programme samples, 300 without.
+- Final database: **1,000 distinct universities** (996 `PARTIALLY_VERIFIED`, 4 `VERIFIED`), **3,866** programmes and **59,580** field facts.
+- `db:verify:qs:all`: `databaseUniversities: 1000`, `matchesExpectedTotal: true`, `missingQsNids: []`, `mismatchedRankCount: 0`, `missingSourceUrls: []`, `duplicateExpectedNids: []`, `duplicateNames: []`, `duplicateSlugs: []`, `duplicateQsNids: []`, `legacyManchesterDuplicate: false`.
+- Batch-2 import report: 500 dataset records, 500 created universities, 1,634 created programmes, 328 skipped programme rows with unrecognized degree levels, 2,466 citations, 26,840 field facts and **0 errors**.
+- The four hand-verified seed universities remain `VERIFIED`: TU Munich, University of Amsterdam, TU Delft and The University of Manchester.
+
+**Missing information**
+
+- Batch 2 adds 169 universities without a confidently resolved official website and 300 without a QS programme sample; the existing explicit-unavailable UI behavior is unchanged.
+- QS still does not supply IELTS/TOEFL/SAT minima, application deadlines, intake months, founded years, contact details, individual scholarship awards, credits or guaranteed English-taught status. Those facts remain `INFORMATION_UNAVAILABLE`.
+- QS tuition and programme fees remain indicative third-party figures stored as `PARTIALLY_VERIFIED`, not official university fee sheets.
+- Application deadlines/statuses remain private student-entered tracker data, not catalog facts. The catalog still stores no scholarship award amounts and calculates no numerical scholarship average.
+- Live AI provider, managed PostgreSQL, production S3/ClamAV/telemetry, browser E2E and Git commit remain external to this environment. No Git binary is available, so all changes are uncommitted.
+
+**Tests run**
+
+- `npm run research:qs:batch2` — three runs; the first two had transient Wikidata chunk failures, the third resolved all remaining chunks using the shared cache.
+- `npm run db:import:qs:batch2` — 500 created universities, 0 errors.
+- `npm run db:verify:qs:all` — 1,000 universities verified with no missing ids/ranks/sources and no duplicates.
+- `npm run format` — applied; only the generated batch-2 dataset needed reformatting.
+- `npm run lint` — 0 errors, 0 warnings.
+- `npm run typecheck` — passed.
+- `npm test` — **265 passed / 37 files**.
+- `npm run test:integration` — **83 passed / 10 files**.
+- `npm run build` — succeeded; 36 static pages generated and all routes built.
+- `npx prisma validate` — schema valid.
+
+**Fixes**
+
+- Retried transient Wikidata `P856` failures until all 500 batch-2 website lookups were cached.
+- Replaced parallel verification reads with sequential Prisma reads so the shared PGlite socket does not reject concurrent connections.
+- Replaced the hard-coded `exactly500` check with configurable, multi-dataset expected-total verification plus source and duplicate checks.
+
+## Follow-up — browser QA and render-time cleanup
+
+**Status:** Complete
+
+**Completed work**
+
+- Added a pure `plainText()` helper in `src/lib/catalog/format.ts`. It strips pasted QS rich-text tags, comments, script/style bodies, named and numeric HTML entities, and dangling tag fragments left when a QS snippet is truncated at 10,000 characters. It preserves literal `<` comparisons.
+- Applied `plainText()` at render time to university heroes, catalog cards, dashboard university details, field-fact panels, the source-fact grid and shared availability checks. Source datasets, import reports and stored provenance remain untouched.
+- Routed all catalog fact values and notes through the same cleanup, so placeholder wording hidden inside markup is now detected and those facts are hidden instead of rendered.
+- Hid remaining placeholder badges and links (`Not classified`, `Official site unavailable`, `Program details pending`, `QS 2027 rank unavailable`) instead of showing them as catalog facts.
+- Cleaned trailing punctuation in QS city values so locations no longer render as `Aalborg,, Denmark`.
+- Added six `plainText()` unit tests and one fact-group test covering markup-wrapped placeholders.
+
+**Modified files**
+
+- `src/lib/catalog/format.ts`
+- `src/lib/catalog/fact-groups.ts`
+- `src/components/catalog/source-fact-grid.tsx`
+- `src/components/catalog/verification.tsx`
+- `src/components/catalog/university-hero.tsx`
+- `src/components/catalog/cards.tsx`
+- `src/app/dashboard/universities/[slug]/page.tsx`
+- `src/app/dashboard/universities/page.tsx`
+- `tests/unit/catalog-format.test.ts`
+- `tests/unit/fact-groups.test.ts`
+
+**Browser QA**
+
+- Fresh PGlite QA database rebuilt and re-imported from both datasets; `db:verify:qs:all` still reports 1,000 universities, 3,866 programmes, 59,580 field facts, no missing nids/ranks/sources and no duplicates.
+- `/universities` shows `1000 UNIVERSITIES`, no raw markup and no placeholder badges; 0 console errors.
+- `/universities/university-of-texas-at-dallas` shows `QS 2027 · =597` with the `QS TopUniversities` source, a clean profile description and field facts, no banned placeholder phrases and 0 console errors.
+- `/universities/tulane-university` shows the same clean state with no raw markup and 0 console errors.
+
+**Tests run**
+
+- `npm run format`, `npm run format:check`, `npm run lint`, `npm run typecheck`.
+- `npm test` — **272 passed / 37 files**.
+- `npm run test:integration` — **83 passed / 10 files** (first parallel run hit the PGlite startup timeout; rerun alone passed).
+- `npm run build` — succeeded; 36 static pages generated.
+- `npx prisma validate` — schema valid.
+- `npm run db:verify:qs:all` — 1,000 universities, no duplicates or missing provenance.
+
+**Missing information**
+
+- Playwright E2E, live AI provider verification, managed PostgreSQL, production S3/ClamAV and telemetry remain external. In-app browser QA replaced Playwright for this pass; Git is unavailable, so all changes remain uncommitted.

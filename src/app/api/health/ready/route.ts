@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { logError } from "@/lib/observability/logger";
-import { productionConfigurationIssues } from "@/lib/env";
+import { productionReadinessIssues } from "@/lib/config/readiness";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -13,7 +13,7 @@ const unavailable = () =>
   );
 
 export async function GET(): Promise<Response> {
-  const issues = productionConfigurationIssues();
+  const issues = productionReadinessIssues();
   if (issues.length > 0) {
     logError("health.configuration_invalid", null, {
       issueCount: issues.length,

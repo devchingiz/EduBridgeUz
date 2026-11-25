@@ -32,7 +32,11 @@ import { getBootstrapAdminEmails } from "@/lib/env";
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.BOOTSTRAP_ADMIN_EMAILS = "";
-  mocks.findUnique.mockResolvedValue({ role: "STUDENT", deletedAt: null });
+  mocks.findUnique.mockResolvedValue({
+    role: "STUDENT",
+    emailVerifiedAt: new Date("2026-01-01T00:00:00.000Z"),
+    deletedAt: null,
+  });
   mocks.update.mockResolvedValue({ count: 1 });
   mocks.recordAuditEvent.mockResolvedValue(undefined);
   mocks.logError.mockImplementation(() => undefined);
@@ -78,7 +82,7 @@ describe("bootstrap administrator emails", () => {
     expect(promoted).toBe(true);
     expect(mocks.update).toHaveBeenCalledWith({
       where: { id: "user-1" },
-      data: { role: "ADMIN" },
+      data: { role: "SUPER_ADMIN" },
     });
     expect(mocks.recordAuditEvent).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -88,6 +92,7 @@ describe("bootstrap administrator emails", () => {
         entityId: "user-1",
         metadata: {
           previousRole: "STUDENT",
+          role: "SUPER_ADMIN",
           source: "BOOTSTRAP_ADMIN_EMAILS",
         },
         ip: "198.51.100.1",
@@ -95,11 +100,12 @@ describe("bootstrap administrator emails", () => {
     );
   });
 
-  it("skips accounts that are already administrators or deleted", async () => {
+  it("skips accounts that are already Super Admins or deleted", async () => {
     process.env.BOOTSTRAP_ADMIN_EMAILS = "owner@example.com";
 
     mocks.findUnique.mockResolvedValueOnce({
-      role: "ADMIN",
+      role: "SUPER_ADMIN",
+      emailVerifiedAt: new Date("2026-01-01T00:00:00.000Z"),
       deletedAt: null,
     });
     expect(await promoteBootstrapAdmin("user-1", "owner@example.com")).toBe(
@@ -108,12 +114,27 @@ describe("bootstrap administrator emails", () => {
 
     mocks.findUnique.mockResolvedValueOnce({
       role: "STUDENT",
+      emailVerifiedAt: new Date("2026-01-01T00:00:00.000Z"),
       deletedAt: new Date(),
     });
     expect(await promoteBootstrapAdmin("user-2", "owner@example.com")).toBe(
       false,
     );
 
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+
+  it("does not promote an account with an unverified email", async () => {
+    process.env.BOOTSTRAP_ADMIN_EMAILS = "owner@example.com";
+    mocks.findUnique.mockResolvedValueOnce({
+      role: "STUDENT",
+      emailVerifiedAt: null,
+      deletedAt: null,
+    });
+
+    expect(await promoteBootstrapAdmin("user-1", "owner@example.com")).toBe(
+      false,
+    );
     expect(mocks.update).not.toHaveBeenCalled();
   });
 

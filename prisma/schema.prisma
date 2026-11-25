@@ -22,12 +22,44 @@ enum Role {
   STUDENT
   REVIEWER
   ADMIN
+  SUPER_ADMIN
+  CONTENT_MANAGER
+  UNIVERSITY_MANAGER
+  SCHOLARSHIP_MANAGER
+  SUPPORT_MANAGER
+}
+
+/// Capabilities used by the administration panel. Role defaults are declared in
+/// application code; these grants are explicit per-user additions made by a
+/// Super Admin. Grants never remove a role permission and never grant
+/// administrator-role management.
+enum AdminPermission {
+  ADMIN_ACCESS
+  USERS_READ
+  USERS_MANAGE
+  CONTENT_READ
+  CONTENT_MANAGE
+  MEDIA_READ
+  MEDIA_MANAGE
+  UNIVERSITIES_READ
+  UNIVERSITIES_MANAGE
+  SCHOLARSHIPS_READ
+  SCHOLARSHIPS_MANAGE
+  APPLICATIONS_READ
+  APPLICATIONS_REVIEW
+  AI_READ
+  AI_MANAGE
+  NOTIFICATIONS_SEND
+  AUDIT_READ
+  SETTINGS_READ
+  SETTINGS_MANAGE
 }
 
 enum TokenPurpose {
   EMAIL_VERIFICATION
   PASSWORD_RESET
   GUARDIAN_CONSENT
+  MFA_CHALLENGE
 }
 
 enum ConsentType {
@@ -42,6 +74,9 @@ model User {
   email           String    @unique
   emailVerifiedAt DateTime?
   passwordHash    String?
+  /** AES-GCM ciphertext of the TOTP seed; never a plaintext secret. */
+  mfaSecret       String?
+  mfaEnabledAt    DateTime?
   name            String
   role            Role      @default(STUDENT)
   dateOfBirth     DateTime? @db.Date
@@ -54,8 +89,11 @@ model User {
   sessions               Session[]
   googleAccount          GoogleAccount?
   tokens                 AuthToken[]
+  mfaRecoveryCodes       MfaRecoveryCode[]
   consents               ConsentRecord[]
   auditEvents            AuditEvent[]            @relation("ActorAuditEvents")
+  adminPermissionGrants  AdminPermissionGrant[]  @relation("AdminPermissionGrants")
+  grantedAdminPermissions AdminPermissionGrant[] @relation("AdminPermissionGrantsBy")
   citations              SourceCitation[]        @relation("CitationAuthor")
   catalogReviews         CatalogReview[]         @relation("CatalogReviews")
   universityFavorites    UniversityFavorite[]
@@ -68,6 +106,7 @@ model User {
   advisorUsage           AdvisorUsage[]
   comparison             UniversityComparison?
   studyNotes             StudyNote[]
+  homepageContentUpdates HomepageContent[]       @relation("HomepageContentUpdatedBy")
 
   @@index([role])
   @@index([deletedAt])
@@ -138,6 +177,20 @@ model AuthToken {
   @@index([expiresAt])
 }
 
+/// One-time recovery codes. Only SHA-256 hashes are stored; the plaintext is
+/// shown to the user exactly once during enrollment or regeneration.
+model MfaRecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String    @unique
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
+}
+
 model ConsentRecord {
   id        String      @id @default(cuid())
   userId    String
@@ -167,6 +220,37 @@ model AuditEvent {
   @@index([entityType, entityId, createdAt])
   @@index([actorId, createdAt])
   @@index([action, createdAt])
+}
+
+model AdminPermissionGrant {
+  id          String          @id @default(cuid())
+  userId      String
+  permission  AdminPermission
+  grantedById String?
+  createdAt   DateTime        @default(now())
+
+  user      User @relation("AdminPermissionGrants", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User? @relation("AdminPermissionGrantsBy", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@unique([userId, permission])
+  @@index([userId])
+}
+
+/// Controlled CMS document for the marketing homepage. Only the strict field
+/// allowlist in `homepageContentSchema` may be written; the JSON is never used
+/// as HTML, CSS, or script. A single row is updated on every save and the
+/// revision is recorded so administrators can see that a change took effect.
+model HomepageContent {
+  id          String   @id
+  content     Json
+  revision    Int      @default(1)
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  updatedBy User? @relation("HomepageContentUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([updatedById])
 }
 
 // ---------------------------------------------------------------------------
@@ -389,6 +473,9 @@ model University {
   rankingIsRange      Boolean            @default(false)
   qsNid               Int?               @unique
   verificationStatus  VerificationStatus @default(UNVERIFIED)
+  /// Featured records are pinned in public discovery. Never set without a
+  /// verified source and an explicit administrator action.
+  featured            Boolean            @default(false)
   lastVerifiedAt      DateTime?          @db.Date
   nextReviewAt        DateTime?          @db.Date
   primarySourceId     String
@@ -406,6 +493,7 @@ model University {
 
   @@index([countryCode, verificationStatus])
   @@index([verificationStatus, nextReviewAt])
+  @@index([featured, verificationStatus])
   @@index([name])
   @@index([countryCode, rankingPosition])
 }
@@ -462,6 +550,9 @@ model Scholarship {
   fields                String[]           @default([])
   summary               String
   verificationStatus    VerificationStatus @default(UNVERIFIED)
+  /// Featured scholarships are pinned in public discovery. Never set without a
+  /// verified source and an explicit administrator action.
+  featured              Boolean            @default(false)
   lastVerifiedAt        DateTime?          @db.Date
   nextReviewAt          DateTime?          @db.Date
   primarySourceId       String
@@ -477,6 +568,7 @@ model Scholarship {
 
   @@index([hostCountryCode, verificationStatus])
   @@index([fundingType, verificationStatus])
+  @@index([featured, verificationStatus])
   @@index([verificationStatus, nextReviewAt])
 }
 
@@ -506,6 +598,8 @@ model ScholarshipFavorite {
   @@index([userId, createdAt])
 }
 
+/// The SQL migration also enforces `CHECK (progress >= 0 AND progress <= 100)`.
+/// Prisma cannot express CHECK constraints, so preserve it in future migrations.
 model Application {
   id           String            @id @default(cuid())
   userId       String
@@ -539,6 +633,8 @@ model ApplicationStatusEvent {
   @@index([applicationId, createdAt])
 }
 
+/// The SQL migration also enforces `CHECK (sizeBytes > 0 AND sizeBytes <= 5242880)`.
+/// Prisma cannot express CHECK constraints, so preserve it in future migrations.
 model StudentDocument {
   id         String                  @id @default(cuid())
   userId     String
@@ -771,6 +867,7 @@ model CatalogFieldFact {
   @@unique([entityType, entityId, fieldKey])
   @@index([entityType, status])
   @@index([entityId])
+  @@index([universityId])
 }
 
 /// A user's private four-way shortlist. The four-item maximum is enforced by

@@ -5,7 +5,38 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Shenzhen_University",
     "wikidataId": "Q1945756"
   },
+  "293158": {
+    "officialWebsiteUrl": "https://b-u.ac.in/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3534400#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Bharathiar_University",
+    "wikidataId": "Q3534400"
+  },
+  "293160": {
+    "officialWebsiteUrl": "https://seattleu.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q615873#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Seattle_University",
+    "wikidataId": "Q615873"
+  },
   "293278": null,
+  "293332": {
+    "officialWebsiteUrl": "https://www.ju.edu.sa",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q12204417#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Jouf_University",
+    "wikidataId": "Q12204417"
+  },
+  "293338": {
+    "officialWebsiteUrl": "http://www.ut.edu.sa",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7896400#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Tabuk",
+    "wikidataId": "Q7896400"
+  },
+  "293339": {
+    "officialWebsiteUrl": "http://web.tu.edu.sa/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7675938#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Taif_University",
+    "wikidataId": "Q7675938"
+  },
+  "293340": null,
   "293349": {
     "officialWebsiteUrl": "http://www.qu.edu.qa",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1574578#P856",
@@ -18,6 +49,89 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Sharjah",
     "wikidataId": "Q7896294"
   },
+  "293377": {
+    "officialWebsiteUrl": "http://www.pucsp.br",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1815994#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Pontif%C3%ADcia_Universidade_Cat%C3%B3lica_de_S%C3%A3o_Paulo",
+    "wikidataId": "Q1815994"
+  },
+  "293381": null,
+  "293386": null,
+  "293446": null,
+  "293554": {
+    "officialWebsiteUrl": "https://ufsc.br/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1851075#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universidade_Federal_de_Santa_Catarina",
+    "wikidataId": "Q1851075"
+  },
+  "293556": null,
+  "293558": {
+    "officialWebsiteUrl": "http://www.unifesp.br",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4384447#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universidade_Federal_de_S%C3%A3o_Paulo",
+    "wikidataId": "Q4384447"
+  },
+  "293598": null,
+  "293621": null,
+  "293622": null,
+  "293626": null,
+  "293627": {
+    "officialWebsiteUrl": "http://www.ektu.kz/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4126492#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/East_Kazakhstan_Technical_University",
+    "wikidataId": "Q4126492"
+  },
+  "293628": null,
+  "293642": null,
+  "293647": {
+    "officialWebsiteUrl": "https://www.unbc.ca/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1165458#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Northern_British_Columbia",
+    "wikidataId": "Q1165458"
+  },
+  "293648": {
+    "officialWebsiteUrl": "http://www.sut.ac.jp/en",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1069994#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Tokyo_University_of_Science",
+    "wikidataId": "Q1069994"
+  },
+  "293650": {
+    "officialWebsiteUrl": "https://www.napier.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1277357#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Edinburgh_Napier_University",
+    "wikidataId": "Q1277357"
+  },
+  "293723": {
+    "officialWebsiteUrl": "http://www.amity.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4746980#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Amity_University%2C_Noida",
+    "wikidataId": "Q4746980"
+  },
+  "293738": {
+    "officialWebsiteUrl": "http://www.unimap.edu.my/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q778594#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universiti_Malaysia_Perlis",
+    "wikidataId": "Q778594"
+  },
+  "293740": {
+    "officialWebsiteUrl": "http://en.ablaikhan.kz/en/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3739702#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kazakh_Ablai_Khan_University_of_International_Relations_and_World_Languages",
+    "wikidataId": "Q3739702"
+  },
+  "293775": {
+    "officialWebsiteUrl": "https://www.unibs.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1781263#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Brescia",
+    "wikidataId": "Q1781263"
+  },
+  "293776": null,
+  "293778": {
+    "officialWebsiteUrl": "https://www.umb.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q15144#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Massachusetts_Boston",
+    "wikidataId": "Q15144"
+  },
   "293781": {
     "officialWebsiteUrl": "https://www.cmu.edu.tw/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q706177#P856",
@@ -25,6 +139,20 @@
     "wikidataId": "Q706177"
   },
   "293783": null,
+  "293793": null,
+  "293847": {
+    "officialWebsiteUrl": "http://www.nmbu.no/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1725075#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Norwegian_University_of_Life_Sciences",
+    "wikidataId": "Q1725075"
+  },
+  "293848": {
+    "officialWebsiteUrl": "http://www.uia.no",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1470769#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Agder",
+    "wikidataId": "Q1470769"
+  },
+  "293851": null,
   "293855": {
     "officialWebsiteUrl": "http://www.ied.edu.hk",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5968342#P856",
@@ -37,12 +165,36 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Taylor's_University",
     "wikidataId": "Q841775"
   },
+  "293871": {
+    "officialWebsiteUrl": "https://www.viu.ca",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7914214#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Vancouver_Island_University",
+    "wikidataId": "Q7914214"
+  },
   "293876": null,
   "293896": {
     "officialWebsiteUrl": "https://www.comillas.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1687025#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Comillas_Pontifical_University",
     "wikidataId": "Q1687025"
+  },
+  "293897": {
+    "officialWebsiteUrl": "https://www.deusto.es/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1468481#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Deusto",
+    "wikidataId": "Q1468481"
+  },
+  "293899": {
+    "officialWebsiteUrl": "https://universidadeuropea.com/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2290716#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universidad_Europea_de_Madrid",
+    "wikidataId": "Q2290716"
+  },
+  "293919": {
+    "officialWebsiteUrl": "https://pratt.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1204714#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Pratt_Institute",
+    "wikidataId": "Q1204714"
   },
   "293977": null,
   "293982": null,
@@ -52,12 +204,25 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Maastricht_University",
     "wikidataId": "Q1137652"
   },
+  "293990": null,
   "293992": null,
   "293996": {
     "officialWebsiteUrl": "https://www.lunduniversity.lu.se",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q218506#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Lund_University",
     "wikidataId": "Q218506"
+  },
+  "294002": {
+    "officialWebsiteUrl": "https://www.luc.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1537759#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Loyola_University_Chicago",
+    "wikidataId": "Q1537759"
+  },
+  "294004": {
+    "officialWebsiteUrl": "https://www.lsu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1521725#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Louisiana_State_University",
+    "wikidataId": "Q1521725"
   },
   "294009": {
     "officialWebsiteUrl": "https://www.lboro.ac.uk/",
@@ -78,6 +243,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Queen_Mary_University_of_London",
     "wikidataId": "Q195668"
   },
+  "294025": {
+    "officialWebsiteUrl": "http://www.londonmet.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1869028#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/London_Metropolitan_University",
+    "wikidataId": "Q1869028"
+  },
   "294029": {
     "officialWebsiteUrl": "https://kcl.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q245247#P856",
@@ -89,6 +260,12 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q189022#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Imperial_College_London",
     "wikidataId": "Q189022"
+  },
+  "294032": {
+    "officialWebsiteUrl": "https://gold.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q528231#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Goldsmiths%2C_University_of_London",
+    "wikidataId": "Q528231"
   },
   "294045": {
     "officialWebsiteUrl": "https://liverpool.ac.uk/",
@@ -102,6 +279,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Link%C3%B6ping_University",
     "wikidataId": "Q782600"
   },
+  "294055": null,
   "294065": null,
   "294071": {
     "officialWebsiteUrl": "https://www.universiteitleiden.nl/",
@@ -133,6 +311,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Lausanne",
     "wikidataId": "Q658975"
   },
+  "294087": null,
   "294098": {
     "officialWebsiteUrl": "https://www.latrobe.edu.au",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1478723#P856",
@@ -163,6 +342,19 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Kyoto_University",
     "wikidataId": "Q336264"
   },
+  "294115": {
+    "officialWebsiteUrl": "http://www.uef.fi",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2093139#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Eastern_Finland",
+    "wikidataId": "Q2093139"
+  },
+  "294118": null,
+  "294119": {
+    "officialWebsiteUrl": "https://www.kumamoto-u.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1148782#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kumamoto_University",
+    "wikidataId": "Q1148782"
+  },
   "294121": {
     "officialWebsiteUrl": "http://www.korea.ac.kr/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q39997#P856",
@@ -182,17 +374,26 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Cologne",
     "wikidataId": "Q54096"
   },
+  "294135": null,
   "294136": {
     "officialWebsiteUrl": "https://www.kobe-u.ac.jp/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1192597#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Kobe_University",
     "wikidataId": "Q1192597"
   },
+  "294138": null,
+  "294141": null,
   "294142": {
     "officialWebsiteUrl": "https://www.mines.edu/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1111367#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Colorado_School_of_Mines",
     "wikidataId": "Q1111367"
+  },
+  "294149": {
+    "officialWebsiteUrl": "https://uky.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1360303#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Kentucky",
+    "wikidataId": "Q1360303"
   },
   "294152": {
     "officialWebsiteUrl": "https://www.kent.ac.uk",
@@ -206,13 +407,27 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Keio_University",
     "wikidataId": "Q815432"
   },
+  "294159": {
+    "officialWebsiteUrl": "https://www.unb.ca/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1112515#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_New_Brunswick",
+    "wikidataId": "Q1112515"
+  },
   "294164": null,
+  "294166": null,
   "294169": {
     "officialWebsiteUrl": "https://www.ku.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q52413#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Kansas",
     "wikidataId": "Q52413"
   },
+  "294171": {
+    "officialWebsiteUrl": "http://www.kanazawa-u.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q684783#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kanazawa_University",
+    "wikidataId": "Q684783"
+  },
+  "294173": null,
   "294178": {
     "officialWebsiteUrl": "https://www.jyu.fi/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q578326#P856",
@@ -238,11 +453,23 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Jawaharlal_Nehru_University",
     "wikidataId": "Q1147063"
   },
+  "294202": {
+    "officialWebsiteUrl": "https://www.istanbul.edu.tr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q192964#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Istanbul_University",
+    "wikidataId": "Q192964"
+  },
   "294206": {
     "officialWebsiteUrl": "https://www.itu.edu.tr/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q344334#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Istanbul_Technical_University",
     "wikidataId": "Q344334"
+  },
+  "294215": {
+    "officialWebsiteUrl": "https://uiowa.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q182973#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Iowa",
+    "wikidataId": "Q182973"
   },
   "294222": {
     "officialWebsiteUrl": "https://www.iastate.edu",
@@ -341,6 +568,12 @@
     "wikidataId": "Q28695"
   },
   "294265": null,
+  "294268": {
+    "officialWebsiteUrl": "https://manoa.hawaii.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2000129#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Hawai%CA%BBi_at_M%C4%81noa",
+    "wikidataId": "Q2000129"
+  },
   "294270": {
     "officialWebsiteUrl": "https://harvard.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q13371#P856",
@@ -358,6 +591,13 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q678982#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Leibniz_University_Hannover",
     "wikidataId": "Q678982"
+  },
+  "294285": null,
+  "294288": {
+    "officialWebsiteUrl": "http://www.gunma-u.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q178017#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Gunma_University",
+    "wikidataId": "Q178017"
   },
   "294293": {
     "officialWebsiteUrl": "https://www.rug.nl/",
@@ -389,11 +629,23 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Gothenburg",
     "wikidataId": "Q371522"
   },
+  "294318": {
+    "officialWebsiteUrl": "http://www.srmuniv.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7392844#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/SRM_Institute_of_Science_and_Technology",
+    "wikidataId": "Q7392844"
+  },
   "294322": {
     "officialWebsiteUrl": "https://gla.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q192775#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Glasgow",
     "wikidataId": "Q192775"
+  },
+  "294325": {
+    "officialWebsiteUrl": "https://www.gifu-u.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1375986#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Gifu_University",
+    "wikidataId": "Q1375986"
   },
   "294327": null,
   "294337": {
@@ -401,6 +653,12 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1509484#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/The_University_of_Georgia",
     "wikidataId": "Q1509484"
+  },
+  "294343": {
+    "officialWebsiteUrl": "http://www.gsu.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1509333#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Georgia_State_University",
+    "wikidataId": "Q1509333"
   },
   "294349": null,
   "294355": {
@@ -433,7 +691,20 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Fudan_University",
     "wikidataId": "Q495015"
   },
+  "294370": {
+    "officialWebsiteUrl": "http://www.fju.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q685664#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Fu_Jen_Catholic_University",
+    "wikidataId": "Q685664"
+  },
+  "294371": null,
   "294376": null,
+  "294378": {
+    "officialWebsiteUrl": "http://www.ntpu.edu.tw",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q707456#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Taipei_University",
+    "wikidataId": "Q707456"
+  },
   "294382": null,
   "294384": null,
   "294394": {
@@ -447,6 +718,13 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q861548#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Florida_State_University",
     "wikidataId": "Q861548"
+  },
+  "294404": null,
+  "294406": {
+    "officialWebsiteUrl": "http://www.ucf.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q143451#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Central_Florida",
+    "wikidataId": "Q143451"
   },
   "294412": {
     "officialWebsiteUrl": "https://www.unifi.it/",
@@ -473,6 +751,8 @@
     "wikidataId": "Q11942"
   },
   "294434": null,
+  "294436": null,
+  "294450": null,
   "294454": null,
   "294457": {
     "officialWebsiteUrl": "http://www.eur.nl/",
@@ -518,6 +798,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/CentraleSup%C3%A9lec",
     "wikidataId": "Q19203245"
   },
+  "294487": null,
   "294488": {
     "officialWebsiteUrl": "https://dur.ac.uk",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q458393#P856",
@@ -535,6 +816,26 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q168751#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Duke_University",
     "wikidataId": "Q168751"
+  },
+  "294495": {
+    "officialWebsiteUrl": "https://drexel.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q603034#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Drexel_University",
+    "wikidataId": "Q603034"
+  },
+  "294496": {
+    "officialWebsiteUrl": "https://www.doshisha.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q921088#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Doshisha_University",
+    "wikidataId": "Q921088"
+  },
+  "294497": null,
+  "294498": null,
+  "294500": {
+    "officialWebsiteUrl": "https://www.du.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q519427#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Denver",
+    "wikidataId": "Q519427"
   },
   "294501": {
     "officialWebsiteUrl": "https://www.du.ac.in/",
@@ -572,6 +873,13 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Curtin_University",
     "wikidataId": "Q1145497"
   },
+  "294508": {
+    "officialWebsiteUrl": "https://cuny.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q762266#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/City_University_of_New_York",
+    "wikidataId": "Q762266"
+  },
+  "294509": null,
   "294512": {
     "officialWebsiteUrl": "https://www.coventry.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1138080#P856",
@@ -620,7 +928,37 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Colorado_State_University",
     "wikidataId": "Q1111640"
   },
+  "294524": {
+    "officialWebsiteUrl": "https://www.wm.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q875637#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/College_of_William_%26_Mary",
+    "wikidataId": "Q875637"
+  },
   "294527": null,
+  "294528": {
+    "officialWebsiteUrl": "https://www.uc.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q153265#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Cincinnati",
+    "wikidataId": "Q153265"
+  },
+  "294530": {
+    "officialWebsiteUrl": "http://www.cnu.ac.kr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q489488#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chungnam_National_University",
+    "wikidataId": "Q489488"
+  },
+  "294532": {
+    "officialWebsiteUrl": "http://www.jnu.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q494681#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chonnam_National_University",
+    "wikidataId": "Q494681"
+  },
+  "294533": {
+    "officialWebsiteUrl": "http://www.jbnu.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q623851#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Jeonbuk_National_University",
+    "wikidataId": "Q623851"
+  },
   "294534": {
     "officialWebsiteUrl": "https://ustc.edu.cn",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1074103#P856",
@@ -633,13 +971,33 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Chicago",
     "wikidataId": "Q131252"
   },
+  "294537": {
+    "officialWebsiteUrl": "http://www.chiba-u.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1321803#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chiba_University",
+    "wikidataId": "Q1321803"
+  },
   "294540": {
     "officialWebsiteUrl": "http://www.chalmers.se/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q836805#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Chalmers_University_of_Technology",
     "wikidataId": "Q836805"
   },
+  "294542": null,
+  "294543": {
+    "officialWebsiteUrl": "http://www.uclan.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1857773#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Lancashire",
+    "wikidataId": "Q1857773"
+  },
+  "294545": {
+    "officialWebsiteUrl": "https://www.bcu.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3547145#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Birmingham_City_University",
+    "wikidataId": "Q3547145"
+  },
   "294549": null,
+  "294552": null,
   "294553": null,
   "294554": {
     "officialWebsiteUrl": "https://case.edu",
@@ -652,6 +1010,12 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q190080#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Carnegie_Mellon_University",
     "wikidataId": "Q190080"
+  },
+  "294556": {
+    "officialWebsiteUrl": "https://carleton.ca/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1041737#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Carleton_University",
+    "wikidataId": "Q1041737"
   },
   "294557": {
     "officialWebsiteUrl": "https://cardiff.ac.uk/",
@@ -707,6 +1071,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Calgary",
     "wikidataId": "Q1067471"
   },
+  "294575": {
+    "officialWebsiteUrl": "https://www.caluniv.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1145306#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Calcutta",
+    "wikidataId": "Q1145306"
+  },
   "294583": null,
   "294584": {
     "officialWebsiteUrl": "https://www.brown.edu/",
@@ -726,12 +1096,30 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Bristol",
     "wikidataId": "Q459506"
   },
+  "294588": {
+    "officialWebsiteUrl": "https://www.byu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q332498#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Brigham_Young_University",
+    "wikidataId": "Q332498"
+  },
   "294589": null,
+  "294590": {
+    "officialWebsiteUrl": "https://www.brandeis.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49119#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Brandeis_University",
+    "wikidataId": "Q49119"
+  },
   "294591": {
     "officialWebsiteUrl": "http://www.brad.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q954035#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Bradford",
     "wikidataId": "Q954035"
+  },
+  "294592": {
+    "officialWebsiteUrl": "http://www.bournemouth.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3182943#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Bournemouth_University",
+    "wikidataId": "Q3182943"
   },
   "294593": {
     "officialWebsiteUrl": "https://bu.edu/",
@@ -751,6 +1139,12 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q861904#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Bilkent_University",
     "wikidataId": "Q861904"
+  },
+  "294599": {
+    "officialWebsiteUrl": "https://www.uni-bielefeld.de/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q24382#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Bielefeld_University",
+    "wikidataId": "Q24382"
   },
   "294601": {
     "officialWebsiteUrl": "https://www.unibe.ch/",
@@ -787,6 +1181,12 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q372608#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Basel",
     "wikidataId": "Q372608"
+  },
+  "294611": {
+    "officialWebsiteUrl": "https://www.uniba.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1236136#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Bari",
+    "wikidataId": "Q1236136"
   },
   "294613": {
     "officialWebsiteUrl": "https://crai.ub.edu/",
@@ -825,6 +1225,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Arizona_State_University",
     "wikidataId": "Q670897"
   },
+  "294633": {
+    "officialWebsiteUrl": "https://www.aoyama.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q616359#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Aoyama_Gakuin_University",
+    "wikidataId": "Q616359"
+  },
   "294637": {
     "officialWebsiteUrl": "https://american.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q168000#P856",
@@ -837,7 +1243,19 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Alberta",
     "wikidataId": "Q640694"
   },
+  "294641": {
+    "officialWebsiteUrl": "https://www.ua.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q492318#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Alabama",
+    "wikidataId": "Q492318"
+  },
   "294642": null,
+  "294646": {
+    "officialWebsiteUrl": "https://www.aber.ac.uk/en/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q319761#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Aberystwyth_University",
+    "wikidataId": "Q319761"
+  },
   "294647": {
     "officialWebsiteUrl": "https://abdn.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q270532#P856",
@@ -856,13 +1274,79 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/RWTH_Aachen_University",
     "wikidataId": "Q273263"
   },
+  "294650": {
+    "officialWebsiteUrl": "http://www.fcu.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q696672#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Feng_Chia_University",
+    "wikidataId": "Q696672"
+  },
   "294654": {
     "officialWebsiteUrl": "https://ox.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q34433#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Oxford",
     "wikidataId": "Q34433"
   },
+  "294655": {
+    "officialWebsiteUrl": "http://nau.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q139901#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Northern_Arizona_University",
+    "wikidataId": "Q139901"
+  },
   "294656": null,
+  "294667": {
+    "officialWebsiteUrl": "https://www.ohio.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1075339#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ohio_University",
+    "wikidataId": "Q1075339"
+  },
+  "294676": null,
+  "294680": {
+    "officialWebsiteUrl": "https://www.pdx.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1771717#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Portland_State_University",
+    "wikidataId": "Q1771717"
+  },
+  "294682": {
+    "officialWebsiteUrl": "http://www.cgu.edu.tw",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2748799#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chang_Gung_University",
+    "wikidataId": "Q2748799"
+  },
+  "294683": {
+    "officialWebsiteUrl": "http://www.erciyes.edu.tr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4810943#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Erciyes_University",
+    "wikidataId": "Q4810943"
+  },
+  "294692": {
+    "officialWebsiteUrl": "https://www.ccu.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q697299#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Chung_Cheng_University",
+    "wikidataId": "Q697299"
+  },
+  "294694": {
+    "officialWebsiteUrl": "https://www.sdsu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q913861#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/San_Diego_State_University",
+    "wikidataId": "Q913861"
+  },
+  "294695": null,
+  "294703": null,
+  "294711": null,
+  "294713": {
+    "officialWebsiteUrl": "https://dmu.ac.uk/home.aspx",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3551402#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/De_Montfort_University",
+    "wikidataId": "Q3551402"
+  },
+  "294714": null,
+  "294717": null,
+  "294725": {
+    "officialWebsiteUrl": "http://www.ttu.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1423756#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Texas_Tech_University",
+    "wikidataId": "Q1423756"
+  },
   "294729": {
     "officialWebsiteUrl": "https://adu.ac.ae",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4670157#P856",
@@ -875,6 +1359,36 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajman_University",
     "wikidataId": "Q12204508"
   },
+  "294733": {
+    "officialWebsiteUrl": "https://www.uaf.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1285262#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Alaska_Fairbanks",
+    "wikidataId": "Q1285262"
+  },
+  "294734": {
+    "officialWebsiteUrl": "http://www.ou.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q640652#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Oklahoma",
+    "wikidataId": "Q640652"
+  },
+  "294737": {
+    "officialWebsiteUrl": "https://www.okayama-u.ac.jp/index_e.html",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1067916#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Okayama_University",
+    "wikidataId": "Q1067916"
+  },
+  "294738": {
+    "officialWebsiteUrl": "https://www.hartford.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q747053#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Hartford",
+    "wikidataId": "Q747053"
+  },
+  "294739": {
+    "officialWebsiteUrl": "https://www.uidaho.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1854488#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Idaho",
+    "wikidataId": "Q1854488"
+  },
   "294741": {
     "officialWebsiteUrl": "https://osu.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q309331#P856",
@@ -882,11 +1396,47 @@
     "wikidataId": "Q309331"
   },
   "294743": null,
+  "294747": {
+    "officialWebsiteUrl": "https://www.unr.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1185955#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Nevada%2C_Reno",
+    "wikidataId": "Q1185955"
+  },
+  "294748": {
+    "officialWebsiteUrl": "https://www.unh.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49207#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_New_Hampshire",
+    "wikidataId": "Q49207"
+  },
+  "294751": {
+    "officialWebsiteUrl": "https://www.nova.edu/index.html",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1798499#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Nova_Southeastern_University",
+    "wikidataId": "Q1798499"
+  },
+  "294753": {
+    "officialWebsiteUrl": "https://www.unt.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q860527#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_North_Texas",
+    "wikidataId": "Q860527"
+  },
+  "294756": {
+    "officialWebsiteUrl": "https://www.uri.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1641788#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Rhode_Island",
+    "wikidataId": "Q1641788"
+  },
   "294758": {
     "officialWebsiteUrl": "https://www.nottingham.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q472316#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Nottingham",
     "wikidataId": "Q472316"
+  },
+  "294760": {
+    "officialWebsiteUrl": "http://www.utoledo.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2302319#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Toledo",
+    "wikidataId": "Q2302319"
   },
   "294761": {
     "officialWebsiteUrl": "https://www.nd.edu/",
@@ -894,11 +1444,29 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Notre_Dame",
     "wikidataId": "Q178848"
   },
+  "294762": {
+    "officialWebsiteUrl": "http://www.uwyo.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1326975#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Wyoming",
+    "wikidataId": "Q1326975"
+  },
+  "294763": {
+    "officialWebsiteUrl": "http://www.usu.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1052614#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Utah_State_University",
+    "wikidataId": "Q1052614"
+  },
   "294764": {
     "officialWebsiteUrl": "https://ntnu.no",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q314536#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Norwegian_University_of_Science_and_Technology",
     "wikidataId": "Q314536"
+  },
+  "294766": {
+    "officialWebsiteUrl": "https://wayne.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q349055#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Wayne_State_University",
+    "wikidataId": "Q349055"
   },
   "294767": {
     "officialWebsiteUrl": "https://www.northwestern.edu/",
@@ -907,11 +1475,18 @@
     "wikidataId": "Q309350"
   },
   "294770": null,
+  "294772": null,
   "294773": {
     "officialWebsiteUrl": "https://www.northeastern.edu/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q37548#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Northeastern_University",
     "wikidataId": "Q37548"
+  },
+  "294776": {
+    "officialWebsiteUrl": "https://auburn.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q540672#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Auburn_University",
+    "wikidataId": "Q540672"
   },
   "294777": {
     "officialWebsiteUrl": "https://www.ru.nl/",
@@ -925,6 +1500,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Milan",
     "wikidataId": "Q46210"
   },
+  "294779": {
+    "officialWebsiteUrl": "http://www.niigata-u.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q267111#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Niigata_University",
+    "wikidataId": "Q267111"
+  },
   "294781": {
     "officialWebsiteUrl": "https://www.ncl.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q837164#P856",
@@ -935,12 +1516,19 @@
   "294786": null,
   "294787": null,
   "294788": null,
+  "294790": {
+    "officialWebsiteUrl": "https://www.unm.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1190812#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_New_Mexico",
+    "wikidataId": "Q1190812"
+  },
   "294791": {
     "officialWebsiteUrl": "https://www.univ-amu.fr/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2302586#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Aix-Marseille_University",
     "wikidataId": "Q2302586"
   },
+  "294792": null,
   "294793": null,
   "294795": {
     "officialWebsiteUrl": "https://www.ym.edu.tw",
@@ -951,14 +1539,32 @@
   "294798": null,
   "294800": null,
   "294802": null,
+  "294803": {
+    "officialWebsiteUrl": "https://www.mst.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4380853#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Missouri_University_of_Science_and_Technology",
+    "wikidataId": "Q4380853"
+  },
   "294804": null,
   "294806": null,
   "294807": null,
+  "294808": {
+    "officialWebsiteUrl": "https://www.nchu.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q707573#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Chung_Hsing_University",
+    "wikidataId": "Q707573"
+  },
   "294810": {
     "officialWebsiteUrl": "https://www.nctu.edu.tw",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q43401#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Chiao_Tung_University",
     "wikidataId": "Q43401"
+  },
+  "294811": {
+    "officialWebsiteUrl": "http://www.nccu.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q712849#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Chengchi_University",
+    "wikidataId": "Q712849"
   },
   "294816": {
     "officialWebsiteUrl": "https://www.ncu.edu.tw/tw/index.html",
@@ -980,11 +1586,18 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Nanjing_University",
     "wikidataId": "Q683580"
   },
+  "294830": null,
   "294832": {
     "officialWebsiteUrl": "https://www.nagoya-u.ac.jp",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1191132#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Nagoya_University",
     "wikidataId": "Q1191132"
+  },
+  "294833": {
+    "officialWebsiteUrl": "http://www.nagasaki-u.ac.jp",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q114892#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Nagasaki_University",
+    "wikidataId": "Q114892"
   },
   "294836": {
     "officialWebsiteUrl": "https://unc.edu",
@@ -998,6 +1611,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/North_Carolina_State_University",
     "wikidataId": "Q1132346"
   },
+  "294838": {
+    "officialWebsiteUrl": "https://www.um.es/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1236345#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Murcia",
+    "wikidataId": "Q1236345"
+  },
   "294839": {
     "officialWebsiteUrl": "https://www.uni-muenster.de/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q168426#P856",
@@ -1005,17 +1624,30 @@
     "wikidataId": "Q168426"
   },
   "294840": null,
+  "294841": {
+    "officialWebsiteUrl": "https://mu.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q406402#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Mumbai",
+    "wikidataId": "Q406402"
+  },
   "294843": {
     "officialWebsiteUrl": "https://www.umontreal.ca/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q392189#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Universit%C3%A9_de_Montr%C3%A9al",
     "wikidataId": "Q392189"
   },
+  "294844": null,
   "294848": {
     "officialWebsiteUrl": "https://www.monash.edu/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q598841#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Monash_University",
     "wikidataId": "Q598841"
+  },
+  "294849": {
+    "officialWebsiteUrl": "https://www.unimore.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1243705#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Modena_and_Reggio_Emilia",
+    "wikidataId": "Q1243705"
   },
   "294850": {
     "officialWebsiteUrl": "https://mit.edu",
@@ -1023,9 +1655,16 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Massachusetts_Institute_of_Technology",
     "wikidataId": "Q49108"
   },
+  "294851": null,
   "294852": null,
   "294853": null,
   "294854": null,
+  "294856": {
+    "officialWebsiteUrl": "https://www.mdx.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1760791#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Middlesex_University",
+    "wikidataId": "Q1760791"
+  },
   "294857": {
     "officialWebsiteUrl": "https://umich.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q230492#P856",
@@ -1074,7 +1713,14 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Maryland",
     "wikidataId": "Q503415"
   },
+  "294868": null,
   "294869": null,
+  "294870": {
+    "officialWebsiteUrl": "https://umanitoba.ca/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1191833#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Manitoba",
+    "wikidataId": "Q1191833"
+  },
   "294871": {
     "officialWebsiteUrl": "https://manchester.ac.uk",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q230899#P856",
@@ -1093,17 +1739,71 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Complutense_University_of_Madrid",
     "wikidataId": "Q219694"
   },
+  "294881": {
+    "officialWebsiteUrl": "https://www.unisa.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1633215#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Salerno",
+    "wikidataId": "Q1633215"
+  },
+  "294883": {
+    "officialWebsiteUrl": "http://www.k-state.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q31249#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kansas_State_University",
+    "wikidataId": "Q31249"
+  },
+  "294894": {
+    "officialWebsiteUrl": "http://www.icu.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1141728#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/International_Christian_University",
+    "wikidataId": "Q1141728"
+  },
+  "294918": null,
+  "294921": {
+    "officialWebsiteUrl": "https://www.meiji.ac.jp",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q46492#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Meiji_University",
+    "wikidataId": "Q46492"
+  },
+  "294932": {
+    "officialWebsiteUrl": "https://www.rikkyo.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1143235#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Rikkyo_University",
+    "wikidataId": "Q1143235"
+  },
   "294942": {
     "officialWebsiteUrl": "https://www.toyota-ti.ac.jp/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7830890#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Toyota_Technological_Institute",
     "wikidataId": "Q7830890"
   },
+  "294949": null,
+  "294953": null,
+  "294955": null,
+  "294956": null,
+  "294957": null,
+  "294960": {
+    "officialWebsiteUrl": "http://www.ntou.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q6978829#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Taiwan_Ocean_University",
+    "wikidataId": "Q6978829"
+  },
+  "294961": {
+    "officialWebsiteUrl": "https://www.ndhu.edu.tw",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q11194540#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Dong_Hwa_University",
+    "wikidataId": "Q11194540"
+  },
   "294963": {
     "officialWebsiteUrl": "http://www.ntut.edu.tw/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q6978828#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Taipei_University_of_Technology",
     "wikidataId": "Q6978828"
+  },
+  "294966": {
+    "officialWebsiteUrl": "http://www.cycu.edu.tw",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5116360#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chung_Yuan_Christian_University",
+    "wikidataId": "Q5116360"
   },
   "294971": {
     "officialWebsiteUrl": "http://www.hust.edu.cn",
@@ -1117,11 +1817,41 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Northwestern_Polytechnical_University",
     "wikidataId": "Q832550"
   },
+  "294973": {
+    "officialWebsiteUrl": "http://www.cumt.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1074084#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/China_University_of_Mining_and_Technology",
+    "wikidataId": "Q1074084"
+  },
   "294974": {
     "officialWebsiteUrl": "http://www.ustb.edu.cn",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1510516#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Science_and_Technology_Beijing",
     "wikidataId": "Q1510516"
+  },
+  "294975": {
+    "officialWebsiteUrl": "http://www.cup.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3274786#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/China_University_of_Petroleum_(Beijing)",
+    "wikidataId": "Q3274786"
+  },
+  "294976": {
+    "officialWebsiteUrl": "http://www.cug.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q48880933#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/China_University_of_Geosciences%2C_Wuhan",
+    "wikidataId": "Q48880933"
+  },
+  "294977": {
+    "officialWebsiteUrl": "http://www.njust.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3953805#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Nanjing_University_of_Science_and_Technology",
+    "wikidataId": "Q3953805"
+  },
+  "294978": {
+    "officialWebsiteUrl": "http://www.xidian.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q649906#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Xidian_University",
+    "wikidataId": "Q649906"
   },
   "294979": {
     "officialWebsiteUrl": "http://www.uestc.edu.cn/",
@@ -1129,14 +1859,204 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Electronic_Science_and_Technology_of_China",
     "wikidataId": "Q5971900"
   },
+  "294980": {
+    "officialWebsiteUrl": "http://www.njnu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1477812#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Nanjing_Normal_University",
+    "wikidataId": "Q1477812"
+  },
+  "294981": {
+    "officialWebsiteUrl": "http://www.bjtu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4587760#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_Jiaotong_University",
+    "wikidataId": "Q4587760"
+  },
+  "294982": {
+    "officialWebsiteUrl": "https://www.bjut.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1674548#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_University_of_Technology",
+    "wikidataId": "Q1674548"
+  },
+  "294983": {
+    "officialWebsiteUrl": "http://www.buct.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2496210#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_University_of_Chemical_Technology",
+    "wikidataId": "Q2496210"
+  },
+  "294984": {
+    "officialWebsiteUrl": "http://www.bupt.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4881210#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_University_of_Posts_and_Telecommunications",
+    "wikidataId": "Q4881210"
+  },
+  "294985": {
+    "officialWebsiteUrl": "http://www.bjfu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4881133#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_Forestry_University",
+    "wikidataId": "Q4881133"
+  },
+  "294989": {
+    "officialWebsiteUrl": "http://www.bucm.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1039400#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_University_of_Chinese_Medicine",
+    "wikidataId": "Q1039400"
+  },
+  "294990": {
+    "officialWebsiteUrl": "https://www.bfsu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1144682#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_Foreign_Studies_University",
+    "wikidataId": "Q1144682"
+  },
+  "294991": {
+    "officialWebsiteUrl": "https://www.cupl.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q833961#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/China_University_of_Political_Science_and_Law",
+    "wikidataId": "Q833961"
+  },
+  "294995": {
+    "officialWebsiteUrl": "https://www.shisu.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1455176#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Shanghai_International_Studies_University",
+    "wikidataId": "Q1455176"
+  },
+  "294997": {
+    "officialWebsiteUrl": "http://www.dhu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q837544#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Donghua_University",
+    "wikidataId": "Q837544"
+  },
+  "294998": {
+    "officialWebsiteUrl": "http://www.swu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q840443#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Southwest_University",
+    "wikidataId": "Q840443"
+  },
+  "295006": {
+    "officialWebsiteUrl": "http://www.hrbeu.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q23102#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Harbin_Engineering_University",
+    "wikidataId": "Q23102"
+  },
+  "295010": {
+    "officialWebsiteUrl": "http://www.hhu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q662131#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Hohai_University",
+    "wikidataId": "Q662131"
+  },
+  "295011": {
+    "officialWebsiteUrl": "http://www.jiangnan.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q6191676#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Jiangnan_University",
+    "wikidataId": "Q6191676"
+  },
+  "295012": {
+    "officialWebsiteUrl": "http://www.ahu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q545540#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Anhui_University",
+    "wikidataId": "Q545540"
+  },
+  "295016": {
+    "officialWebsiteUrl": "http://www.ouc.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1074015#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ocean_University_of_China",
+    "wikidataId": "Q1074015"
+  },
+  "295017": {
+    "officialWebsiteUrl": "http://www.hzau.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3429270#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Huazhong_Agricultural_University",
+    "wikidataId": "Q3429270"
+  },
+  "295018": {
+    "officialWebsiteUrl": "http://www.ccnu.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1397589#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Central_China_Normal_University",
+    "wikidataId": "Q1397589"
+  },
+  "295028": {
+    "officialWebsiteUrl": "https://www.snnu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5932856#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Shaanxi_Normal_University",
+    "wikidataId": "Q5932856"
+  },
+  "295031": {
+    "officialWebsiteUrl": "https://www.swjtu.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3551422#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Southwest_Jiaotong_University",
+    "wikidataId": "Q3551422"
+  },
+  "295034": {
+    "officialWebsiteUrl": "http://www.fjnu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4570168#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Fujian_Normal_University",
+    "wikidataId": "Q4570168"
+  },
+  "295037": {
+    "officialWebsiteUrl": "http://www.nwu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2496116#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Northwest_University",
+    "wikidataId": "Q2496116"
+  },
   "295038": null,
+  "295040": {
+    "officialWebsiteUrl": "http://www.gachon.ac.kr/english/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q56147#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Gachon_University",
+    "wikidataId": "Q56147"
+  },
   "295060": {
     "officialWebsiteUrl": "https://illinois.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q457281#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Illinois_Urbana-Champaign",
     "wikidataId": "Q457281"
   },
+  "295062": {
+    "officialWebsiteUrl": "https://www.umbc.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q735049#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Maryland%2C_Baltimore_County",
+    "wikidataId": "Q735049"
+  },
+  "295063": {
+    "officialWebsiteUrl": "https://www.newark.rutgers.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7382780#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Rutgers_University%E2%80%93Newark",
+    "wikidataId": "Q7382780"
+  },
+  "295081": null,
+  "295082": null,
+  "295083": {
+    "officialWebsiteUrl": "https://www.umkc.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q940690#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Missouri%E2%80%93Kansas_City",
+    "wikidataId": "Q940690"
+  },
+  "295084": {
+    "officialWebsiteUrl": "http://www.uab.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1472663#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Alabama_at_Birmingham",
+    "wikidataId": "Q1472663"
+  },
+  "295086": null,
   "295098": null,
+  "295100": null,
+  "295102": {
+    "officialWebsiteUrl": "http://www.alfaisal.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4118882#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Alfaisal_University",
+    "wikidataId": "Q4118882"
+  },
+  "295103": {
+    "officialWebsiteUrl": "http://www.qu.edu.sa/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7267062#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Qassim_University",
+    "wikidataId": "Q7267062"
+  },
+  "295108": {
+    "officialWebsiteUrl": "http://www.psu.edu.sa",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7244255#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Prince_Sultan_University",
+    "wikidataId": "Q7244255"
+  },
   "295110": null,
   "295111": {
     "officialWebsiteUrl": "https://satbayev.university",
@@ -1144,34 +2064,183 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Satbayev_University",
     "wikidataId": "Q1513804"
   },
+  "295112": null,
+  "295113": null,
+  "295114": null,
+  "295162": {
+    "officialWebsiteUrl": "http://www.wvu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q115376#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/West_Virginia_University",
+    "wikidataId": "Q115376"
+  },
+  "295196": {
+    "officialWebsiteUrl": "https://www.uncc.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1783178#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_North_Carolina_at_Charlotte",
+    "wikidataId": "Q1783178"
+  },
+  "295200": null,
+  "295201": null,
+  "295202": {
+    "officialWebsiteUrl": "https://go.okstate.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q749718#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Oklahoma_State_University",
+    "wikidataId": "Q749718"
+  },
+  "295205": {
+    "officialWebsiteUrl": "https://www.unipa.it/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1641504#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Palermo",
+    "wikidataId": "Q1641504"
+  },
+  "295208": null,
+  "295212": null,
+  "295215": {
+    "officialWebsiteUrl": "https://www.kent.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1473615#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kent_State_University",
+    "wikidataId": "Q1473615"
+  },
+  "295218": {
+    "officialWebsiteUrl": "https://www.sfsu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1256981#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/San_Francisco_State_University",
+    "wikidataId": "Q1256981"
+  },
+  "295219": {
+    "officialWebsiteUrl": "https://www.utdallas.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1781394#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Texas_at_Dallas",
+    "wikidataId": "Q1781394"
+  },
+  "295222": null,
+  "295242": {
+    "officialWebsiteUrl": "http://www.louisville.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1317143#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Louisville",
+    "wikidataId": "Q1317143"
+  },
+  "295243": {
+    "officialWebsiteUrl": "https://www.unipr.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1758474#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Parma",
+    "wikidataId": "Q1758474"
+  },
+  "295244": {
+    "officialWebsiteUrl": "http://www.olemiss.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1138384#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Mississippi",
+    "wikidataId": "Q1138384"
+  },
+  "295248": {
+    "officialWebsiteUrl": "https://swarthmore.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1378320#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Swarthmore_College",
+    "wikidataId": "Q1378320"
+  },
+  "295250": null,
+  "295253": null,
+  "295258": {
+    "officialWebsiteUrl": "http://www.cyut.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5072867#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chaoyang_University_of_Technology",
+    "wikidataId": "Q5072867"
+  },
   "295295": null,
+  "295297": {
+    "officialWebsiteUrl": "https://www.ec-lyon.fr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q10177#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/%C3%89cole_Centrale_de_Lyon",
+    "wikidataId": "Q10177"
+  },
   "295319": {
     "officialWebsiteUrl": "http://aau.ac.ae/en/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4703454#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Al_Ain_University",
     "wikidataId": "Q4703454"
   },
+  "295335": {
+    "officialWebsiteUrl": "http://www.psau.edu.sa/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q12204394#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Prince_Sattam_bin_Abdulaziz_University",
+    "wikidataId": "Q12204394"
+  },
   "295341": null,
+  "295342": null,
+  "295344": null,
+  "295391": {
+    "officialWebsiteUrl": "http://www.effatuniversity.edu.sa/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5347215#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Effat_University",
+    "wikidataId": "Q5347215"
+  },
   "295395": {
     "officialWebsiteUrl": "https://soas.ac.uk",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q220144#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/SOAS%2C_University_of_London",
     "wikidataId": "Q220144"
   },
+  "295447": null,
+  "295450": {
+    "officialWebsiteUrl": "https://www.nitt.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3521821#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/National_Institute_of_Technology%2C_Tiruchirappalli",
+    "wikidataId": "Q3521821"
+  },
   "295458": null,
+  "295479": null,
   "295508": null,
   "295536": null,
+  "295565": {
+    "officialWebsiteUrl": "http://www.galgotiasuniversity.edu.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5518530#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Galgotias_University",
+    "wikidataId": "Q5518530"
+  },
+  "295579": null,
   "295657": {
     "officialWebsiteUrl": "http://ku.ac.ae/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q6399651#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Khalifa_University",
     "wikidataId": "Q6399651"
   },
+  "295730": {
+    "officialWebsiteUrl": "http://www.osmania.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2092358#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Osmania_University",
+    "wikidataId": "Q2092358"
+  },
+  "295742": {
+    "officialWebsiteUrl": "https://jmi.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2340211#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Jamia_Millia_Islamia",
+    "wikidataId": "Q2340211"
+  },
+  "295746": null,
+  "295760": {
+    "officialWebsiteUrl": "http://www.amu.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q196544#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Aligarh_Muslim_University",
+    "wikidataId": "Q196544"
+  },
+  "295780": null,
+  "295787": {
+    "officialWebsiteUrl": "https://www.kmu.edu.tw/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q700801#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kaohsiung_Medical_University",
+    "wikidataId": "Q700801"
+  },
   "295796": {
     "officialWebsiteUrl": "http://www.msu.edu.my/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q12712163#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Management_and_Science_University",
     "wikidataId": "Q12712163"
+  },
+  "295821": {
+    "officialWebsiteUrl": "https://www.slu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q734774#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Saint_Louis_University",
+    "wikidataId": "Q734774"
   },
   "295828": {
     "officialWebsiteUrl": "http://www.ucsiuniversity.edu.my/index.aspx",
@@ -1185,13 +2254,47 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Canadian_University_Dubai",
     "wikidataId": "Q5030654"
   },
+  "295871": {
+    "officialWebsiteUrl": "http://www.imu.edu.my/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q12712164#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/IMU_University",
+    "wikidataId": "Q12712164"
+  },
+  "295883": {
+    "officialWebsiteUrl": "http://www.seoultech.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q482678#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Seoul_National_University_of_Science_and_Technology",
+    "wikidataId": "Q482678"
+  },
+  "295900": null,
+  "295908": {
+    "officialWebsiteUrl": "https://www.wesleyan.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49167#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Wesleyan_University",
+    "wikidataId": "Q49167"
+  },
   "295923": {
     "officialWebsiteUrl": "http://www.pmu.edu.sa/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7244166#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Prince_Mohammad_bin_Fahd_University",
     "wikidataId": "Q7244166"
   },
+  "295950": null,
+  "295966": {
+    "officialWebsiteUrl": "http://korkyt.kz",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q16434809#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Korkyt_Ata_Kyzylorda_University",
+    "wikidataId": "Q16434809"
+  },
+  "296028": {
+    "officialWebsiteUrl": "http://www.rutgers.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7382823#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Rutgers_University%E2%80%93Camden",
+    "wikidataId": "Q7382823"
+  },
+  "296066": null,
   "296089": null,
+  "296097": null,
   "296110": {
     "officialWebsiteUrl": "http://www.metu.edu.tr",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q756126#P856",
@@ -1204,29 +2307,189 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Sussex",
     "wikidataId": "Q1161297"
   },
+  "296350": null,
+  "296370": null,
+  "296371": null,
+  "296375": {
+    "officialWebsiteUrl": "http://www.lincoln.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2738646#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Lincoln",
+    "wikidataId": "Q2738646"
+  },
+  "296377": {
+    "officialWebsiteUrl": "http://www.gcal.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1353139#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Glasgow_Caledonian_University",
+    "wikidataId": "Q1353139"
+  },
+  "296378": {
+    "officialWebsiteUrl": "https://aru.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q540751#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Anglia_Ruskin_University",
+    "wikidataId": "Q540751"
+  },
+  "296379": {
+    "officialWebsiteUrl": "http://www.leedsbeckett.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2392351#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Leeds_Beckett_University",
+    "wikidataId": "Q2392351"
+  },
+  "296380": {
+    "officialWebsiteUrl": "https://www.arts.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2065666#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_the_Arts_London",
+    "wikidataId": "Q2065666"
+  },
+  "296381": {
+    "officialWebsiteUrl": "http://www.gre.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1896148#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Greenwich",
+    "wikidataId": "Q1896148"
+  },
+  "296383": {
+    "officialWebsiteUrl": "https://www.ulster.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2096524#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ulster_University",
+    "wikidataId": "Q2096524"
+  },
+  "296386": null,
+  "296399": null,
+  "296402": null,
+  "296403": null,
+  "296404": null,
+  "296405": null,
+  "296418": null,
+  "296429": {
+    "officialWebsiteUrl": "https://konkuk.ac.kr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q41765#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Konkuk_University",
+    "wikidataId": "Q41765"
+  },
+  "296432": {
+    "officialWebsiteUrl": "https://www.hongik.ac.kr/index.do",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q491511#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Hongik_University",
+    "wikidataId": "Q491511"
+  },
   "296433": {
     "officialWebsiteUrl": "http://www.ajou.ac.kr/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q491082#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Ajou_University",
     "wikidataId": "Q491082"
   },
+  "296449": null,
+  "296452": null,
+  "296453": null,
+  "296454": {
+    "officialWebsiteUrl": "http://www.universidaddeleon.edu.mx/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q16644582#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universidad_de_Le%C3%B3n",
+    "wikidataId": "Q16644582"
+  },
+  "296455": {
+    "officialWebsiteUrl": "https://www.uclm.es/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q941806#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universidad_de_Castilla-La_Mancha",
+    "wikidataId": "Q941806"
+  },
+  "296457": null,
+  "296458": null,
+  "296459": {
+    "officialWebsiteUrl": "https://www.uma.es/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q958650#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universidad_de_M%C3%A1laga",
+    "wikidataId": "Q958650"
+  },
+  "296460": {
+    "officialWebsiteUrl": "https://www.ehu.eus/eu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1232428#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_the_Basque_Country",
+    "wikidataId": "Q1232428"
+  },
+  "296462": null,
   "296463": null,
+  "296464": {
+    "officialWebsiteUrl": "https://www.ua.es",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2037040#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Alicante",
+    "wikidataId": "Q2037040"
+  },
   "296465": null,
+  "296528": {
+    "officialWebsiteUrl": "https://www.uis.no/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q498401#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Stavanger",
+    "wikidataId": "Q498401"
+  },
+  "296533": null,
+  "296535": null,
   "296537": null,
+  "296543": null,
+  "296548": null,
+  "296551": {
+    "officialWebsiteUrl": "https://www.unibz.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1231433#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Free_University_of_Bozen-Bolzano",
+    "wikidataId": "Q1231433"
+  },
+  "296555": null,
+  "296557": null,
+  "296559": {
+    "officialWebsiteUrl": "https://www.unisalento.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1230902#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Salento",
+    "wikidataId": "Q1230902"
+  },
+  "296560": null,
+  "296561": null,
+  "296569": null,
   "296570": null,
+  "296574": null,
+  "296576": null,
+  "296584": {
+    "officialWebsiteUrl": "https://www.uni-hohenheim.de/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q690912#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Hohenheim",
+    "wikidataId": "Q690912"
+  },
+  "296588": null,
   "296589": null,
+  "296598": null,
+  "296605": null,
+  "296609": null,
+  "296615": null,
   "296634": {
     "officialWebsiteUrl": "https://www.u-bordeaux.fr/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q13344#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Bordeaux",
     "wikidataId": "Q13344"
   },
+  "296635": null,
   "296646": null,
+  "296649": null,
+  "296656": {
+    "officialWebsiteUrl": "https://ruc.dk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1542386#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Roskilde_University",
+    "wikidataId": "Q1542386"
+  },
   "296663": {
     "officialWebsiteUrl": "https://www.aau.dk",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q601956#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Aalborg_University",
     "wikidataId": "Q601956"
+  },
+  "296681": {
+    "officialWebsiteUrl": "http://www.nwu.ac.za",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1998811#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/North-West_University",
+    "wikidataId": "Q1998811"
+  },
+  "296682": {
+    "officialWebsiteUrl": "http://www.aud.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q467144#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/American_University_in_Dubai",
+    "wikidataId": "Q467144"
   },
   "296684": {
     "officialWebsiteUrl": "https://ksu.edu.sa",
@@ -1240,18 +2503,116 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/King_Khalid_University",
     "wikidataId": "Q6411791"
   },
+  "296686": {
+    "officialWebsiteUrl": "http://www.kfu.edu.sa",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3070702#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/King_Faisal_University",
+    "wikidataId": "Q3070702"
+  },
+  "296688": {
+    "officialWebsiteUrl": "https://iu.edu.sa/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1141959#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Islamic_University_of_Madinah",
+    "wikidataId": "Q1141959"
+  },
   "296716": {
     "officialWebsiteUrl": "http://www.sejong.ac.kr/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q491711#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Sejong_University",
     "wikidataId": "Q491711"
   },
+  "296721": {
+    "officialWebsiteUrl": "http://www.pknu.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q482730#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Pukyong_National_University",
+    "wikidataId": "Q482730"
+  },
+  "296739": {
+    "officialWebsiteUrl": "http://www.kookmin.ac.kr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q487177#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kookmin_University",
+    "wikidataId": "Q487177"
+  },
+  "296742": {
+    "officialWebsiteUrl": "https://www.kangwon.ac.kr/ko/index.do",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q497259#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kangwon_National_University",
+    "wikidataId": "Q497259"
+  },
+  "296751": null,
+  "296752": {
+    "officialWebsiteUrl": "http://www.hallym.ac.kr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q482724#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Hallym_University",
+    "wikidataId": "Q482724"
+  },
+  "296753": {
+    "officialWebsiteUrl": "https://www.gnu.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q487836#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Gyeongsang_National_University",
+    "wikidataId": "Q487836"
+  },
+  "296757": {
+    "officialWebsiteUrl": "https://www.dongguk.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q487804#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Dongguk_University",
+    "wikidataId": "Q487804"
+  },
+  "296758": {
+    "officialWebsiteUrl": "http://www.dankook.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q491127#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Dankook_University",
+    "wikidataId": "Q491127"
+  },
+  "296761": {
+    "officialWebsiteUrl": "https://www.cbnu.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q491714#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chungbuk_National_University",
+    "wikidataId": "Q491714"
+  },
   "296762": null,
+  "296764": {
+    "officialWebsiteUrl": "http://www.jejunu.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q487855#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Jeju_National_University",
+    "wikidataId": "Q487855"
+  },
+  "296770": {
+    "officialWebsiteUrl": "http://www.yamaguchi-u.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1073666#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Yamaguchi_University",
+    "wikidataId": "Q1073666"
+  },
+  "296772": {
+    "officialWebsiteUrl": "https://www.tuat.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1301275#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Tokyo_University_of_Agriculture_and_Technology",
+    "wikidataId": "Q1301275"
+  },
+  "296773": null,
+  "296775": {
+    "officialWebsiteUrl": "http://www.sophia.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1153094#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Sophia_University",
+    "wikidataId": "Q1153094"
+  },
+  "296780": {
+    "officialWebsiteUrl": "http://www.apu.ac.jp",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1133142#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ritsumeikan_Asia_Pacific_University",
+    "wikidataId": "Q1133142"
+  },
   "296811": {
     "officialWebsiteUrl": "http://annauniv.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q165053#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Anna_University",
     "wikidataId": "Q165053"
+  },
+  "296812": {
+    "officialWebsiteUrl": "https://www.hksyu.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q834082#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Hong_Kong_Shue_Yan_University",
+    "wikidataId": "Q834082"
   },
   "296813": {
     "officialWebsiteUrl": "https://www.hkbu.edu.hk/",
@@ -1271,6 +2632,18 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Sydney",
     "wikidataId": "Q487556"
   },
+  "296816": {
+    "officialWebsiteUrl": "http://www.whut.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q832355#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Wuhan_University_of_Technology",
+    "wikidataId": "Q832355"
+  },
+  "296819": {
+    "officialWebsiteUrl": "http://www.scu.edu.au/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1278780#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Southern_Cross_University",
+    "wikidataId": "Q1278780"
+  },
   "296820": {
     "officialWebsiteUrl": "https://www.canberra.edu.au/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1640648#P856",
@@ -1282,6 +2655,24 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1284960#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Edith_Cowan_University",
     "wikidataId": "Q1284960"
+  },
+  "296822": {
+    "officialWebsiteUrl": "http://csu.edu.au/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1066188#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Charles_Sturt_University",
+    "wikidataId": "Q1066188"
+  },
+  "296834": null,
+  "296836": null,
+  "296838": null,
+  "296864": null,
+  "296865": null,
+  "296868": null,
+  "296875": {
+    "officialWebsiteUrl": "http://www.xjtlu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q13562485#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Xi'an_Jiaotong-Liverpool_University",
+    "wikidataId": "Q13562485"
   },
   "296893": {
     "officialWebsiteUrl": "https://www.usask.ca/",
@@ -1295,12 +2686,51 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Guelph",
     "wikidataId": "Q795988"
   },
+  "296896": {
+    "officialWebsiteUrl": "https://www.usherbrooke.ca/longueuil/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q64626742#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universit%C3%A9_de_Sherbrooke_-_Campus_de_Longueuil",
+    "wikidataId": "Q64626742"
+  },
   "296897": {
     "officialWebsiteUrl": "https://www.uwindsor.ca/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2065769#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Windsor",
     "wikidataId": "Q2065769"
   },
+  "296898": {
+    "officialWebsiteUrl": "http://www.mun.ca/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1895354#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Memorial_University_of_Newfoundland",
+    "wikidataId": "Q1895354"
+  },
+  "296900": {
+    "officialWebsiteUrl": "https://brocku.ca",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q923624#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Brock_University",
+    "wikidataId": "Q923624"
+  },
+  "296902": {
+    "officialWebsiteUrl": "https://www.uregina.ca/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3104287#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Regina",
+    "wikidataId": "Q3104287"
+  },
+  "296959": null,
+  "296977": {
+    "officialWebsiteUrl": "https://www.unical.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1752540#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Calabria",
+    "wikidataId": "Q1752540"
+  },
+  "296979": null,
+  "296992": {
+    "officialWebsiteUrl": "https://www.amrita.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4748684#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Amrita_Vishwa_Vidyapeetham",
+    "wikidataId": "Q4748684"
+  },
+  "296993": null,
   "296994": {
     "officialWebsiteUrl": "https://www.xmu.edu.cn/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1153539#P856",
@@ -1325,6 +2755,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/South_China_University_of_Technology",
     "wikidataId": "Q835366"
   },
+  "297002": {
+    "officialWebsiteUrl": "http://www.suda.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1639978#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Soochow_University",
+    "wikidataId": "Q1639978"
+  },
   "297004": {
     "officialWebsiteUrl": "https://scu.edu.cn",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2281517#P856",
@@ -1332,11 +2768,36 @@
     "wikidataId": "Q2281517"
   },
   "297005": null,
+  "297007": null,
+  "297008": {
+    "officialWebsiteUrl": "http://www.ud.ac.ae",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7895347#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Dubai",
+    "wikidataId": "Q7895347"
+  },
   "297009": {
     "officialWebsiteUrl": "http://www.nankai.edu.cn/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q254204#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Nankai_University",
     "wikidataId": "Q254204"
+  },
+  "297010": {
+    "officialWebsiteUrl": "http://www.njau.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1804773#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Nanjing_Agricultural_University",
+    "wikidataId": "Q1804773"
+  },
+  "297011": {
+    "officialWebsiteUrl": "http://www.nuaa.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q23110#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Nanjing_University_of_Aeronautics_and_Astronautics",
+    "wikidataId": "Q23110"
+  },
+  "297012": {
+    "officialWebsiteUrl": "http://www.lzu.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4475799#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Lanzhou_University",
+    "wikidataId": "Q4475799"
   },
   "297013": {
     "officialWebsiteUrl": "http://www.hunu.edu.cn/",
@@ -1349,6 +2810,12 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q632558#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Harbin_Institute_of_Technology",
     "wikidataId": "Q632558"
+  },
+  "297015": {
+    "officialWebsiteUrl": "http://www.ecust.edu.cn/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2655352#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/East_China_University_of_Science_and_Technology",
+    "wikidataId": "Q2655352"
   },
   "297016": {
     "officialWebsiteUrl": "http://english.ecnu.edu.cn",
@@ -1393,6 +2860,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Beijing_Institute_of_Technology",
     "wikidataId": "Q23101"
   },
+  "297040": {
+    "officialWebsiteUrl": "https://vicu.utoronto.ca",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3551503#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Victoria_University",
+    "wikidataId": "Q3551503"
+  },
   "297041": {
     "officialWebsiteUrl": "https://www.westernsydney.edu.au/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1141452#P856",
@@ -1405,11 +2878,18 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Southern_Queensland",
     "wikidataId": "Q978124"
   },
+  "297044": null,
   "297046": {
     "officialWebsiteUrl": "http://www.cdu.edu.au/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1064071#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Charles_Darwin_University",
     "wikidataId": "Q1064071"
+  },
+  "297047": {
+    "officialWebsiteUrl": "http://www.acu.edu.au/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q781371#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Australian_Catholic_University",
+    "wikidataId": "Q781371"
   },
   "297051": {
     "officialWebsiteUrl": "http://www.uaeu.ac.ae/",
@@ -1424,6 +2904,19 @@
     "wikidataId": "Q1567050"
   },
   "297053": null,
+  "297058": {
+    "officialWebsiteUrl": "https://uohyd.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1191166#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Hyderabad",
+    "wikidataId": "Q1191166"
+  },
+  "297061": null,
+  "297066": {
+    "officialWebsiteUrl": "https://www.unive.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1546906#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ca'_Foscari_University_of_Venice",
+    "wikidataId": "Q1546906"
+  },
   "297068": {
     "officialWebsiteUrl": "https://www.ku.edu.tr",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1193155#P856",
@@ -1436,6 +2929,13 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Swinburne_University_of_Technology",
     "wikidataId": "Q787234"
   },
+  "297076": {
+    "officialWebsiteUrl": "http://www.harper-adams.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5663364#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Harper_Adams_University",
+    "wikidataId": "Q5663364"
+  },
+  "297096": null,
   "297097": null,
   "297099": {
     "officialWebsiteUrl": "https://www.hw.ac.uk/",
@@ -1450,11 +2950,18 @@
     "wikidataId": "Q49118"
   },
   "297110": null,
+  "297111": null,
   "297113": {
     "officialWebsiteUrl": "http://www.bond.edu.au/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q892188#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Bond_University",
     "wikidataId": "Q892188"
+  },
+  "297122": {
+    "officialWebsiteUrl": "https://www.inha.ac.kr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q488851#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Inha_University",
+    "wikidataId": "Q488851"
   },
   "297123": {
     "officialWebsiteUrl": "https://www.zju.edu.cn",
@@ -1462,6 +2969,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Zhejiang_University",
     "wikidataId": "Q197543"
   },
+  "297124": null,
   "297126": {
     "officialWebsiteUrl": "https://www.uzh.ch/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q206702#P856",
@@ -1494,6 +3002,57 @@
     "wikidataId": "Q1048626"
   },
   "297140": null,
+  "297141": null,
+  "297142": null,
+  "297154": {
+    "officialWebsiteUrl": "http://www.yu.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q56148#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Yeungnam_University",
+    "wikidataId": "Q56148"
+  },
+  "297161": {
+    "officialWebsiteUrl": "http://www.uos.ac.kr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q488334#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Seoul",
+    "wikidataId": "Q488334"
+  },
+  "297163": {
+    "officialWebsiteUrl": "http://www.ulsan.ac.kr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q491717#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Ulsan",
+    "wikidataId": "Q491717"
+  },
+  "297168": null,
+  "297169": {
+    "officialWebsiteUrl": "http://www.sungshin.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7640246#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Sungshin_Women's_University",
+    "wikidataId": "Q7640246"
+  },
+  "297173": {
+    "officialWebsiteUrl": "https://www.sch.ac.kr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q484622#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Soonchunhyang_University",
+    "wikidataId": "Q484622"
+  },
+  "297174": {
+    "officialWebsiteUrl": "http://www.ynu.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1192619#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Yokohama_National_University",
+    "wikidataId": "Q1192619"
+  },
+  "297175": {
+    "officialWebsiteUrl": "https://www.yokohama-cu.ac.jp/index-e.html",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q914024#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Yokohama_City_University",
+    "wikidataId": "Q914024"
+  },
+  "297176": {
+    "officialWebsiteUrl": "https://www.yu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1048851#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Yeshiva_University",
+    "wikidataId": "Q1048851"
+  },
   "297177": {
     "officialWebsiteUrl": "https://yale.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49112#P856",
@@ -1520,6 +3079,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Wisconsin%E2%80%93Madison",
     "wikidataId": "Q838330"
   },
+  "297186": {
+    "officialWebsiteUrl": "http://www.westminster.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1247544#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Westminster",
+    "wikidataId": "Q1247544"
+  },
   "297187": {
     "officialWebsiteUrl": "https://www.western.ac.th",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q100979770#P856",
@@ -1532,6 +3097,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Western_Australia",
     "wikidataId": "Q1517021"
   },
+  "297189": null,
   "297191": {
     "officialWebsiteUrl": "https://uwaterloo.ca",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1049470#P856",
@@ -1568,6 +3134,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Warwick",
     "wikidataId": "Q865528"
   },
+  "297200": {
+    "officialWebsiteUrl": "https://wfu.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q392667#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Wake_Forest_University",
+    "wikidataId": "Q392667"
+  },
   "297201": {
     "officialWebsiteUrl": "https://www.waikato.ac.nz",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q606140#P856",
@@ -1593,6 +3165,12 @@
     "wikidataId": "Q213439"
   },
   "297206": null,
+  "297207": {
+    "officialWebsiteUrl": "http://www.vcu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2303536#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Virginia_Commonwealth_University",
+    "wikidataId": "Q2303536"
+  },
   "297210": null,
   "297211": {
     "officialWebsiteUrl": "https://www.victoria.ac.nz/",
@@ -1653,6 +3231,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Turin",
     "wikidataId": "Q499911"
   },
+  "297230": {
+    "officialWebsiteUrl": "https://tulane.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1193547#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Tulane_University",
+    "wikidataId": "Q1193547"
+  },
   "297231": {
     "officialWebsiteUrl": "https://tufts.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49120#P856",
@@ -1678,6 +3262,13 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Tsinghua_University",
     "wikidataId": "Q16955"
   },
+  "297236": null,
+  "297237": {
+    "officialWebsiteUrl": "https://units.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1751060#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Trieste",
+    "wikidataId": "Q1751060"
+  },
   "297238": {
     "officialWebsiteUrl": "https://www.unitn.it",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q930528#P856",
@@ -1685,6 +3276,7 @@
     "wikidataId": "Q930528"
   },
   "297239": null,
+  "297241": null,
   "297242": {
     "officialWebsiteUrl": "http://www.utoronto.ca/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q180865#P856",
@@ -1702,6 +3294,12 @@
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7842#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Tokyo",
     "wikidataId": "Q7842"
+  },
+  "297247": {
+    "officialWebsiteUrl": "https://www.tmu.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1148334#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Tokyo_Metropolitan_University",
+    "wikidataId": "Q1148334"
   },
   "297248": null,
   "297250": {
@@ -1734,6 +3332,13 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Texas_at_Austin",
     "wikidataId": "Q49213"
   },
+  "297258": null,
+  "297259": {
+    "officialWebsiteUrl": "https://www.temple.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1420239#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Temple_University",
+    "wikidataId": "Q1420239"
+  },
   "297262": {
     "officialWebsiteUrl": "https://www.tum.de/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q157808#P856",
@@ -1746,6 +3351,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Technical_University_of_Denmark",
     "wikidataId": "Q1269766"
   },
+  "297265": null,
   "297268": {
     "officialWebsiteUrl": "https://www.utas.edu.au/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q962011#P856",
@@ -1834,17 +3440,93 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Sogang_University",
     "wikidataId": "Q374457"
   },
+  "297291": {
+    "officialWebsiteUrl": "https://www.smith.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49204#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Smith_College",
+    "wikidataId": "Q49204"
+  },
   "297293": {
     "officialWebsiteUrl": "https://www.sfu.ca/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q201603#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Simon_Fraser_University",
     "wikidataId": "Q201603"
   },
+  "297297": null,
   "297298": {
     "officialWebsiteUrl": "http://www.unom.ac.in",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1364464#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Madras",
     "wikidataId": "Q1364464"
+  },
+  "297301": null,
+  "297304": {
+    "officialWebsiteUrl": "http://www.pondiuni.edu.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q283032#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Pondicherry_University",
+    "wikidataId": "Q283032"
+  },
+  "297305": {
+    "officialWebsiteUrl": "https://www.puchd.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q567899#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Panjab_University",
+    "wikidataId": "Q567899"
+  },
+  "297312": null,
+  "297316": {
+    "officialWebsiteUrl": "https://jadavpuruniversity.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2579702#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Jadavpur_University",
+    "wikidataId": "Q2579702"
+  },
+  "297321": {
+    "officialWebsiteUrl": "http://www.ggsipu.nic.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2746795#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Guru_Gobind_Singh_Indraprastha_University",
+    "wikidataId": "Q2746795"
+  },
+  "297324": {
+    "officialWebsiteUrl": "http://www.bits-pilani.ac.in/Hyderabad/index.aspx",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4916526#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Birla_Institute_of_Technology_and_Science%2C_Pilani_%E2%80%93_Hyderabad",
+    "wikidataId": "Q4916526"
+  },
+  "297328": {
+    "officialWebsiteUrl": "http://www.osakafu-u.ac.jp/chinese/index.html",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q290456#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Osaka_Prefecture_University",
+    "wikidataId": "Q290456"
+  },
+  "297331": {
+    "officialWebsiteUrl": "http://www.kyutech.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1150245#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kyushu_Institute_of_Technology",
+    "wikidataId": "Q1150245"
+  },
+  "297333": {
+    "officialWebsiteUrl": "http://www.kwansei.ac.jp",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1036470#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Kwansei_Gakuin_University",
+    "wikidataId": "Q1036470"
+  },
+  "297334": null,
+  "297347": {
+    "officialWebsiteUrl": "https://www.unisi.it",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1245999#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Siena",
+    "wikidataId": "Q1245999"
+  },
+  "297350": {
+    "officialWebsiteUrl": "https://www.uel.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1345942#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_East_London",
+    "wikidataId": "Q1345942"
+  },
+  "297360": {
+    "officialWebsiteUrl": "https://www.derby.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3183295#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Derby",
+    "wikidataId": "Q3183295"
   },
   "297367": {
     "officialWebsiteUrl": "http://www.shu.edu.cn",
@@ -1852,19 +3534,56 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Shanghai_University",
     "wikidataId": "Q1343386"
   },
+  "297368": {
+    "officialWebsiteUrl": "http://www.brighton.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3056813#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Brighton",
+    "wikidataId": "Q3056813"
+  },
+  "297371": {
+    "officialWebsiteUrl": "https://www.ege.edu.tr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1297001#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ege_University",
+    "wikidataId": "Q1297001"
+  },
+  "297377": {
+    "officialWebsiteUrl": "http://www.uqu.edu.sa",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3133606#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Umm_al-Qura_University",
+    "wikidataId": "Q3133606"
+  },
   "297378": {
     "officialWebsiteUrl": "https://www.sjtu.edu.cn/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q525169#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Shanghai_Jiao_Tong_University",
     "wikidataId": "Q525169"
   },
+  "297383": null,
   "297386": {
     "officialWebsiteUrl": "https://www.sdu.edu.cn/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q604470#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Shandong_University",
     "wikidataId": "Q604470"
   },
+  "297388": {
+    "officialWebsiteUrl": "https://www.cmich.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q250205#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Central_Michigan_University",
+    "wikidataId": "Q250205"
+  },
   "297392": null,
+  "297397": {
+    "officialWebsiteUrl": "https://clarkson.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q931865#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Clarkson_University",
+    "wikidataId": "Q931865"
+  },
+  "297399": {
+    "officialWebsiteUrl": "http://www.csuohio.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1100801#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Cleveland_State_University",
+    "wikidataId": "Q1100801"
+  },
   "297403": {
     "officialWebsiteUrl": "https://www.snu.ac.kr",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q39913#P856",
@@ -1878,13 +3597,57 @@
     "wikidataId": "Q3056815"
   },
   "297422": null,
+  "297427": {
+    "officialWebsiteUrl": "https://www.gmu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1411222#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/George_Mason_University",
+    "wikidataId": "Q1411222"
+  },
   "297429": null,
+  "297434": null,
   "297437": {
     "officialWebsiteUrl": "https://rice.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q842909#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Rice_University",
     "wikidataId": "Q842909"
   },
+  "297439": {
+    "officialWebsiteUrl": "http://www.indstate.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q666128#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Indiana_State_University",
+    "wikidataId": "Q666128"
+  },
+  "297444": {
+    "officialWebsiteUrl": "http://www.rpi.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49211#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Rensselaer_Polytechnic_Institute",
+    "wikidataId": "Q49211"
+  },
+  "297446": {
+    "officialWebsiteUrl": "https://www.mtu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q12432#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Michigan_Technological_University",
+    "wikidataId": "Q12432"
+  },
+  "297447": {
+    "officialWebsiteUrl": "https://www.univ-rennes.fr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q126050081#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universit%C3%A9_de_Rennes",
+    "wikidataId": "Q126050081"
+  },
+  "297448": {
+    "officialWebsiteUrl": "http://www.msstate.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1939211#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Mississippi_State_University",
+    "wikidataId": "Q1939211"
+  },
+  "297453": {
+    "officialWebsiteUrl": "https://www.nmsu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1353248#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/New_Mexico_State_University",
+    "wikidataId": "Q1353248"
+  },
+  "297455": null,
   "297458": {
     "officialWebsiteUrl": "https://www.reading.ac.uk/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1432632#P856",
@@ -1910,6 +3673,18 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Queen's_University",
     "wikidataId": "Q1420038"
   },
+  "297463": {
+    "officialWebsiteUrl": "https://uqam.ca/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1634522#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Universit%C3%A9_du_Qu%C3%A9bec_%C3%A0_Montr%C3%A9al",
+    "wikidataId": "Q1634522"
+  },
+  "297466": {
+    "officialWebsiteUrl": "http://www.fau.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q429863#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Florida_Atlantic_University",
+    "wikidataId": "Q429863"
+  },
   "297467": null,
   "297469": null,
   "297470": {
@@ -1924,6 +3699,12 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Sheffield",
     "wikidataId": "Q823917"
   },
+  "297473": {
+    "officialWebsiteUrl": "http://www.salford.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2738622#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Salford",
+    "wikidataId": "Q2738622"
+  },
   "297474": {
     "officialWebsiteUrl": "https://www.usal.es/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q308963#P856",
@@ -1931,7 +3712,31 @@
     "wikidataId": "Q308963"
   },
   "297475": null,
+  "297476": {
+    "officialWebsiteUrl": "https://www.saitama-u.ac.jp",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1322412#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Saitama_University",
+    "wikidataId": "Q1322412"
+  },
   "297478": null,
+  "297479": {
+    "officialWebsiteUrl": "https://www.uni-saarland.de/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q700758#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Saarland_University",
+    "wikidataId": "Q700758"
+  },
+  "297480": {
+    "officialWebsiteUrl": "http://www.usf.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q500606#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_South_Florida",
+    "wikidataId": "Q500606"
+  },
+  "297481": {
+    "officialWebsiteUrl": "https://sc.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1024426#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_South_Carolina",
+    "wikidataId": "Q1024426"
+  },
   "297482": {
     "officialWebsiteUrl": "http://www.rutgers.edu/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q7382826#P856",
@@ -1993,6 +3798,18 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Rochester",
     "wikidataId": "Q149990"
   },
+  "297495": {
+    "officialWebsiteUrl": "https://port.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2744209#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Portsmouth",
+    "wikidataId": "Q2744209"
+  },
+  "297496": {
+    "officialWebsiteUrl": "http://www.rgu.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1788342#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Robert_Gordon_University",
+    "wikidataId": "Q1788342"
+  },
   "297497": null,
   "297499": {
     "officialWebsiteUrl": "https://www.rmit.edu.au/",
@@ -2000,9 +3817,21 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/RMIT_University",
     "wikidataId": "Q1057890"
   },
+  "297500": {
+    "officialWebsiteUrl": "http://www.ritsumei.jp/index_j.html",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1152190#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ritsumeikan_University",
+    "wikidataId": "Q1152190"
+  },
   "297501": null,
   "297502": null,
   "297503": null,
+  "297505": {
+    "officialWebsiteUrl": "http://www.ljmu.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1627967#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Liverpool_John_Moores_University",
+    "wikidataId": "Q1627967"
+  },
   "297511": {
     "officialWebsiteUrl": "https://bbk.ac.uk",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q375606#P856",
@@ -2023,7 +3852,68 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/James_Cook_University",
     "wikidataId": "Q536512"
   },
+  "297519": {
+    "officialWebsiteUrl": "https://www.ntu.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q2002619#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Nottingham_Trent_University",
+    "wikidataId": "Q2002619"
+  },
+  "297522": {
+    "officialWebsiteUrl": "http://oregonstate.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q861888#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Oregon_State_University",
+    "wikidataId": "Q861888"
+  },
   "297526": null,
+  "297527": {
+    "officialWebsiteUrl": "https://www.keele.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1737734#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Keele_University",
+    "wikidataId": "Q1737734"
+  },
+  "297531": {
+    "officialWebsiteUrl": "https://howard.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1068752#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Howard_University",
+    "wikidataId": "Q1068752"
+  },
+  "297533": {
+    "officialWebsiteUrl": "https://www.lsbu.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q289348#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/London_South_Bank_University",
+    "wikidataId": "Q289348"
+  },
+  "297535": {
+    "officialWebsiteUrl": "http://www.wpi.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q195046#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Worcester_Polytechnic_Institute",
+    "wikidataId": "Q195046"
+  },
+  "297537": {
+    "officialWebsiteUrl": "http://www.shu.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1752117#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Sheffield_Hallam_University",
+    "wikidataId": "Q1752117"
+  },
+  "297540": {
+    "officialWebsiteUrl": "https://www.mmu.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1888771#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Manchester_Metropolitan_University",
+    "wikidataId": "Q1888771"
+  },
+  "297543": {
+    "officialWebsiteUrl": "https://www.wlv.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1816202#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Wolverhampton",
+    "wikidataId": "Q1816202"
+  },
+  "297547": {
+    "officialWebsiteUrl": "http://www.canterbury.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3182956#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Canterbury_Christ_Church_University",
+    "wikidataId": "Q3182956"
+  },
+  "297551": null,
   "297554": null,
   "297555": {
     "officialWebsiteUrl": "http://www.sunway.edu.my/",
@@ -2031,11 +3921,30 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Sunway_University",
     "wikidataId": "Q4475815"
   },
+  "297557": {
+    "officialWebsiteUrl": "https://www.plymouth.ac.uk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1711558#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Plymouth",
+    "wikidataId": "Q1711558"
+  },
+  "297558": {
+    "officialWebsiteUrl": "http://www.clarku.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1095773#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Clark_University",
+    "wikidataId": "Q1095773"
+  },
+  "297560": null,
   "297561": {
     "officialWebsiteUrl": "https://www.pitt.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q235034#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Pittsburgh",
     "wikidataId": "Q235034"
+  },
+  "297562": {
+    "officialWebsiteUrl": "https://www.stevens.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q657222#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Stevens_Institute_of_Technology",
+    "wikidataId": "Q657222"
   },
   "297565": {
     "officialWebsiteUrl": "https://www.unipi.it",
@@ -2043,6 +3952,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Pisa",
     "wikidataId": "Q645663"
   },
+  "297567": null,
   "297569": {
     "officialWebsiteUrl": "https://upenn.edu",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49117#P856",
@@ -2056,11 +3966,59 @@
     "wikidataId": "Q739627"
   },
   "297573": null,
+  "297574": {
+    "officialWebsiteUrl": "https://www.herts.ac.uk/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1745633#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Hertfordshire",
+    "wikidataId": "Q1745633"
+  },
+  "297583": {
+    "officialWebsiteUrl": "https://fordham.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q130965#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Fordham_University",
+    "wikidataId": "Q130965"
+  },
+  "297587": {
+    "officialWebsiteUrl": "https://miamioh.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q590643#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Miami_University",
+    "wikidataId": "Q590643"
+  },
+  "297590": {
+    "officialWebsiteUrl": "https://www.ufs.ac.za/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1678733#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_the_Free_State",
+    "wikidataId": "Q1678733"
+  },
+  "297591": {
+    "officialWebsiteUrl": "https://www.syracuse.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q617433#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Syracuse_University",
+    "wikidataId": "Q617433"
+  },
   "297592": {
     "officialWebsiteUrl": "http://www.uj.ac.za/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1972050#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Johannesburg",
     "wikidataId": "Q1972050"
+  },
+  "297594": {
+    "officialWebsiteUrl": "https://www.unisa.ac.za/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q677993#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_South_Africa",
+    "wikidataId": "Q677993"
+  },
+  "297595": {
+    "officialWebsiteUrl": "https://utulsa.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1848657#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Tulsa",
+    "wikidataId": "Q1848657"
+  },
+  "297596": {
+    "officialWebsiteUrl": "https://www.ru.ac.za/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q377757#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Rhodes_University",
+    "wikidataId": "Q377757"
   },
   "297597": {
     "officialWebsiteUrl": "https://www.brookes.ac.uk/",
@@ -2068,17 +4026,42 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Oxford_Brookes_University",
     "wikidataId": "Q132478"
   },
+  "297598": {
+    "officialWebsiteUrl": "http://www.uwc.ac.za/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q475700#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_the_Western_Cape",
+    "wikidataId": "Q475700"
+  },
+  "297601": {
+    "officialWebsiteUrl": "https://www2.lehigh.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q622137#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Lehigh_University",
+    "wikidataId": "Q622137"
+  },
   "297603": {
     "officialWebsiteUrl": "https://oulu.fi",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1357517#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Oulu",
     "wikidataId": "Q1357517"
   },
+  "297604": null,
   "297610": {
     "officialWebsiteUrl": "https://www.uottawa.ca/en",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q627969#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Ottawa",
     "wikidataId": "Q627969"
+  },
+  "297611": {
+    "officialWebsiteUrl": "https://www.uvm.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1048898#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Vermont",
+    "wikidataId": "Q1048898"
+  },
+  "297616": {
+    "officialWebsiteUrl": "https://www.smu.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1536258#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Southern_Methodist_University",
+    "wikidataId": "Q1536258"
   },
   "297618": {
     "officialWebsiteUrl": "https://www.otago.ac.nz/",
@@ -2092,11 +4075,30 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Oslo",
     "wikidataId": "Q486156"
   },
+  "297621": null,
+  "297622": {
+    "officialWebsiteUrl": "https://www.clemson.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q631066#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Clemson_University",
+    "wikidataId": "Q631066"
+  },
   "297628": {
     "officialWebsiteUrl": "https://www.osaka-u.ac.jp/ja",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q651233#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Osaka",
     "wikidataId": "Q651233"
+  },
+  "297630": {
+    "officialWebsiteUrl": "https://www.baylor.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q812573#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Baylor_University",
+    "wikidataId": "Q812573"
+  },
+  "297633": {
+    "officialWebsiteUrl": "https://www.osaka-cu.ac.jp",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1143396#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Osaka_City_University",
+    "wikidataId": "Q1143396"
   },
   "297638": {
     "officialWebsiteUrl": "http://www.zu.ac.ae",
@@ -2105,11 +4107,23 @@
     "wikidataId": "Q8067559"
   },
   "297639": null,
+  "297641": {
+    "officialWebsiteUrl": "https://www.unifr.ch",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q36188#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Fribourg",
+    "wikidataId": "Q36188"
+  },
   "297642": {
     "officialWebsiteUrl": "https://www.aus.edu/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4115992#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/American_University_of_Sharjah",
     "wikidataId": "Q4115992"
+  },
+  "297643": {
+    "officialWebsiteUrl": "http://www.uoregon.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q766145#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Oregon",
+    "wikidataId": "Q766145"
   },
   "297648": {
     "officialWebsiteUrl": "http://www.smu.edu.sg",
@@ -2117,6 +4131,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Singapore_Management_University",
     "wikidataId": "Q950609"
   },
+  "297650": null,
   "297652": {
     "officialWebsiteUrl": "https://bogazici.edu.tr/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q896267#P856",
@@ -2135,11 +4150,32 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Singapore_University_of_Technology_and_Design",
     "wikidataId": "Q11081251"
   },
+  "309595": null,
+  "309609": {
+    "officialWebsiteUrl": "https://www.ashoka.edu.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4805801#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ashoka_University",
+    "wikidataId": "Q4805801"
+  },
   "309623": null,
   "309634": null,
   "309672": null,
+  "309722": {
+    "officialWebsiteUrl": "http://www.ujs.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q6191740#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Jiangsu_University",
+    "wikidataId": "Q6191740"
+  },
+  "309727": null,
   "325908": null,
+  "328355": {
+    "officialWebsiteUrl": "https://www.upes.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q3633126#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/UPES",
+    "wikidataId": "Q3633126"
+  },
   "334592": null,
+  "334604": null,
   "360165": {
     "officialWebsiteUrl": "https://newinti.edu.my/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5972777#P856",
@@ -2152,6 +4188,7 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Sorbonne_University",
     "wikidataId": "Q41497113"
   },
+  "397495": null,
   "397503": null,
   "884388": {
     "officialWebsiteUrl": "http://www.deakin.edu.au/",
@@ -2166,19 +4203,118 @@
     "wikidataId": "Q6020729"
   },
   "884447": null,
+  "884449": {
+    "officialWebsiteUrl": "http://www.iitbbs.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1814765#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Indian_Institute_of_Technology_Bhubaneswar",
+    "wikidataId": "Q1814765"
+  },
+  "893795": {
+    "officialWebsiteUrl": "http://www.anadolu.edu.tr/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q483758#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Anadolu_University",
+    "wikidataId": "Q483758"
+  },
   "913795": {
     "officialWebsiteUrl": "https://www.tuni.fi",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q56403399#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Tampere_University",
     "wikidataId": "Q56403399"
   },
+  "913867": null,
+  "919381": {
+    "officialWebsiteUrl": "http://www.cjcu.edu.tw",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q5071633#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Chang_Jung_Christian_University",
+    "wikidataId": "Q5071633"
+  },
+  "921377": {
+    "officialWebsiteUrl": "https://www.marmara.edu.tr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1424081#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Marmara_University",
+    "wikidataId": "Q1424081"
+  },
+  "922649": null,
   "924190": null,
+  "924859": {
+    "officialWebsiteUrl": "https://www.williams.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q49166#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Williams_College",
+    "wikidataId": "Q49166"
+  },
+  "925002": {
+    "officialWebsiteUrl": "http://www.umaryland.edu",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4119470#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Maryland%2C_Baltimore",
+    "wikidataId": "Q4119470"
+  },
   "926532": null,
+  "945690": {
+    "officialWebsiteUrl": "http://cybermed.edu.my/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q22344812#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_Cyberjaya",
+    "wikidataId": "Q22344812"
+  },
+  "955251": null,
+  "955254": null,
+  "955264": {
+    "officialWebsiteUrl": "https://www.gdut.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q716822#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Guangdong_University_of_Technology",
+    "wikidataId": "Q716822"
+  },
   "955279": null,
+  "955289": null,
+  "955846": null,
   "3291252": null,
+  "3315974": null,
+  "3738806": {
+    "officialWebsiteUrl": "https://www.csulb.edu/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1026926#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/California_State_University%2C_Long_Beach",
+    "wikidataId": "Q1026926"
+  },
+  "3739620": null,
+  "3740455": {
+    "officialWebsiteUrl": "https://www.cyu.fr",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q74452784#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/CY_Cergy_Paris_University",
+    "wikidataId": "Q74452784"
+  },
   "3740459": null,
+  "3782779": null,
+  "3783101": null,
+  "3783193": null,
+  "3786740": null,
+  "3791951": {
+    "officialWebsiteUrl": "http://www.bhu.ac.in",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q806116#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Banaras_Hindu_University",
+    "wikidataId": "Q806116"
+  },
+  "3794802": null,
+  "3794879": null,
   "3845845": null,
+  "3919720": {
+    "officialWebsiteUrl": "https://www.omu.ac.jp/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q101579967#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Osaka_Metropolitan_University",
+    "wikidataId": "Q101579967"
+  },
+  "3923582": {
+    "officialWebsiteUrl": "http://www.usc.edu.au/",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1423677#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/University_of_the_Sunshine_Coast",
+    "wikidataId": "Q1423677"
+  },
   "3923723": null,
+  "3935039": {
+    "officialWebsiteUrl": "https://www.hkmu.edu.hk",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q1540301#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Hong_Kong_Metropolitan_University",
+    "wikidataId": "Q1540301"
+  },
+  "3993267": null,
   "4008801": {
     "officialWebsiteUrl": "https://welcome.miami.edu/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q738258#P856",
@@ -2197,12 +4333,31 @@
     "wikipediaUrl": "https://en.wikipedia.org/wiki/City_St_George's%2C_University_of_London",
     "wikidataId": "Q124917493"
   },
+  "4083059": {
+    "officialWebsiteUrl": "http://www.henu.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q391150#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Henan_University",
+    "wikidataId": "Q391150"
+  },
+  "4083091": {
+    "officialWebsiteUrl": "https://www.nbu.edu.cn",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q4391363#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Ningbo_University",
+    "wikidataId": "Q4391363"
+  },
   "4083352": {
     "officialWebsiteUrl": "https://www.zjut.edu.cn/",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q986087#P856",
     "wikipediaUrl": "https://en.wikipedia.org/wiki/Zhejiang_University_of_Technology",
     "wikidataId": "Q986087"
   },
+  "4089480": {
+    "officialWebsiteUrl": "http://www.oslomet.no",
+    "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q47249304#P856",
+    "wikipediaUrl": "https://en.wikipedia.org/wiki/Oslo_Metropolitan_University",
+    "wikidataId": "Q47249304"
+  },
+  "4089487": null,
   "4113705": {
     "officialWebsiteUrl": "https://www.isct.ac.jp/ja",
     "officialWebsiteSourceUrl": "https://www.wikidata.org/wiki/Q116264906#P856",

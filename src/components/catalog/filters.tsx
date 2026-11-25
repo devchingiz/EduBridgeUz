@@ -204,15 +204,19 @@ export function UniversityFiltersForm({
 export function ScholarshipFiltersForm({
   filters,
   hostCountries,
+  action = "/scholarships",
+  clearHref = "/scholarships",
 }: {
   filters: ScholarshipFilters;
   hostCountries: string[];
+  action?: string;
+  clearHref?: string;
 }) {
   return (
     <FilterShell
-      action="/scholarships"
+      action={action}
       active={hasActiveScholarshipFilters(filters)}
-      clearHref="/scholarships"
+      clearHref={clearHref}
       label="Filter scholarships"
     >
       <SearchInput defaultValue={filters.q} />

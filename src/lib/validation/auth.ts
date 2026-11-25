@@ -122,7 +122,7 @@ function checkGuardianDetails(
   }
 }
 
-/** Service-level schema. The Server Action fills `confirmPassword` for the simple form. */
+/** Service- and Server Action-level schema. Both password fields are submitted. */
 export const registerSchema = z
   .object({ name, ...registrationFields, confirmPassword: z.string() })
   .superRefine((value, ctx) => {
@@ -136,7 +136,7 @@ export const registerSchema = z
     checkGuardianDetails(value, ctx);
   });
 
-/** Simple registration form: one name field and a visible-password toggle instead of two password fields. */
+/** Legacy schema retained for validation coverage; the current form posts `confirmPassword` too. */
 export const registerFormSchema = z
   .object({ name, ...registrationFields })
   .superRefine(checkGuardianDetails);
@@ -191,6 +191,30 @@ export const changePasswordSchema = z
       });
     }
   });
+
+/**
+ * Accepts either a 6-digit TOTP code or a formatted recovery code. Kept
+ * permissive about separators so a pasted recovery code is not rejected.
+ */
+export const mfaCodeSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .max(64)
+    .refine(
+      (value) =>
+        /^\d{6}$/.test(value) ||
+        /^[a-f0-9]{4}([- ]?[a-f0-9]{4}){3}$/i.test(value),
+      "Enter a 6-digit code or a recovery code.",
+    ),
+});
+
+export const mfaConfirmSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, "Enter the 6-digit code from your authenticator app."),
+});
 
 export const tokenSchema = z.object({ token: z.string().min(20) });
 

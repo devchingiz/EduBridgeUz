@@ -9,6 +9,8 @@ import {
 import {
   BenchmarkStrip,
   CatalogBenchmarkPanel,
+  hasBenchmarkForKind,
+  hasCatalogBenchmarkData,
 } from "@/components/catalog/catalog-benchmark-panel";
 import { ComparisonButton } from "@/components/catalog/comparison-button";
 import { FavoriteButton } from "@/components/catalog/favorite-button";
@@ -24,6 +26,8 @@ import { degreeLabel } from "@/lib/data/fields";
 import { getUniversityDiscoveryDetail } from "@/lib/catalog/discovery-queries";
 import { getComparisonIds } from "@/lib/catalog/comparison";
 import { VERIFICATION_LABELS } from "@/lib/catalog/constants";
+import { availableText, filterAvailableFacts } from "@/lib/catalog/fact-groups";
+import { plainText } from "@/lib/catalog/format";
 import { NotebookPen } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -59,8 +63,14 @@ function money(amountMinor: number, currency: string): string {
 function SourceLink({
   source,
 }: {
-  source: { url: string; title: string; verifiedAt: string | null };
+  source: {
+    url: string | null;
+    title: string | null;
+    verifiedAt: string | null;
+  } | null;
 }) {
+  if (!source?.url) return null;
+
   return (
     <span className="text-muted-foreground text-xs">
       <a
@@ -69,7 +79,7 @@ function SourceLink({
         rel="noreferrer"
         className="text-primary underline underline-offset-2"
       >
-        Source: {source.title}
+        Source: {source.title ?? "Source"}
       </a>
       {source.verifiedAt ? ` · Verified ${source.verifiedAt}` : ""}
     </span>
@@ -95,6 +105,87 @@ export default async function UniversityDiscoveryDetailPage({
   ]);
   if (!university) notFound();
   const savedInComparison = comparisonIds.includes(university.id);
+
+  const location = [university.city, countryName(university.countryCode)]
+    .filter(Boolean)
+    .join(", ");
+  const websiteUrl = university.websiteUrl?.trim() || null;
+  const ranking = university.rankingDisplay?.trim() || null;
+  const description = plainText(university.description);
+  const hasPrimarySource = Boolean(university.primarySource?.url);
+  const availableFacts = filterAvailableFacts(
+    university.fieldFacts.map((fact) => ({
+      label: fact.label,
+      value: fact.value,
+      status: fact.status,
+      sourceUrl: fact.sourceUrl,
+      sourceTitle: fact.sourceTitle,
+      verifiedAt: fact.verifiedAt,
+      academicYear: fact.academicYear,
+      intake: fact.intake,
+      currency: fact.currency,
+      unit: fact.unit,
+      note: fact.note,
+    })),
+  );
+
+  const programsWithCosts = university.programs.filter(
+    (program) => program.tuition.length > 0 || program.costs.length > 0,
+  );
+  const scholarshipEntries = university.programs.flatMap((program) =>
+    program.scholarships.map((scholarship) => ({
+      program,
+      scholarship,
+      summary: availableText(scholarship.summary),
+    })),
+  );
+  const programsWithRequirements = university.programs
+    .map((program) => ({
+      program,
+      requirements: program.requirements.flatMap((requirement) => {
+        const summary = availableText(requirement.summary);
+        return summary
+          ? [
+              {
+                kind: requirement.kind,
+                summary,
+                source: requirement.source,
+              },
+            ]
+          : [];
+      }),
+    }))
+    .filter((entry) => entry.requirements.length > 0);
+  const deadlinePrograms = university.programs
+    .map((program) => {
+      const intakes = program.intakes.flatMap((intake) => {
+        const term = availableText(intake.term);
+        const note = availableText(intake.note);
+        return term || note ? [{ term, note, source: intake.source }] : [];
+      });
+      return {
+        program,
+        intakes,
+        deadlines: program.deadlines.filter(
+          (deadline) => deadline.deadlineOn || deadline.deadlineMonthDay,
+        ),
+        startNote: availableText(program.startNote),
+      };
+    })
+    .filter(
+      (entry) =>
+        entry.intakes.length > 0 ||
+        entry.deadlines.length > 0 ||
+        Boolean(entry.startNote),
+    );
+  const sourceRows = [
+    ...(hasPrimarySource
+      ? [{ label: null, source: university.primarySource }]
+      : []),
+    ...university.programs
+      .filter((program) => Boolean(program.source?.url))
+      .map((program) => ({ label: program.name, source: program.source })),
+  ];
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -124,25 +215,24 @@ export default async function UniversityDiscoveryDetailPage({
                 <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                   {university.name}
                 </h1>
-                <p className="text-muted-foreground text-sm">
-                  {university.city}, {countryName(university.countryCode)}
-                </p>
+                {location ? (
+                  <p className="text-muted-foreground text-sm">{location}</p>
+                ) : null}
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {university.rankingDisplay ? (
+              {ranking ? (
                 <Badge variant="brand">
-                  {university.rankingOrganization ?? "QS"} ·{" "}
-                  {university.rankingDisplay}
+                  {university.rankingOrganization ?? "QS"} · {ranking}
                 </Badge>
-              ) : (
-                <Badge variant="outline">QS 2027 rank unavailable</Badge>
-              )}
+              ) : null}
               {university.continent ? (
                 <Badge variant="muted">{university.continent}</Badge>
               ) : null}
-              {university.institutionType ? (
-                <Badge variant="outline">{university.institutionType}</Badge>
+              {availableText(university.institutionType) ? (
+                <Badge variant="outline">
+                  {availableText(university.institutionType)}
+                </Badge>
               ) : null}
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -207,33 +297,35 @@ export default async function UniversityDiscoveryDetailPage({
             )}
           </div>
         </div>
-        <div className="flex flex-wrap gap-3">
-          {university.websiteUrl ? (
-            <a
-              href={university.websiteUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary text-sm font-medium underline underline-offset-2"
-            >
-              Official university website
-            </a>
-          ) : (
-            <span className="text-muted-foreground text-sm">
-              Official university website unavailable
-            </span>
-          )}
-          <SourceLink source={university.primarySource} />
-        </div>
-        {university.description ? (
+        {websiteUrl || hasPrimarySource ? (
+          <div className="flex flex-wrap gap-3">
+            {websiteUrl ? (
+              <a
+                href={websiteUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary text-sm font-medium underline underline-offset-2"
+              >
+                Official university website
+              </a>
+            ) : null}
+            {hasPrimarySource ? (
+              <SourceLink source={university.primarySource} />
+            ) : null}
+          </div>
+        ) : null}
+        {description ? (
           <p className="text-muted-foreground max-w-3xl text-sm leading-6">
-            {university.description}
+            {description}
           </p>
         ) : null}
       </header>
 
-      <CatalogBenchmarkPanel benchmarks={benchmarks} variant="full" />
+      {hasCatalogBenchmarkData(benchmarks) ? (
+        <CatalogBenchmarkPanel benchmarks={benchmarks} variant="full" />
+      ) : null}
 
-      {university.fieldFacts.length > 0 ? (
+      {availableFacts.length > 0 ? (
         <section
           aria-labelledby="field-facts-heading"
           className="surface-card p-5 sm:p-6"
@@ -242,144 +334,144 @@ export default async function UniversityDiscoveryDetailPage({
             Source-backed details
           </h2>
           <p className="text-muted-foreground mt-1 text-sm">
-            Each field carries its own verification status and source. Values
-            marked unavailable are never guessed.
+            Each field carries its own verification status and source.
           </p>
           <div className="mt-4">
-            <FieldFactPanel
-              facts={university.fieldFacts.map((fact) => ({
-                label: fact.label,
-                value: fact.value,
-                status: fact.status,
-                sourceUrl: fact.sourceUrl,
-                sourceTitle: fact.sourceTitle,
-                verifiedAt: fact.verifiedAt,
-                academicYear: fact.academicYear,
-                intake: fact.intake,
-                currency: fact.currency,
-                unit: fact.unit,
-                note: fact.note,
-              }))}
-            />
+            <FieldFactPanel facts={availableFacts} />
           </div>
         </section>
       ) : null}
 
-      <section
-        aria-labelledby="overview-heading"
-        className="surface-card p-5 sm:p-6"
-      >
-        <h2 id="overview-heading" className="text-lg font-semibold">
-          Overview
-        </h2>
-        <BenchmarkStrip benchmarks={benchmarks} kind="program" />
-        {university.programs.length ? (
+      {university.programs.length > 0 ? (
+        <section
+          aria-labelledby="overview-heading"
+          className="surface-card p-5 sm:p-6"
+        >
+          <h2 id="overview-heading" className="text-lg font-semibold">
+            Overview
+          </h2>
+          {hasBenchmarkForKind(benchmarks, "program") ? (
+            <BenchmarkStrip benchmarks={benchmarks} kind="program" />
+          ) : null}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {university.programs.map((program) => (
-              <article key={program.id} className="rounded-lg border p-4">
+            {university.programs.map((program) => {
+              const details = [
+                availableText(degreeLabel(program.degreeLevel)),
+                availableText(program.field),
+                availableText(program.language),
+              ]
+                .filter(Boolean)
+                .join(" · ");
+              const startNote = availableText(program.startNote);
+              return (
+                <article key={program.id} className="rounded-lg border p-4">
+                  <h3 className="font-medium">{program.name}</h3>
+                  {details ? (
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      {details}
+                    </p>
+                  ) : null}
+                  {startNote ? (
+                    <p className="mt-2 text-sm">
+                      Intake information: {startNote}
+                    </p>
+                  ) : null}
+                  {program.source?.url ? (
+                    <p className="mt-2">
+                      <SourceLink source={program.source} />
+                    </p>
+                  ) : null}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {programsWithCosts.length > 0 ? (
+        <section
+          aria-labelledby="costs-heading"
+          className="surface-card p-5 sm:p-6"
+        >
+          <h2 id="costs-heading" className="text-lg font-semibold">
+            Costs
+          </h2>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Costs are shown only when supported by a cited source; periods and
+            applicant groups are kept as published.
+          </p>
+          {hasBenchmarkForKind(benchmarks, "tuition") ? (
+            <BenchmarkStrip benchmarks={benchmarks} kind="tuition" />
+          ) : null}
+          <div className="mt-4 space-y-4">
+            {programsWithCosts.map((program) => (
+              <div key={program.id} className="rounded-lg border p-4">
                 <h3 className="font-medium">{program.name}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  {degreeLabel(program.degreeLevel)} · {program.field}
-                  {program.language ? ` · ${program.language}` : ""}
-                </p>
-                {program.startNote ? (
-                  <p className="mt-2 text-sm">
-                    Intake information: {program.startNote}
-                  </p>
-                ) : null}
-                <p className="mt-2">
-                  <SourceLink source={program.source} />
-                </p>
-              </article>
+                <div className="mt-3 space-y-3">
+                  {program.tuition.map((fact, index) => (
+                    <div key={`tuition-${index}`} className="space-y-1">
+                      <p className="text-sm">
+                        Tuition: {money(fact.amountMinor, fact.currency)}{" "}
+                        {fact.period}
+                        {availableText(fact.applicantGroup)
+                          ? ` · ${availableText(fact.applicantGroup)}`
+                          : ""}
+                      </p>
+                      <SourceLink source={fact.source} />
+                    </div>
+                  ))}
+                  {program.costs.map((fact, index) => (
+                    <div key={`${fact.kind}-${index}`} className="space-y-1">
+                      <p className="text-sm">
+                        {COST_LABELS[fact.kind] ?? fact.kind}:{" "}
+                        {money(fact.amountMinor, fact.currency)} {fact.period}
+                        {availableText(fact.applicantGroup)
+                          ? ` · ${availableText(fact.applicantGroup)}`
+                          : ""}
+                        {availableText(fact.note)
+                          ? ` — ${availableText(fact.note)}`
+                          : ""}
+                      </p>
+                      <SourceLink source={fact.source} />
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
-        ) : (
-          <p className="text-muted-foreground mt-2 text-sm">
-            Program information has not been published in the verified catalog.
-          </p>
-        )}
-      </section>
+        </section>
+      ) : null}
 
-      <section
-        aria-labelledby="costs-heading"
-        className="surface-card p-5 sm:p-6"
-      >
-        <h2 id="costs-heading" className="text-lg font-semibold">
-          Costs
-        </h2>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Costs are shown only when supported by a cited source; periods and
-          applicant groups are kept as published.
-        </p>
-        <BenchmarkStrip benchmarks={benchmarks} kind="tuition" />
-        <div className="mt-4 space-y-4">
-          {university.programs.map((program) => (
-            <div key={program.id} className="rounded-lg border p-4">
-              <h3 className="font-medium">{program.name}</h3>
-              <div className="mt-3 space-y-3">
-                {program.tuition.map((fact, index) => (
-                  <div key={`tuition-${index}`} className="space-y-1">
-                    <p className="text-sm">
-                      Tuition: {money(fact.amountMinor, fact.currency)}{" "}
-                      {fact.period}
-                      {fact.applicantGroup ? ` · ${fact.applicantGroup}` : ""}
-                    </p>
-                    <SourceLink source={fact.source} />
-                  </div>
-                ))}
-                {program.costs.map((fact, index) => (
-                  <div key={`${fact.kind}-${index}`} className="space-y-1">
-                    <p className="text-sm">
-                      {COST_LABELS[fact.kind] ?? fact.kind}:{" "}
-                      {money(fact.amountMinor, fact.currency)} {fact.period}
-                      {fact.applicantGroup ? ` · ${fact.applicantGroup}` : ""}
-                      {fact.note ? ` — ${fact.note}` : ""}
-                    </p>
-                    <SourceLink source={fact.source} />
-                  </div>
-                ))}
-                {program.tuition.length === 0 && program.costs.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">
-                    No verified cost amounts are available.
-                  </p>
-                ) : null}
-              </div>
-            </div>
-          ))}
-          {!university.programs.length ? (
-            <p className="text-muted-foreground text-sm">
-              No cost information is available.
-            </p>
+      {scholarshipEntries.length > 0 ? (
+        <section
+          aria-labelledby="scholarships-heading"
+          className="surface-card p-5 sm:p-6"
+        >
+          <h2 id="scholarships-heading" className="text-lg font-semibold">
+            Scholarships
+          </h2>
+          {hasBenchmarkForKind(benchmarks, "scholarship") ? (
+            <BenchmarkStrip benchmarks={benchmarks} kind="scholarship" />
           ) : null}
-        </div>
-      </section>
-
-      <section
-        aria-labelledby="scholarships-heading"
-        className="surface-card p-5 sm:p-6"
-      >
-        <h2 id="scholarships-heading" className="text-lg font-semibold">
-          Scholarships
-        </h2>
-        <BenchmarkStrip benchmarks={benchmarks} kind="scholarship" />
-        <div className="mt-4 space-y-3">
-          {university.programs.flatMap((program) =>
-            program.scholarships.map((scholarship) => (
+          <div className="mt-4 space-y-3">
+            {scholarshipEntries.map(({ program, scholarship, summary }) => (
               <article
                 key={`${program.id}-${scholarship.slug}`}
                 className="rounded-lg border p-4"
               >
                 <h3 className="font-medium">
                   <Link
-                    href={`/scholarships/${scholarship.slug}`}
+                    href={`/dashboard/scholarships/${scholarship.slug}`}
                     className="text-primary underline underline-offset-2"
                   >
                     {scholarship.name}
                   </Link>
                 </h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  {scholarship.summary}
-                </p>
+                {summary ? (
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    {summary}
+                  </p>
+                ) : null}
                 <p className="mt-2">
                   <SourceLink source={scholarship.source} />
                 </p>
@@ -390,40 +482,25 @@ export default async function UniversityDiscoveryDetailPage({
                   Linked to {program.name}
                 </p>
               </article>
-            )),
-          )}
-          {university.programs.every(
-            (program) => program.scholarships.length === 0,
-          ) ? (
-            <p className="text-muted-foreground text-sm">
-              No source-verified scholarship is currently linked to these
-              programs. Browse the{" "}
-              <Link
-                href="/scholarships"
-                className="text-primary underline underline-offset-2"
-              >
-                scholarship catalog
-              </Link>
-              .
-            </p>
-          ) : null}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-      <section
-        aria-labelledby="requirements-heading"
-        className="surface-card p-5 sm:p-6"
-      >
-        <h2 id="requirements-heading" className="text-lg font-semibold">
-          Requirements
-        </h2>
-        <div className="mt-4 space-y-4">
-          {university.programs.map((program) => (
-            <div key={program.id} className="rounded-lg border p-4">
-              <h3 className="font-medium">{program.name}</h3>
-              {program.requirements.length ? (
+      {programsWithRequirements.length > 0 ? (
+        <section
+          aria-labelledby="requirements-heading"
+          className="surface-card p-5 sm:p-6"
+        >
+          <h2 id="requirements-heading" className="text-lg font-semibold">
+            Requirements
+          </h2>
+          <div className="mt-4 space-y-4">
+            {programsWithRequirements.map(({ program, requirements }) => (
+              <div key={program.id} className="rounded-lg border p-4">
+                <h3 className="font-medium">{program.name}</h3>
                 <ul className="mt-3 space-y-3">
-                  {program.requirements.map((requirement, index) => (
+                  {requirements.map((requirement, index) => (
                     <li
                       key={`${requirement.kind}-${index}`}
                       className="text-sm"
@@ -440,147 +517,147 @@ export default async function UniversityDiscoveryDetailPage({
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p className="text-muted-foreground mt-2 text-sm">
-                  No verified requirements have been recorded.
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section
-        aria-labelledby="deadlines-heading"
-        className="surface-card p-5 sm:p-6"
-      >
-        <h2 id="deadlines-heading" className="text-lg font-semibold">
-          Deadlines &amp; intakes
-        </h2>
-        <BenchmarkStrip benchmarks={benchmarks} kind="deadline" />
-        <div className="mt-4 space-y-4">
-          {university.programs.map((program) => (
-            <div key={program.id} className="rounded-lg border p-4">
-              <h3 className="font-medium">{program.name}</h3>
-              <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <h4 className="text-sm font-medium">Intakes</h4>
-                  {program.intakes.length ? (
-                    <ul className="mt-2 space-y-2">
-                      {program.intakes.map((intake) => (
-                        <li
-                          key={`${intake.term}-${intake.source.url}`}
-                          className="text-sm"
-                        >
-                          <p>
-                            {intake.term}
-                            {intake.note ? ` — ${intake.note}` : ""}
-                          </p>
-                          <SourceLink source={intake.source} />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-muted-foreground mt-2 text-sm">
-                      {program.startNote ??
-                        "No verified intake term available."}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">Application deadlines</h4>
-                  {program.deadlines.length ? (
-                    <ul className="mt-2 space-y-3">
-                      {program.deadlines.map((deadline, index) => (
-                        <li
-                          key={`${deadline.cycle}-${index}`}
-                          className="text-sm"
-                        >
-                          <p>
-                            {deadline.cycle}:{" "}
-                            {deadline.deadlineOn ??
-                              (deadline.deadlineMonthDay
-                                ? `${deadline.deadlineMonthDay} (annual)`
-                                : "Not specified")}
-                          </p>
-                          {deadline.note ? (
-                            <p className="text-muted-foreground">
-                              {deadline.note}
-                            </p>
-                          ) : null}
-                          <SourceLink source={deadline.source} />
-                          {university.isTracked && deadline.deadlineOn ? (
-                            <form
-                              action={setApplicationDeadlineAction}
-                              className="mt-2"
-                            >
-                              <input
-                                type="hidden"
-                                name="universityId"
-                                value={university.id}
-                              />
-                              <input
-                                type="hidden"
-                                name="slug"
-                                value={university.slug}
-                              />
-                              <input
-                                type="hidden"
-                                name="deadline"
-                                value={deadline.deadlineOn}
-                              />
-                              <SubmitButton
-                                size="sm"
-                                variant="outline"
-                                pendingLabel="Adding…"
-                              >
-                                Add to calendar
-                              </SubmitButton>
-                            </form>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-muted-foreground mt-2 text-sm">
-                      No verified deadlines are available.
-                    </p>
-                  )}
-                </div>
               </div>
-            </div>
-          ))}
-          {!university.programs.length ? (
-            <p className="text-muted-foreground text-sm">
-              No intake or deadline information is available.
-            </p>
-          ) : null}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-      <section
-        aria-labelledby="sources-heading"
-        className="surface-card p-5 sm:p-6"
-      >
-        <h2 id="sources-heading" className="text-lg font-semibold">
-          Sources
-        </h2>
-        <p className="text-muted-foreground mt-2 text-sm">
-          University and program facts link directly to their cited sources.
-          Verification dates are shown beside each fact.
-        </p>
-        <ul className="mt-3 space-y-2">
-          <li>
-            <SourceLink source={university.primarySource} />
-          </li>
-          {university.programs.map((program) => (
-            <li key={program.id}>
-              <span className="text-sm font-medium">{program.name}: </span>
-              <SourceLink source={program.source} />
-            </li>
-          ))}
-        </ul>
-      </section>
+      {deadlinePrograms.length > 0 ? (
+        <section
+          aria-labelledby="deadlines-heading"
+          className="surface-card p-5 sm:p-6"
+        >
+          <h2 id="deadlines-heading" className="text-lg font-semibold">
+            Deadlines &amp; intakes
+          </h2>
+          {hasBenchmarkForKind(benchmarks, "deadline") ? (
+            <BenchmarkStrip benchmarks={benchmarks} kind="deadline" />
+          ) : null}
+          <div className="mt-4 space-y-4">
+            {deadlinePrograms.map(
+              ({ program, intakes, deadlines, startNote }) => (
+                <div key={program.id} className="rounded-lg border p-4">
+                  <h3 className="font-medium">{program.name}</h3>
+                  <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                    {intakes.length > 0 || startNote ? (
+                      <div>
+                        <h4 className="text-sm font-medium">Intakes</h4>
+                        {intakes.length > 0 ? (
+                          <ul className="mt-2 space-y-2">
+                            {intakes.map((intake) => (
+                              <li
+                                key={`${intake.term ?? "note"}-${intake.source.url}`}
+                                className="text-sm"
+                              >
+                                <p>
+                                  {[intake.term, intake.note]
+                                    .filter(Boolean)
+                                    .join(" — ")}
+                                </p>
+                                <SourceLink source={intake.source} />
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-muted-foreground mt-2 text-sm">
+                            Intake information: {startNote}
+                          </p>
+                        )}
+                      </div>
+                    ) : null}
+                    {deadlines.length > 0 ? (
+                      <div>
+                        <h4 className="text-sm font-medium">
+                          Application deadlines
+                        </h4>
+                        <ul className="mt-2 space-y-3">
+                          {deadlines.map((deadline, index) => (
+                            <li
+                              key={`${deadline.cycle}-${index}`}
+                              className="text-sm"
+                            >
+                              <p>
+                                {availableText(deadline.cycle)
+                                  ? `${availableText(deadline.cycle)}: `
+                                  : ""}
+                                {deadline.deadlineOn ??
+                                  (deadline.deadlineMonthDay
+                                    ? `${deadline.deadlineMonthDay} (annual)`
+                                    : null)}
+                              </p>
+                              {availableText(deadline.note) ? (
+                                <p className="text-muted-foreground">
+                                  {availableText(deadline.note)}
+                                </p>
+                              ) : null}
+                              <SourceLink source={deadline.source} />
+                              {university.isTracked && deadline.deadlineOn ? (
+                                <form
+                                  action={setApplicationDeadlineAction}
+                                  className="mt-2"
+                                >
+                                  <input
+                                    type="hidden"
+                                    name="universityId"
+                                    value={university.id}
+                                  />
+                                  <input
+                                    type="hidden"
+                                    name="slug"
+                                    value={university.slug}
+                                  />
+                                  <input
+                                    type="hidden"
+                                    name="deadline"
+                                    value={deadline.deadlineOn}
+                                  />
+                                  <SubmitButton
+                                    size="sm"
+                                    variant="outline"
+                                    pendingLabel="Adding…"
+                                  >
+                                    Add to calendar
+                                  </SubmitButton>
+                                </form>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+      ) : null}
+
+      {sourceRows.length > 0 ? (
+        <section
+          aria-labelledby="sources-heading"
+          className="surface-card p-5 sm:p-6"
+        >
+          <h2 id="sources-heading" className="text-lg font-semibold">
+            Sources
+          </h2>
+          <p className="text-muted-foreground mt-2 text-sm">
+            University and program facts link directly to their cited sources.
+            Verification dates are shown beside each fact.
+          </p>
+          <ul className="mt-3 space-y-2">
+            {sourceRows.map(({ label, source }, index) => (
+              <li key={`${label ?? "primary"}-${index}`}>
+                {label ? (
+                  <span className="text-sm font-medium">{label}: </span>
+                ) : null}
+                <SourceLink source={source} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

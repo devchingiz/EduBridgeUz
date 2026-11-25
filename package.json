@@ -17,15 +17,21 @@
     "test:all": "npm run test && npm run test:integration",
     "db:start": "node scripts/dev-db.mjs",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push",
+    "db:push": "node scripts/db-push-guard.mjs",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "node --env-file=.env scripts/seed-catalog.mts",
     "db:import:qs": "node --env-file=.env scripts/import-qs-universities.mts",
+    "db:import:scholarships": "node --env-file=.env scripts/import-scholarships.mts",
+    "db:verify:scholarships": "node --env-file=.env scripts/verify-scholarship-import.mts",
+    "research:qs:batch2": "node scripts/research-qs-universities.mjs --batch=2",
+    "db:import:qs:batch2": "node --env-file=.env scripts/import-qs-universities.mts --dataset=data/qs-2027-universities-batch-2.json --report=data/qs-2027-import-report-batch-2.json",
     "db:verify:qs": "node --env-file=.env scripts/verify-qs-import.mts",
+    "db:verify:qs:all": "node --env-file=.env scripts/verify-qs-import.mts",
     "db:studio": "prisma studio",
     "catalog:expire": "node --env-file=.env scripts/expire-catalog.mts",
     "db:backup": "node --env-file=.env scripts/backup.mjs",
     "db:restore": "node --env-file=.env scripts/restore.mjs",
+    "staging:verify": "node scripts/staging-db-verify.mjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -77,6 +83,7 @@
   },
   "overrides": {
     "deepmerge-ts": "8.0.2",
+    "effect": "3.22.1",
     "@typescript-eslint/typescript-estree": {
       "minimatch": "11.0.1"
     }

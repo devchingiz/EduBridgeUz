@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   assertSameOrigin: vi.fn(),
   checkPassword: vi.fn(),
+  checkRateLimits: vi.fn(),
+  enforcePasswordPolicy: vi.fn(),
   enforceRateLimits: vi.fn(),
   getRequestContext: vi.fn(),
   redirect: vi.fn(),
@@ -14,6 +16,7 @@ vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 
 vi.mock("@/lib/auth/service", () => ({
   authenticate: vi.fn(),
+  completeMfaLogin: vi.fn(),
   recordGuardianDecision: vi.fn(),
   registerAccount: mocks.registerAccount,
   requestPasswordReset: vi.fn(),
@@ -38,10 +41,12 @@ vi.mock("@/lib/http/request", async (importOriginal) => {
 });
 
 vi.mock("@/lib/security/rate-limit", () => ({
+  checkRateLimits: mocks.checkRateLimits,
   enforceRateLimits: mocks.enforceRateLimits,
 }));
 vi.mock("@/lib/security/password", () => ({
   checkPassword: mocks.checkPassword,
+  enforcePasswordPolicy: mocks.enforcePasswordPolicy,
 }));
 
 import { registerAction } from "@/app/(auth)/actions";
@@ -54,6 +59,7 @@ function registrationForm(
     name: "Amina Karimova",
     email: "amina@example.com",
     password: "Correct-Horse-Battery-9",
+    confirmPassword: "Correct-Horse-Battery-9",
     dateOfBirth: "2000-05-10",
     acceptTerms: "on",
     ...overrides,
@@ -69,6 +75,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.assertSameOrigin.mockResolvedValue(undefined);
   mocks.checkPassword.mockReturnValue({ ok: true });
+  mocks.enforcePasswordPolicy.mockResolvedValue({ ok: true });
   mocks.enforceRateLimits.mockResolvedValue(null);
   mocks.getRequestContext.mockResolvedValue({
     ip: "198.51.100.1",
@@ -99,13 +106,39 @@ describe("registration action", () => {
     expect(result.status).toBe("error");
     expect(result.fieldErrors?.name).toBeDefined();
     expect(result.fieldErrors?.password).toBeDefined();
-    expect(mocks.checkPassword).not.toHaveBeenCalled();
+    expect(mocks.enforcePasswordPolicy).not.toHaveBeenCalled();
     expect(mocks.enforceRateLimits).not.toHaveBeenCalled();
     expect(mocks.registerAccount).not.toHaveBeenCalled();
   });
 
+  it("accepts a matching password confirmation", async () => {
+    await registerAction(initialFormState, registrationForm());
+
+    expect(mocks.registerAccount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        password: "Correct-Horse-Battery-9",
+        confirmPassword: "Correct-Horse-Battery-9",
+      }),
+      expect.anything(),
+    );
+    expect(mocks.redirect).toHaveBeenCalledWith("/verify-email");
+  });
+
+  it("rejects a non-matching password confirmation on the server", async () => {
+    const result = await registerAction(
+      initialFormState,
+      registrationForm({ confirmPassword: "Different-Strong-Pass-9" }),
+    );
+
+    expect(result.status).toBe("error");
+    expect(result.fieldErrors?.confirmPassword).toBe("Passwords do not match.");
+    expect(mocks.enforceRateLimits).not.toHaveBeenCalled();
+    expect(mocks.registerAccount).not.toHaveBeenCalled();
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled();
+  });
+
   it("rejects a weak password without consuming an attempt", async () => {
-    mocks.checkPassword.mockReturnValueOnce({
+    mocks.enforcePasswordPolicy.mockResolvedValueOnce({
       ok: false,
       errors: ["Do not include your name in your password."],
     });
@@ -155,7 +188,22 @@ describe("registration action", () => {
       expect.anything(),
     );
     expect(mocks.setSessionCookie).toHaveBeenCalledWith("session-token");
-    expect(mocks.redirect).toHaveBeenCalledWith("/dashboard?registered=1");
+    expect(mocks.redirect).toHaveBeenCalledWith("/verify-email");
+  });
+
+  it("returns the same public redirect for an existing email", async () => {
+    mocks.registerAccount.mockResolvedValueOnce({
+      ok: false,
+      reason: "email_taken",
+    });
+
+    const result = await registerAction(initialFormState, registrationForm());
+
+    expect(result).toBeUndefined();
+    expect(mocks.redirect).toHaveBeenCalledWith("/verify-email");
+    expect(mocks.redirect).toHaveBeenCalledTimes(1);
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled();
+    expect(mocks.enforceRateLimits).toHaveBeenCalledTimes(1);
   });
 
   it("shows a retry message when the counter is exhausted", async () => {

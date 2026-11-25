@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   ALL_FILTER,
   CATALOG_PAGE_SIZE,
+  dashboardScholarshipSearchHref,
   hasActiveScholarshipFilters,
   hasActiveUniversityFilters,
   parseScholarshipFilters,
@@ -147,6 +148,14 @@ describe("search hrefs", () => {
     expect(href).toContain("q=computer+science");
     expect(href).toContain("country=NL");
     expect(href).not.toContain("page=");
+  });
+
+  it("keeps dashboard scholarship filters inside the dashboard", () => {
+    const filters = parseScholarshipFilters({ funding: "FULLY_FUNDED" });
+    expect(dashboardScholarshipSearchHref(filters)).toBe(
+      "/dashboard/scholarships?funding=FULLY_FUNDED",
+    );
+    expect(dashboardScholarshipSearchHref(filters, 2)).toContain("page=2");
   });
 
   it("includes later pages", () => {

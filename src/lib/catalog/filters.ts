@@ -151,8 +151,9 @@ export function universitySearchHref(
 export function scholarshipSearchHref(
   filters: ScholarshipFilters,
   page = filters.page,
+  basePath = "/scholarships",
 ): string {
-  return `/scholarships${buildQuery([
+  return `${basePath}${buildQuery([
     ["q", filters.q],
     ["host_country", filters.hostCountry],
     ["funding", filters.funding],
@@ -161,6 +162,13 @@ export function scholarshipSearchHref(
     ["nationality", filters.nationality],
     ["page", page],
   ])}`;
+}
+
+export function dashboardScholarshipSearchHref(
+  filters: ScholarshipFilters,
+  page = filters.page,
+): string {
+  return scholarshipSearchHref(filters, page, "/dashboard/scholarships");
 }
 
 export function isFundingType(value: string): value is FundingTypeValue {

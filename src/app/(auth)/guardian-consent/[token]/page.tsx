@@ -4,7 +4,25 @@ import Link from "next/link";
 import { findToken } from "@/lib/auth/tokens";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Alert } from "@/components/ui/alert";
+import { getPrivacyContactEmail } from "@/lib/env";
 import { GuardianDecisionForm } from "./guardian-decision-form";
+
+/** Uses only a configured deliverable address; never renders a placeholder. */
+function PrivacyContact({ className }: { className: string }) {
+  const email = getPrivacyContactEmail();
+  if (!email) {
+    return (
+      <Link href="/security" className={className}>
+        our published privacy contact
+      </Link>
+    );
+  }
+  return (
+    <a href={`mailto:${email}`} className={className}>
+      {email}
+    </a>
+  );
+}
 
 export const metadata: Metadata = {
   title: "Guardian consent",
@@ -27,12 +45,7 @@ export default async function GuardianConsentPage({
         footer={
           <p className="text-muted-foreground text-[13px] leading-6">
             Questions? Contact{" "}
-            <a
-              href="mailto:privacy@edubridge.example"
-              className="text-foreground underline underline-offset-2"
-            >
-              privacy@edubridge.example
-            </a>
+            <PrivacyContact className="text-foreground underline underline-offset-2" />
             .
           </p>
         }
@@ -51,13 +64,8 @@ export default async function GuardianConsentPage({
       description={`${record.user.name} is under 18 and has asked to use EduBridge. We need your decision before their workspace is unlocked.`}
       footer={
         <p className="text-muted-foreground text-[12px] leading-5">
-          You can withdraw consent at any time by emailing{" "}
-          <a
-            href="mailto:privacy@edubridge.example"
-            className="text-foreground underline underline-offset-2"
-          >
-            privacy@edubridge.example
-          </a>
+          You can withdraw consent at any time by contacting{" "}
+          <PrivacyContact className="text-foreground underline underline-offset-2" />
           . EduBridge never asks students for payment details.
         </p>
       }

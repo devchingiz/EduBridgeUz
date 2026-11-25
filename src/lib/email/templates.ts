@@ -122,21 +122,22 @@ export function guardianConsentEmail(input: {
 
 export function accountExistsEmail(input: {
   name: string;
-  url: string;
+  signInUrl: string;
+  resetUrl: string;
 }): Template {
   const name = escapeHtml(input.name);
   return {
     subject: "You already have an EduBridge account",
-    text: `Hi ${input.name},\n\nSomeone tried to create an EduBridge account with this email address. You already have one. Sign in here:\n${input.url}\n\nIf this was not you, no action is needed.`,
+    text: `Hi ${input.name},\n\nSomeone tried to create an EduBridge account with this email address. You already have one.\n\nSign in: ${input.signInUrl}\nReset your password: ${input.resetUrl}\n\nIf this was not you, no action is needed.`,
     html: layout({
       heading: "You already have an account",
       body: [
         `Hi ${name}, someone tried to create an EduBridge account with this email address.`,
-        "You can sign in with your existing password. If you have forgotten it, use the password reset link on the sign-in page.",
+        "You can sign in with your existing password, or reset your password if you have forgotten it.",
       ],
       actionLabel: "Go to sign in",
-      actionUrl: input.url,
-      footer: "If this was not you, no action is needed.",
+      actionUrl: input.signInUrl,
+      footer: `Need a new password? Reset it here: ${input.resetUrl}. If this was not you, no action is needed.`,
     }),
   };
 }

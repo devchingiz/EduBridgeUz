@@ -7,11 +7,17 @@ import { removePrivateDocument } from "@/lib/workspace/storage";
 import { NAME_MAX_LENGTH, POLICY_VERSION } from "@/lib/auth/constants";
 import { evaluateAgeGate, isAdult, parseDateOfBirth } from "@/lib/auth/age";
 import { createSession, revokeAllSessions } from "@/lib/auth/session";
-import { consumeToken, issueToken, TOKEN_TTL } from "@/lib/auth/tokens";
+import {
+  consumeToken,
+  findToken,
+  issueToken,
+  TOKEN_TTL,
+} from "@/lib/auth/tokens";
 import { recordAuditEvent } from "@/lib/auth/audit";
 import { promoteBootstrapAdmin } from "@/lib/auth/bootstrap-admin";
+import { issueMfaChallenge } from "@/lib/auth/mfa";
 import { getAppUrl } from "@/lib/env";
-import { sendMail } from "@/lib/email/mailer";
+import { EMAIL_SEND_MAX_ATTEMPTS, sendMail } from "@/lib/email/mailer";
 import { logError, logWarn } from "@/lib/observability/logger";
 import {
   accountExistsEmail,
@@ -23,10 +29,11 @@ import {
 import {
   checkPassword,
   consumeDummyVerification,
+  enforceBreachedPasswordPolicy,
   hashPassword,
   verifyPassword,
 } from "@/lib/security/password";
-import { hashIdentifier } from "@/lib/security/crypto";
+import { hashIdentifier, hashToken } from "@/lib/security/crypto";
 import {
   parseBudgetAmount,
   type ProfileInput,
@@ -66,7 +73,10 @@ async function sendSafely(
   } catch (error) {
     // A delivery outage must not roll back an account that was created
     // correctly. The user can request another link from the verify screen.
-    logError("email.delivery_failed", error, { tag: message.tag });
+    logError("email.delivery_failed", error, {
+      tag: message.tag,
+      attempt: EMAIL_SEND_MAX_ATTEMPTS,
+    });
   }
 }
 
@@ -95,24 +105,6 @@ export async function registerAccount(
   input: RegisterInput,
   context: ServiceContext = {},
 ): Promise<RegistrationOutcome> {
-  const existing = await db.user.findUnique({
-    where: { email: input.email },
-    select: { id: true, name: true },
-  });
-
-  if (existing) {
-    const template = accountExistsEmail({
-      name: existing.name,
-      url: appUrl("/login"),
-    });
-    await sendSafely({
-      to: input.email,
-      tag: "account-exists",
-      ...template,
-    });
-    return { ok: false, reason: "email_taken" };
-  }
-
   const policy = checkPassword(input.password, {
     email: input.email,
     name: input.name,
@@ -139,12 +131,44 @@ export async function registerAccount(
     };
   }
 
+  const breachPolicy = await enforceBreachedPasswordPolicy(input.password);
+  if (!breachPolicy.ok) {
+    return {
+      ok: false,
+      reason: "password_rejected",
+      errors: breachPolicy.errors,
+    };
+  }
+
+  // Hash before the existence lookup so both new and existing addresses pay
+  // the same dominant cost. The unique email constraint still prevents a
+  // concurrent request from creating a duplicate account.
+  const passwordHash = await hashPassword(input.password);
+
+  const existing = await db.user.findUnique({
+    where: { email: input.email },
+    select: { id: true, name: true },
+  });
+
+  if (existing) {
+    const template = accountExistsEmail({
+      name: existing.name,
+      signInUrl: appUrl("/login"),
+      resetUrl: appUrl("/forgot-password"),
+    });
+    await sendSafely({
+      to: input.email,
+      tag: "account-exists",
+      ...template,
+    });
+    return { ok: false, reason: "email_taken" };
+  }
+
   const minor = gate.status === "minor";
   const guardianName = minor ? (input.guardianName?.trim() ?? null) : null;
   const guardianEmail = minor
     ? (input.guardianEmail?.trim().toLowerCase() ?? null)
     : null;
-  const passwordHash = await hashPassword(input.password);
 
   const user = await db.$transaction(async (tx) => {
     const created = await tx.user.create({
@@ -257,7 +281,23 @@ export async function registerAccount(
 // ---------------------------------------------------------------------------
 
 export type LoginOutcome =
-  { ok: true; sessionToken: string; userId: string } | { ok: false };
+  | {
+      ok: true;
+      sessionToken: string;
+      userId: string;
+      emailVerifiedAt: Date | null;
+      createdAt: Date;
+      mfaRequired?: false;
+    }
+  | {
+      ok: true;
+      mfaRequired: true;
+      mfaChallengeToken: string;
+      userId: string;
+      emailVerifiedAt: Date | null;
+      createdAt: Date;
+    }
+  | { ok: false };
 
 export async function authenticate(
   input: { email: string; password: string },
@@ -270,6 +310,10 @@ export async function authenticate(
       email: true,
       passwordHash: true,
       deletedAt: true,
+      emailVerifiedAt: true,
+      createdAt: true,
+      mfaEnabledAt: true,
+      mfaSecret: true,
     },
   });
 
@@ -288,6 +332,20 @@ export async function authenticate(
 
   await promoteBootstrapAdmin(user.id, user.email, context);
 
+  // A password alone never creates a session for an enrolled account. The
+  // challenge is single-use and short-lived; the second factor completes login.
+  if (user.mfaEnabledAt && user.mfaSecret) {
+    const mfaChallengeToken = await issueMfaChallenge(user.id);
+    return {
+      ok: true,
+      mfaRequired: true,
+      mfaChallengeToken,
+      userId: user.id,
+      emailVerifiedAt: user.emailVerifiedAt,
+      createdAt: user.createdAt,
+    };
+  }
+
   const session = await createSession(user.id, context);
 
   await recordAuditEvent({
@@ -298,7 +356,47 @@ export async function authenticate(
     ip: context.ip,
   });
 
-  return { ok: true, sessionToken: session.token, userId: user.id };
+  return {
+    ok: true,
+    sessionToken: session.token,
+    userId: user.id,
+    emailVerifiedAt: user.emailVerifiedAt,
+    createdAt: user.createdAt,
+  };
+}
+
+/**
+ * Creates the real session only after a valid second factor. The caller must
+ * have already verified the single-use MFA challenge for this user.
+ */
+export async function completeMfaLogin(
+  userId: string,
+  context: ServiceContext = {},
+): Promise<{
+  sessionToken: string;
+  emailVerifiedAt: Date | null;
+  createdAt: Date;
+} | null> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { emailVerifiedAt: true, createdAt: true, deletedAt: true },
+  });
+  if (!user || user.deletedAt) return null;
+
+  const session = await createSession(userId, context);
+  await recordAuditEvent({
+    actorId: userId,
+    action: "auth.login",
+    entityType: "Session",
+    entityId: session.sessionId,
+    ip: context.ip,
+  });
+
+  return {
+    sessionToken: session.token,
+    emailVerifiedAt: user.emailVerifiedAt,
+    createdAt: user.createdAt,
+  };
 }
 
 export type GoogleIdentity = {
@@ -625,6 +723,25 @@ export async function resendVerificationEmail(
 // Password reset
 // ---------------------------------------------------------------------------
 
+/**
+ * Balances local work for unknown or deleted reset addresses. Sign-in can use
+ * dummy Argon2 verification because it compares passwords; reset requests do
+ * no password verification, so that would be misleading here. This mirrors
+ * token hashing and email-template rendering without writing an AuthToken or
+ * sending mail. Database writes and SMTP latency remain unmatched, so this
+ * reduces but does not eliminate timing differences.
+ */
+function performUnavailableAccountResetWork(): void {
+  hashToken("edubridge-password-reset-timing-equalizer");
+  const template = passwordResetEmail({
+    name: "EduBridge user",
+    url: appUrl("/reset-password"),
+  });
+  void template.subject;
+  void template.text;
+  void template.html;
+}
+
 export async function requestPasswordReset(
   email: string,
   context: ServiceContext = {},
@@ -634,7 +751,10 @@ export async function requestPasswordReset(
     select: { id: true, name: true, email: true, deletedAt: true },
   });
 
-  if (!user || user.deletedAt) return { token: null };
+  if (!user || user.deletedAt) {
+    performUnavailableAccountResetWork();
+    return { token: null };
+  }
 
   const issued = await issueToken({
     userId: user.id,
@@ -663,17 +783,22 @@ export type PasswordResetOutcome =
   | { ok: true; name: string; email: string }
   | {
       ok: false;
-      reason: "invalid_token" | "password_rejected";
+      reason: "invalid_token" | "password_mismatch" | "password_rejected";
       errors?: string[];
     };
 
 export async function resetPasswordWithToken(
   token: string,
   password: string,
+  confirmPassword: string,
   context: ServiceContext = {},
 ): Promise<PasswordResetOutcome> {
-  const record = await consumeToken(token, "PASSWORD_RESET");
+  const record = await findToken(token, "PASSWORD_RESET");
   if (!record) return { ok: false, reason: "invalid_token" };
+
+  if (password !== confirmPassword) {
+    return { ok: false, reason: "password_mismatch" };
+  }
 
   const policy = checkPassword(password, {
     email: record.user.email,
@@ -683,37 +808,50 @@ export async function resetPasswordWithToken(
     return { ok: false, reason: "password_rejected", errors: policy.errors };
   }
 
+  // Check before consuming the token so a rejected password can be retried.
+  const breachPolicy = await enforceBreachedPasswordPolicy(password);
+  if (!breachPolicy.ok) {
+    return {
+      ok: false,
+      reason: "password_rejected",
+      errors: breachPolicy.errors,
+    };
+  }
+
+  const consumed = await consumeToken(token, "PASSWORD_RESET");
+  if (!consumed) return { ok: false, reason: "invalid_token" };
+
   const passwordHash = await hashPassword(password);
 
   await db.user.update({
-    where: { id: record.userId },
+    where: { id: consumed.userId },
     data: {
       passwordHash,
-      emailVerifiedAt: record.user.emailVerifiedAt ?? new Date(),
+      emailVerifiedAt: consumed.user.emailVerifiedAt ?? new Date(),
     },
   });
 
-  await revokeAllSessions(record.userId);
+  await revokeAllSessions(consumed.userId);
 
   const template = passwordChangedEmail({
-    name: record.user.name,
+    name: consumed.user.name,
     url: appUrl("/login"),
   });
   await sendSafely({
-    to: record.user.email,
+    to: consumed.user.email,
     tag: "password-changed",
     ...template,
   });
 
   await recordAuditEvent({
-    actorId: record.userId,
+    actorId: consumed.userId,
     action: "auth.password_reset",
     entityType: "User",
-    entityId: record.userId,
+    entityId: consumed.userId,
     ip: context.ip,
   });
 
-  return { ok: true, name: record.user.name, email: record.user.email };
+  return { ok: true, name: consumed.user.name, email: consumed.user.email };
 }
 
 // ---------------------------------------------------------------------------
@@ -986,6 +1124,15 @@ export async function changePassword(
     return { ok: false, reason: "password_rejected", errors: policy.errors };
   }
 
+  const breachPolicy = await enforceBreachedPasswordPolicy(nextPassword);
+  if (!breachPolicy.ok) {
+    return {
+      ok: false,
+      reason: "password_rejected",
+      errors: breachPolicy.errors,
+    };
+  }
+
   const passwordHash = await hashPassword(nextPassword);
 
   await db.user.update({
@@ -1046,6 +1193,9 @@ export async function deleteAccount(
       data: { revokedAt: new Date() },
     });
     await tx.authToken.deleteMany({ where: { userId } });
+    await tx.mfaRecoveryCode.deleteMany({ where: { userId } });
+    await tx.googleAccount.deleteMany({ where: { userId } });
+    await tx.consentRecord.deleteMany({ where: { userId } });
     await tx.universityFavorite.deleteMany({ where: { userId } });
     await tx.scholarshipFavorite.deleteMany({ where: { userId } });
     await tx.application.deleteMany({ where: { userId } });
@@ -1053,14 +1203,30 @@ export async function deleteAccount(
     await tx.studentNotification.deleteMany({ where: { userId } });
     await tx.notificationPreference.deleteMany({ where: { userId } });
     await tx.studentProfile.deleteMany({ where: { userId } });
+    await tx.universityComparison.deleteMany({ where: { userId } });
+    await tx.studyNote.deleteMany({ where: { userId } });
+    // Usage rows reference conversations with SetNull; remove them first so
+    // no metadata link to the private history survives the deletion.
+    await tx.advisorUsage.deleteMany({ where: { userId } });
+    await tx.advisorConversation.deleteMany({ where: { userId } });
+    // Grants owned by this user are removed. Grants this administrator gave to
+    // *other* users must survive, with attribution detached instead.
+    await tx.adminPermissionGrant.deleteMany({ where: { userId } });
+    await tx.adminPermissionGrant.updateMany({
+      where: { grantedById: userId },
+      data: { grantedById: null },
+    });
     await tx.user.update({
       where: { id: userId },
       data: {
         email: `deleted+${userId}@edubridge.invalid`,
         name: "Deleted account",
         passwordHash: null,
+        mfaSecret: null,
+        mfaEnabledAt: null,
         dateOfBirth: null,
         emailVerifiedAt: null,
+        role: "STUDENT",
         deletedAt: new Date(),
       },
     });

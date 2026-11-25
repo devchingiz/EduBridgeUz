@@ -17,6 +17,7 @@ export default defineConfig({
     env: {
       AUTH_SECRET: "unit-test-secret-value-that-is-long-enough",
       DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/postgres",
+      EMAIL_VERIFICATION_ENFORCEMENT_START: "2026-01-01T00:00:00.000Z",
     },
   },
 });

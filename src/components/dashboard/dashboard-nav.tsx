@@ -16,7 +16,7 @@ import {
   ShieldCheck,
   ShieldEllipsis,
   UserRound,
-  Users,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -54,6 +54,12 @@ export function DashboardNav({
       href: "/dashboard/universities",
       label: "Explore Universities",
       icon: Search,
+      exact: false,
+    },
+    {
+      href: "/dashboard/scholarships",
+      label: "Explore Scholarships",
+      icon: Wallet,
       exact: false,
     },
     {
@@ -117,22 +123,16 @@ export function DashboardNav({
             icon: ClipboardCheck,
             exact: false,
           },
+        ]
+      : []),
+    ...(admin
+      ? [
           {
-            href: "/dashboard/admin",
-            label: "Admin",
+            href: "/admin",
+            label: "Admin panel",
             icon: ShieldEllipsis,
             exact: false,
           },
-          ...(admin
-            ? [
-                {
-                  href: "/dashboard/admin/users",
-                  label: "Users",
-                  icon: Users,
-                  exact: false,
-                },
-              ]
-            : []),
         ]
       : []),
   ];

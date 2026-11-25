@@ -14,6 +14,7 @@ import { Select } from "@/components/ui/select";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { requireWorkspace } from "@/lib/auth/dal";
 import { getCatalogBenchmarks } from "@/lib/catalog/benchmarks";
+import { availableText } from "@/lib/catalog/fact-groups";
 import { COUNTRY_OPTIONS, countryName } from "@/lib/data/countries";
 import { DEGREE_LEVELS } from "@/lib/data/fields";
 import {
@@ -279,6 +280,9 @@ export default async function ExploreUniversitiesPage({
                 />
               </div>
               <div className="flex flex-wrap gap-2">
+                {university.featured ? (
+                  <Badge variant="brand">Featured</Badge>
+                ) : null}
                 <Badge
                   variant={
                     university.status === "VERIFIED"
@@ -295,8 +299,10 @@ export default async function ExploreUniversitiesPage({
                 {university.continent ? (
                   <Badge variant="muted">{university.continent}</Badge>
                 ) : null}
-                {university.institutionType ? (
-                  <Badge variant="outline">{university.institutionType}</Badge>
+                {availableText(university.institutionType) ? (
+                  <Badge variant="outline">
+                    {availableText(university.institutionType)}
+                  </Badge>
                 ) : null}
                 {university.scholarshipAvailable ? (
                   <Badge variant="brand">Linked scholarship</Badge>

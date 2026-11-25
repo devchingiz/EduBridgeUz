@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-function publicHref(
+function dashboardHref(
   entityType: "UNIVERSITY" | "SCHOLARSHIP",
   slug: string,
 ): string {
-  return `/${entityType === "UNIVERSITY" ? "universities" : "scholarships"}/${slug}`;
+  return `/dashboard/${entityType === "UNIVERSITY" ? "universities" : "scholarships"}/${slug}`;
 }
 
 export default async function FavoritesPage() {
@@ -56,7 +56,7 @@ export default async function FavoritesPage() {
               <Link href="/universities">Explore universities</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/scholarships">Find scholarships</Link>
+              <Link href="/dashboard/scholarships">Find scholarships</Link>
             </Button>
           </div>
         </div>
@@ -80,7 +80,7 @@ export default async function FavoritesPage() {
                   <h2 className="mt-1 text-[15px] font-semibold">
                     {available ? (
                       <Link
-                        href={publicHref(favorite.entityType, favorite.slug)}
+                        href={dashboardHref(favorite.entityType, favorite.slug)}
                         className="hover:underline hover:underline-offset-2"
                       >
                         {favorite.name}
@@ -97,7 +97,7 @@ export default async function FavoritesPage() {
                   </div>
                   {available ? (
                     <Link
-                      href={publicHref(favorite.entityType, favorite.slug)}
+                      href={dashboardHref(favorite.entityType, favorite.slug)}
                       className="text-primary mt-3 inline-flex items-center gap-1 text-[12px] font-medium"
                     >
                       View details

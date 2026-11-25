@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowRight,
-  BookOpen,
-  ChevronRight,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, ChevronRight, ShieldCheck, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ProgramExplorer } from "@/components/catalog/program-explorer";
@@ -23,7 +17,7 @@ import { SectionLink } from "@/components/layout/section-link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth/dal";
-import { groupFieldFacts } from "@/lib/catalog/fact-groups";
+import { filterAvailableFacts } from "@/lib/catalog/fact-groups";
 import { getUniversityBySlug } from "@/lib/catalog/queries";
 import { countryName } from "@/lib/data/countries";
 
@@ -31,22 +25,16 @@ export const dynamic = "force-dynamic";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
-const SECTIONS = [
-  { id: "overview", label: "Overview" },
-  { id: "facts", label: "Facts" },
-  { id: "programs", label: "Programs" },
-  { id: "sources", label: "Sources" },
-  { id: "next", label: "What next" },
-] as const;
+type DetailSection = { id: string; label: string };
 
-function DetailSectionNav() {
+function DetailSectionNav({ sections }: { sections: DetailSection[] }) {
   return (
     <nav
       aria-label="University profile sections"
       className="bg-background/85 border-border/70 sticky top-16 z-30 mt-6 rounded-xl border p-1.5 shadow-sm backdrop-blur-xl"
     >
       <ul className="flex scrollbar-none gap-1 overflow-x-auto">
-        {SECTIONS.map((section, index) => (
+        {sections.map((section, index) => (
           <li key={section.id} className="shrink-0">
             <SectionLink
               href={`#${section.id}`}
@@ -131,7 +119,15 @@ export default async function UniversityPage({ params }: PageProps) {
     unit: fact.unit,
     note: fact.note,
   }));
-  const factGroups = groupFieldFacts(fieldFacts);
+  const availableFacts = filterAvailableFacts(fieldFacts);
+  const hasPrimarySource = Boolean(university.provenance.source?.url);
+  const sections: DetailSection[] = [
+    { id: "overview", label: "Overview" },
+    ...(availableFacts.length > 0 ? [{ id: "facts", label: "Facts" }] : []),
+    ...(programs.length > 0 ? [{ id: "programs", label: "Programs" }] : []),
+    ...(hasPrimarySource ? [{ id: "sources", label: "Sources" }] : []),
+    { id: "next", label: "What next" },
+  ];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -178,152 +174,131 @@ export default async function UniversityPage({ params }: PageProps) {
         />
       </div>
 
-      <DetailSectionNav />
+      <DetailSectionNav sections={sections} />
 
-      <section id="facts" className="mt-12 scroll-mt-32">
-        <SectionHeading
-          eyebrow="01 / Evidence"
-          title="Read the evidence, not a sales pitch"
-          description="Every field below keeps its own status, source link, and verification date. Confirmed values and honest gaps are separated so you can judge the record quickly."
-          action={
-            <div className="flex flex-wrap gap-2">
+      {availableFacts.length > 0 ? (
+        <section id="facts" className="mt-12 scroll-mt-32">
+          <SectionHeading
+            eyebrow="01 / Evidence"
+            title="Read the evidence, not a sales pitch"
+            description="Every field below keeps its own status, source link, and verification date. Only sourced values with a usable value are shown."
+            action={
               <Badge variant="success">
-                {factGroups.confirmed.length} usable values
+                {availableFacts.length} sourced values
               </Badge>
-              <Badge variant="muted">
-                {factGroups.unconfirmed.length} explicit gaps
-              </Badge>
-            </div>
-          }
-        />
+            }
+          />
 
-        <div className="surface-card mt-5 p-5 sm:p-7">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="bg-accent text-accent-foreground flex size-9 items-center justify-center rounded-lg">
-                <ShieldCheck aria-hidden="true" className="size-4" />
-              </span>
-              <div>
-                <p className="text-[14px] font-semibold">
-                  Source-backed details
-                </p>
-                <p className="text-muted-foreground text-[12px]">
-                  Open any source link to check the original wording.
-                </p>
+          <div className="surface-card mt-5 p-5 sm:p-7">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="bg-accent text-accent-foreground flex size-9 items-center justify-center rounded-lg">
+                  <ShieldCheck aria-hidden="true" className="size-4" />
+                </span>
+                <div>
+                  <p className="text-[14px] font-semibold">
+                    Source-backed details
+                  </p>
+                  <p className="text-muted-foreground text-[12px]">
+                    Open any source link to check the original wording.
+                  </p>
+                </div>
               </div>
+              <Badge variant="outline">
+                {availableFacts.length} field records
+              </Badge>
             </div>
-            <Badge variant="outline">{fieldFacts.length} field records</Badge>
+
+            <div className="mt-6">
+              <SourceFactGrid facts={availableFacts} />
+            </div>
           </div>
+        </section>
+      ) : null}
 
-          <div className="mt-6">
-            <SourceFactGrid facts={fieldFacts} />
-          </div>
-        </div>
-      </section>
+      {programs.length > 0 ? (
+        <section id="programs" className="mt-14 scroll-mt-32">
+          <SectionHeading
+            eyebrow="02 / Study options"
+            title="Explore programs from this university"
+            description="Search the published program records, filter by degree level, and open the ones that match your field."
+            action={
+              <Badge variant="brand">
+                {programs.length} published program
+                {programs.length === 1 ? "" : "s"}
+              </Badge>
+            }
+          />
 
-      <section id="programs" className="mt-14 scroll-mt-32">
-        <SectionHeading
-          eyebrow="02 / Study options"
-          title="Explore programs from this university"
-          description="Search the published program records, filter by degree level, and open the ones that match your field."
-          action={
-            <Badge variant="brand">
-              {programs.length} published program
-              {programs.length === 1 ? "" : "s"}
-            </Badge>
-          }
-        />
-
-        {programs.length > 0 ? (
           <div className="mt-5">
             <ProgramExplorer
               programs={programs}
               universitySlug={university.slug}
             />
           </div>
-        ) : (
-          <div className="surface-card mt-5 px-6 py-12 text-center">
-            <span className="bg-accent text-accent-foreground mx-auto flex size-11 items-center justify-center rounded-xl">
-              <BookOpen aria-hidden="true" className="size-5" />
-            </span>
-            <p className="mt-4 text-[15px] font-semibold">
-              No program records are published yet
-            </p>
-            <p className="text-muted-foreground mx-auto mt-2 max-w-md text-[12.5px] leading-6">
-              We only publish a program after its facts have a source-backed
-              record. Until then, the university&apos;s official website remains
-              the authoritative source for study options.
-            </p>
-          </div>
-        )}
-      </section>
+        </section>
+      ) : null}
 
-      <section id="sources" className="mt-14 scroll-mt-32">
-        <SectionHeading
-          eyebrow="03 / Provenance"
-          title="Know exactly where this profile comes from"
-          description="The primary source and review dates stay attached to the profile. Nothing on this page is presented as confirmed without a recorded basis."
-        />
+      {hasPrimarySource ? (
+        <section id="sources" className="mt-14 scroll-mt-32">
+          <SectionHeading
+            eyebrow="03 / Provenance"
+            title="Know exactly where this profile comes from"
+            description="The primary source and review dates stay attached to the profile. Nothing on this page is presented as confirmed without a recorded basis."
+          />
 
-        <div className="surface-card mt-5 grid gap-6 p-5 sm:p-7 lg:grid-cols-[1.1fr_.9fr]">
-          <div className="min-w-0">
-            <p className="eyebrow">Primary catalog record</p>
-            <p className="mt-2 text-[17px] font-semibold tracking-[-0.01em]">
-              {university.provenance.source?.publisher ??
-                "No primary source recorded"}
-            </p>
-            <div className="mt-3">
-              <SourceLine citation={university.provenance.source} />
+          <div className="surface-card mt-5 grid gap-6 p-5 sm:p-7 lg:grid-cols-[1.1fr_.9fr]">
+            <div className="min-w-0">
+              <p className="eyebrow">Primary catalog record</p>
+              {university.provenance.source?.publisher ? (
+                <p className="mt-2 text-[17px] font-semibold tracking-[-0.01em]">
+                  {university.provenance.source.publisher}
+                </p>
+              ) : null}
+              <div className="mt-3">
+                <SourceLine citation={university.provenance.source} />
+              </div>
+              <div className="mt-3">
+                <VerificationNote
+                  status={university.provenance.status}
+                  verifiedAt={university.provenance.verifiedAt}
+                  nextReviewAt={university.provenance.nextReviewAt}
+                />
+              </div>
+              <div className="mt-4">
+                <ReviewBanner
+                  status={university.provenance.status}
+                  entityLabel="university"
+                />
+              </div>
             </div>
-            <div className="mt-3">
-              <VerificationNote
-                status={university.provenance.status}
-                verifiedAt={university.provenance.verifiedAt}
-                nextReviewAt={university.provenance.nextReviewAt}
-              />
-            </div>
-            <div className="mt-4">
-              <ReviewBanner
-                status={university.provenance.status}
-                entityLabel="university"
-              />
+
+            <div className="border-border/70 bg-muted/20 rounded-xl border p-4 sm:p-5">
+              <p className="eyebrow">How to read this page</p>
+              <ul className="mt-4 space-y-4 text-[12.5px] leading-6">
+                <li className="flex gap-3">
+                  <span className="text-primary font-mono text-[11px]">01</span>
+                  <p className="text-muted-foreground">
+                    <span className="text-foreground font-medium">
+                      Sourced values
+                    </span>{" "}
+                    have a status and a source link you can open yourself.
+                  </p>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-primary font-mono text-[11px]">02</span>
+                  <p className="text-muted-foreground">
+                    <span className="text-foreground font-medium">
+                      Official pages win
+                    </span>{" "}
+                    when a university has changed a detail since our check date.
+                  </p>
+                </li>
+              </ul>
             </div>
           </div>
-
-          <div className="border-border/70 bg-muted/20 rounded-xl border p-4 sm:p-5">
-            <p className="eyebrow">How to read this page</p>
-            <ul className="mt-4 space-y-4 text-[12.5px] leading-6">
-              <li className="flex gap-3">
-                <span className="text-primary font-mono text-[11px]">01</span>
-                <p className="text-muted-foreground">
-                  <span className="text-foreground font-medium">
-                    Usable values
-                  </span>{" "}
-                  have a status and a source link you can open yourself.
-                </p>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-primary font-mono text-[11px]">02</span>
-                <p className="text-muted-foreground">
-                  <span className="text-foreground font-medium">
-                    Explicit gaps
-                  </span>{" "}
-                  stay visible instead of being replaced by a guess.
-                </p>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-primary font-mono text-[11px]">03</span>
-                <p className="text-muted-foreground">
-                  <span className="text-foreground font-medium">
-                    Official pages win
-                  </span>{" "}
-                  when a university has changed a detail since our check date.
-                </p>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section id="next" className="mt-14 scroll-mt-32">
         <div className="border-border/70 from-brand-soft via-card to-card dark:from-accent/30 dark:via-card dark:to-card relative overflow-hidden rounded-3xl border bg-gradient-to-br p-6 sm:p-9">

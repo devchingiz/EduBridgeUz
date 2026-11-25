@@ -15,6 +15,8 @@ import {
   type EligibilityScopeValue,
   type FundingTypeValue,
 } from "@/lib/catalog/constants";
+import { plainText } from "@/lib/catalog/format";
+import { availableText } from "@/lib/catalog/fact-groups";
 import { countryName } from "@/lib/data/countries";
 import { degreeLabel } from "@/lib/data/fields";
 import type {
@@ -29,6 +31,14 @@ export function UniversityCard({
   university: UniversityListItem;
   signedIn: boolean;
 }) {
+  const description = plainText(university.description);
+  const institutionType = availableText(university.institutionType);
+  const city = plainText(university.city)
+    ?.replace(/[,;]+$/, "")
+    .trim();
+  const location = [city, countryName(university.countryCode)]
+    .filter(Boolean)
+    .join(", ");
   return (
     <article className="surface-card hover:border-primary/25 group flex h-full flex-col gap-4 p-5 transition-colors">
       <div className="flex items-start justify-between gap-3">
@@ -55,7 +65,7 @@ export function UniversityCard({
           <p className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px]">
             <span className="inline-flex items-center gap-1">
               <MapPin aria-hidden="true" className="size-3.5" />
-              {university.city}, {countryName(university.countryCode)}
+              {location}
             </span>
             {university.shortName ? (
               <span className="text-muted-foreground/70">
@@ -70,11 +80,7 @@ export function UniversityCard({
                 {university.rankingDisplay}
               </span>
             </p>
-          ) : (
-            <p className="text-muted-foreground mt-0.5 text-[12px]">
-              QS 2027 rank unavailable
-            </p>
-          )}
+          ) : null}
         </div>
         <div className="flex items-center gap-1">
           <VerificationBadge status={university.status} />
@@ -90,25 +96,26 @@ export function UniversityCard({
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {university.degrees.length > 0 ? (
-          university.degrees.map((degree) => (
-            <Badge key={degree} variant="muted">
-              {degreeLabel(degree)}
-            </Badge>
-          ))
-        ) : (
-          <Badge variant="outline">Program details pending</Badge>
-        )}
-        {university.fields.slice(0, 2).map((field) => (
-          <Badge key={field} variant="brand">
-            {field}
+        {university.featured ? <Badge variant="brand">Featured</Badge> : null}
+        {university.degrees.map((degree) => (
+          <Badge key={degree} variant="muted">
+            {degreeLabel(degree)}
           </Badge>
         ))}
+        {university.fields
+          .map(availableText)
+          .filter((field): field is string => Boolean(field))
+          .slice(0, 2)
+          .map((field) => (
+            <Badge key={field} variant="brand">
+              {field}
+            </Badge>
+          ))}
         {university.continent ? (
           <Badge variant="muted">{university.continent}</Badge>
         ) : null}
-        {university.institutionType ? (
-          <Badge variant="outline">{university.institutionType}</Badge>
+        {institutionType ? (
+          <Badge variant="outline">{institutionType}</Badge>
         ) : null}
         {university.websiteUrl ? (
           <a
@@ -120,16 +127,12 @@ export function UniversityCard({
             Official site
             <ArrowUpRight aria-hidden="true" className="size-3" />
           </a>
-        ) : (
-          <span className="text-muted-foreground text-[12px] italic">
-            Official site unavailable
-          </span>
-        )}
+        ) : null}
       </div>
 
-      {university.description ? (
+      {description ? (
         <p className="text-muted-foreground line-clamp-2 text-[12.5px] leading-5">
-          {university.description}
+          {description}
         </p>
       ) : null}
 
@@ -261,6 +264,7 @@ export function ScholarshipCard({
       </p>
 
       <div className="flex flex-wrap gap-1.5">
+        {scholarship.featured ? <Badge variant="brand">Featured</Badge> : null}
         <Badge variant="brand">
           {FUNDING_LABELS[scholarship.fundingType as FundingTypeValue]}
         </Badge>

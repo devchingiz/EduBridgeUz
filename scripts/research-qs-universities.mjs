@@ -1,7 +1,7 @@
 /**
  * RESEARCH SCRIPT — QS 2027 university dataset
  *
- * Produces `data/qs-2027-universities.json` from PUBLIC, documented sources:
+ * Produces `data/qs-2027-universities.json` (or a numbered batch file) from PUBLIC, documented sources:
  *
  *  1. QS TopUniversities public Algolia search index `live_tu_universities`
  *     (the same index the public University Search page uses). Supplies the
@@ -19,7 +19,11 @@
  * Results are CACHED in a JSON file. The application never calls these APIs at
  * request time. Re-run this script explicitly to refresh the research.
  *
- * Usage:  node scripts/research-qs-universities.mjs [--no-enrich]
+ * Usage:  node scripts/research-qs-universities.mjs [--batch=2] [--no-enrich]
+ *
+ * `--batch=N` writes `data/qs-2027-universities-batch-N.json` and excludes every
+ * institution already present in earlier batch datasets by QS nid, slug, legacy
+ * slug and normalized name. The shared website/programme caches are reused.
  */
 
 import fs from "node:fs";
@@ -27,7 +31,16 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = path.join(ROOT, "data", "qs-2027-universities.json");
+const BATCH_ARG = process.argv.find((arg) => arg.startsWith("--batch="));
+const BATCH = BATCH_ARG ? Number(BATCH_ARG.slice("--batch=".length)) : 1;
+if (!Number.isInteger(BATCH) || BATCH < 1) {
+  throw new Error(`Invalid --batch value: ${BATCH_ARG ?? BATCH}`);
+}
+const DATA_FILE =
+  BATCH === 1
+    ? "qs-2027-universities.json"
+    : `qs-2027-universities-batch-${BATCH}.json`;
+const OUT = path.join(ROOT, "data", DATA_FILE);
 const CACHE_DIR = path.join(ROOT, "data", ".cache", "qs-2027");
 const WEBSITE_CACHE = path.join(CACHE_DIR, "websites.json");
 const PROGRAM_CACHE = path.join(CACHE_DIR, "programs.json");
@@ -63,6 +76,61 @@ function writeCache(file, value) {
 
 function hasCached(cache, key) {
   return Object.prototype.hasOwnProperty.call(cache, String(key));
+}
+
+function legacySlug(slug) {
+  return String(slug || "").replace(/^the-/, "");
+}
+
+function previousDatasetPaths() {
+  const paths = [];
+  for (let batch = 1; batch < BATCH; batch += 1) {
+    paths.push(
+      path.join(
+        ROOT,
+        "data",
+        batch === 1
+          ? "qs-2027-universities.json"
+          : `qs-2027-universities-batch-${batch}.json`,
+      ),
+    );
+  }
+  return paths;
+}
+
+function loadExclusions() {
+  const exclusions = {
+    nids: new Set(),
+    slugs: new Set(),
+    names: new Set(),
+    count: 0,
+  };
+  for (const file of previousDatasetPaths()) {
+    if (!fs.existsSync(file)) {
+      throw new Error(
+        `Batch ${BATCH} requires ${path.basename(file)} so earlier universities are not duplicated.`,
+      );
+    }
+    const previous = JSON.parse(fs.readFileSync(file, "utf8"));
+    for (const university of previous.universities ?? []) {
+      exclusions.nids.add(String(university.qsNid));
+      exclusions.slugs.add(String(university.slug || ""));
+      exclusions.slugs.add(legacySlug(university.slug));
+      exclusions.names.add(normaliseName(university.name));
+      exclusions.count += 1;
+    }
+  }
+  return exclusions;
+}
+
+function isExcluded(university, exclusions) {
+  if (!exclusions) return false;
+  return (
+    exclusions.nids.has(String(university.qsNid)) ||
+    exclusions.slugs.has(String(university.slug || "")) ||
+    exclusions.slugs.has(legacySlug(university.slug)) ||
+    exclusions.names.has(normaliseName(university.name))
+  );
 }
 
 async function mapWithConcurrency(items, limit, worker) {
@@ -349,7 +417,7 @@ function subjectTags(programs) {
   return rules.filter(([, re]) => re.test(text)).map(([label]) => label);
 }
 
-async function fetchUniversities() {
+async function fetchUniversities(exclusions) {
   const all = [];
   const uniAttrs = [
     "title",
@@ -375,7 +443,7 @@ async function fetchUniversities() {
     if (!data.hits?.length || page + 1 >= (data.nbPages ?? 1)) break;
   }
 
-  const ranked = all
+  const rankedAll = all
     .map((hit) => {
       const rank = parseRank(hit.wur_rank);
       const country = first(hit.campus_country);
@@ -414,33 +482,50 @@ async function fetchUniversities() {
     })
     .filter(Boolean);
 
+  const ranked = rankedAll.filter(
+    (university) => !isExcluded(university, exclusions),
+  );
   ranked.sort(
     (a, b) => a.rank.position - b.rank.position || a.name.localeCompare(b.name),
   );
 
   // Guarantee representation from every requested country by reserving the
-  // highest-ranked institution from each, then filling by global rank.
+  // highest-ranked eligible institution from each, then filling by global rank.
   const selected = [];
   const used = new Set();
+  const usedSlugs = new Set();
+  const usedNames = new Set();
+  const canSelect = (university) =>
+    !used.has(university.qsNid) &&
+    !usedSlugs.has(university.slug) &&
+    !usedNames.has(normaliseName(university.name));
+  const add = (university) => {
+    selected.push(university);
+    used.add(university.qsNid);
+    usedSlugs.add(university.slug);
+    usedNames.add(normaliseName(university.name));
+  };
   for (const code of REQUIRED_CODES) {
     const candidate = ranked.find(
-      (u) => u.countryCode === code && !used.has(u.qsNid),
+      (u) => u.countryCode === code && canSelect(u),
     );
-    if (candidate) {
-      selected.push(candidate);
-      used.add(candidate.qsNid);
-    }
+    if (candidate) add(candidate);
   }
   for (const university of ranked) {
     if (selected.length >= TARGET) break;
-    if (used.has(university.qsNid)) continue;
-    selected.push(university);
-    used.add(university.qsNid);
+    if (!canSelect(university)) continue;
+    add(university);
   }
   selected.sort(
     (a, b) => a.rank.position - b.rank.position || a.name.localeCompare(b.name),
   );
-  return { allCount: all.length, rankedCount: ranked.length, selected };
+  return {
+    allCount: all.length,
+    rankedCount: rankedAll.length,
+    eligibleCount: ranked.length,
+    excludedCount: rankedAll.length - ranked.length,
+    selected,
+  };
 }
 
 async function searchWikidataEntity(university) {
@@ -594,10 +679,17 @@ async function fetchPrograms(university, limit = 12) {
 }
 
 async function main() {
+  const exclusions = BATCH === 1 ? null : loadExclusions();
+  if (exclusions) {
+    console.log(
+      `Batch ${BATCH}: excluding ${exclusions.count} records from earlier datasets.`,
+    );
+  }
   console.log("Fetching QS 2027 university index…");
-  const { allCount, rankedCount, selected } = await fetchUniversities();
+  const { allCount, rankedCount, eligibleCount, excludedCount, selected } =
+    await fetchUniversities(exclusions);
   console.log(
-    `  ${allCount} indexed, ${rankedCount} ranked, selected ${selected.length}`,
+    `  ${allCount} indexed, ${rankedCount} ranked, ${excludedCount} excluded, ${eligibleCount} eligible, selected ${selected.length}`,
   );
 
   const websiteCache = readCache(WEBSITE_CACHE);
@@ -684,11 +776,15 @@ async function main() {
   const dataset = {
     meta: {
       title:
-        "EduBridge global university dataset — QS World University Rankings 2027",
+        BATCH === 1
+          ? "EduBridge global university dataset — QS World University Rankings 2027"
+          : `EduBridge global university dataset — QS World University Rankings 2027 (batch ${BATCH})`,
+      batch: BATCH,
       rankingEdition: RANKING_EDITION,
       rankingPublished: RANKING_PUBLISHED,
       retrievedAt: RETRIEVED_AT,
       recordCount: universities.length,
+      excludedPriorRecords: exclusions?.count ?? 0,
       primarySourceUrl: `${QS_ORIGIN}/world-university-rankings`,
       sources: [
         `${QS_ORIGIN}/universities (QS public university search index)`,
@@ -699,7 +795,10 @@ async function main() {
       coverage,
       enrichmentStats,
       notes:
-        "Only facts returned by these sources are stored. Fields not present in the sources (IELTS/TOEFL/SAT minima, application deadlines, founded year, contact details, individual scholarship awards) are deliberately absent and must be marked unavailable by the importer.",
+        "Only facts returned by these sources are stored. Fields not present in the sources (IELTS/TOEFL/SAT minima, application deadlines, founded year, contact details, individual scholarship awards) are deliberately absent and must be marked unavailable by the importer." +
+        (exclusions
+          ? ` Batch ${BATCH} excludes ${exclusions.count} earlier records by QS nid, slug, legacy slug and normalized name.`
+          : ""),
     },
     universities,
   };

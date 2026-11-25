@@ -1,13 +1,24 @@
 /**
- * Authentication and workspace mutation throttles. Sign-in is intentionally
- * excluded; see the security documentation for the associated production risk.
+ * Authentication and workspace mutation throttles.
  *
- * Registration counters are applied only after server-side validation and use
- * versioned scopes so stale counters from older, stricter limits cannot block
- * a current sign-up. Every key is hashed before storage (see `rateLimitKey`),
- * so these tables never contain raw email addresses or IP addresses.
+ * Sign-in counters are written only after a credential check fails; a
+ * non-consuming read prevents further guesses once the limit is exhausted, so
+ * the right password still works during a lockout. Registration counters are
+ * applied only after server-side validation. Both use versioned scopes so stale
+ * counters cannot block a current attempt. Every key is hashed before storage
+ * (see `rateLimitKey`), so these tables never contain raw emails or IPs.
  */
 export const AUTH_RATE_LIMITS = {
+  signInEmail: {
+    scope: "auth.signin.v1.email",
+    limit: 10,
+    windowSeconds: 900,
+  },
+  signInIp: {
+    scope: "auth.signin.v1.ip",
+    limit: 30,
+    windowSeconds: 900,
+  },
   registerIp: {
     scope: "auth.register.v2.ip",
     limit: 20,
@@ -21,6 +32,7 @@ export const AUTH_RATE_LIMITS = {
   forgotIp: { scope: "auth.forgot.ip", limit: 10, windowSeconds: 3600 },
   forgotEmail: { scope: "auth.forgot.email", limit: 5, windowSeconds: 3600 },
   resetIp: { scope: "auth.reset.ip", limit: 10, windowSeconds: 3600 },
+  resetToken: { scope: "auth.reset.token", limit: 5, windowSeconds: 3600 },
   resendIp: { scope: "auth.resend.ip", limit: 10, windowSeconds: 3600 },
   resendUser: { scope: "auth.resend.user", limit: 5, windowSeconds: 3600 },
   guardianIp: { scope: "guardian.decision.ip", limit: 20, windowSeconds: 3600 },
@@ -31,6 +43,17 @@ export const AUTH_RATE_LIMITS = {
     windowSeconds: 3600,
   },
   deleteUser: { scope: "account.delete.user", limit: 3, windowSeconds: 3600 },
+  mfaVerifyIp: { scope: "auth.mfa.verify.ip", limit: 10, windowSeconds: 900 },
+  mfaVerifyChallenge: {
+    scope: "auth.mfa.verify.challenge",
+    limit: 5,
+    windowSeconds: 900,
+  },
+  mfaManageUser: {
+    scope: "account.mfa.manage.user",
+    limit: 10,
+    windowSeconds: 3600,
+  },
   workspaceUploadUser: {
     scope: "workspace.upload.user",
     limit: 30,

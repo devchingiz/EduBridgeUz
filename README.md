@@ -19,10 +19,10 @@ EduBridge is an international university discovery, scholarship search, and stud
 - **Structured discovery facts:** `ProgramCost`, `ProgramIntake`, and `ProgramScholarship` preserve sourced living/application costs, typed intake terms, and program-specific scholarship links. The migration is `20261117000100_university_discovery_details`; the seed adds only TUM's explicitly published winter/summer terms. No living costs, application fees, or university-specific scholarship links are invented where source-backed facts are absent.
 - **Global catalog:** exactly 500 distinct universities sourced from the public QS 2027 indexes, with exact rank strings (including ties and ranges), 2,232 programmes, Wikidata official websites where confidently available, and field-level provenance. Four hand-verified seed universities remain `VERIFIED`. See [docs/500-UNIVERSITIES-PROGRESS.md](docs/500-UNIVERSITIES-PROGRESS.md).
 - **Comparison and notes:** signed-in students can keep a private four-item university shortlist (the cap is enforced server-side) and write private research notes optionally linked to visible universities, programmes, or scholarships.
-- **Admin catalog controls:** `ADMIN` users can search/filter the 500 records and change verification status from `/dashboard/admin/universities`; every override writes a `CatalogReview` and an `AuditEvent`. Reviewers can also explicitly mark records `Partially verified` or `Information unavailable`.
+- **Admin catalog controls:** users with `UNIVERSITIES_READ`/`UNIVERSITIES_MANAGE` can search/filter the 500 records and change verification status from `/admin/universities`; every override writes an `AuditEvent`. Reviewers can also explicitly mark records `Partially verified` or `Information unavailable` in the review queue.
 - **Per-fact provenance:** records carry `VERIFIED`, `PARTIALLY_VERIFIED`, `INFORMATION_UNAVAILABLE`, `NEEDS_REVIEW`, `UNVERIFIED`, `EXPIRED`, or `ARCHIVED`; individual fields add `NOT_VERIFIED`. Public views include partially verified and re-review records with visible status banners.
 - **Honest unknowns:** a missing tuition figure, deadline, requirement, or official website renders an explicit unknown state. No amount, rank, or date is inferred.
-- **Reviewer CRUD:** `/dashboard/review` for `REVIEWER`/`ADMIN` shows the queue, all records, a data-quality report, and recent decisions. `/dashboard/review/new` creates records with an official source URL and verification date. `/dashboard/review/[entityType]/[id]` edits fields, adds facts, and records decisions. Archiving removes a record from public discovery while preserving source and review history.
+- **Reviewer CRUD:** `/dashboard/review` for `REVIEWER`/`ADMIN`/`SUPER_ADMIN` shows the queue, all records, a data-quality report, and recent decisions. `/dashboard/review/new` creates records with an official source URL and verification date. `/dashboard/review/[entityType]/[id]` edits fields, adds facts, and records decisions. Archiving removes a record from public discovery while preserving source and review history.
 - **Audit trail:** every import, edit, approval, change request, expiry, restore, archive, and sweep writes a `CatalogReview` row and an `AuditEvent`.
 - **Expiry sweep:** `npm run catalog:expire` moves records past `nextReviewAt` from `VERIFIED` to `NEEDS_REVIEW`, keeping them visible with a warning and never deleting them.
 - **Seed data:** hand-verified records for Germany, the United Kingdom, and the Netherlands (4 universities, 4 programs, 2 scholarships, 18 requirement facts) with official source URLs. Coverage and known gaps are documented in [docs/DATA-QUALITY.md](docs/DATA-QUALITY.md).
@@ -37,10 +37,10 @@ EduBridge is an international university discovery, scholarship search, and stud
 - **Age gate and guardian consent:** minimum age 13. Students under 18 must name a guardian; the workspace stays locked until the guardian approves through a single-use email link. Consent version and timestamp are stored.
 - **Protected workspace:** `/dashboard` and its sub-routes require a server-validated session. Email verification does not block access; minors still need recorded guardian consent before using the workspace.
 - **Account settings:** password change with other sessions revoked, active session list and revocation, and account deletion that scrubs personal data while keeping an anonymised audit row.
-- **RBAC:** `STUDENT`, `REVIEWER`, and `ADMIN` roles with server-side checks. Catalog writes require reviewer or admin; the operations overview at `/dashboard/admin` is staff-only.
-- **Admin panel:** administrators can search accounts, change roles, and revoke sessions at `/dashboard/admin/users`, and search/filter/change status for the 500-university catalog at `/dashboard/admin/universities`. Role checks are re-read from the database on every change and each change is audited. Self-demotion and removing the last administrator are rejected.
+- **RBAC:** `STUDENT`, `REVIEWER`, `ADMIN`, `SUPER_ADMIN`, and four scoped manager roles (`CONTENT_MANAGER`, `UNIVERSITY_MANAGER`, `SCHOLARSHIP_MANAGER`, `SUPPORT_MANAGER`) with server-side checks. Catalog writes require a reviewer, administrator, or Super Admin.
+- **Admin panel:** a separate, `noindex` administration surface lives at `/admin` with its own shell and navigation. Access requires a verified email plus a role and capability re-read from the database on every request. Super Admins can assign roles and individual capability grants at `/admin/access`; administrators can search accounts and revoke sessions at `/admin/users`, and search/filter/change status for the university catalog at `/admin/universities`. Self-demotion, removing the last administrator/Super Admin, and granting admin roles to unverified emails are rejected. Legacy `/dashboard/admin/*` URLs redirect to `/admin/*`.
 - **Audit trail:** append-only security events for registration, login, verification, password changes and resets, guardian decisions, profile updates, account deletion, and catalog review. IP addresses are hashed, never stored raw.
-- **Rate limiting:** database-backed fixed-window counters keyed by HMAC-hashed email/IP/user identifiers protect registration, password reset, resend, guardian decisions, profile writes, password changes, uploads, and deletion. Registration checks run after validation and use fresh, forgiving scopes so correcting a form error cannot lock a student out. Per-request sign-in throttles were removed to avoid locking users out; see the security caveat in [docs/SECURITY.md](docs/SECURITY.md).
+- **Rate limiting:** database-backed fixed-window counters keyed by HMAC-hashed email/IP/user identifiers protect sign-in, registration, password reset, resend, guardian decisions, profile writes, password changes, uploads, and deletion. Sign-in counts only failed credential checks and leaves correct passwords usable during a lockout; registration checks run after validation. See [docs/SECURITY.md](docs/SECURITY.md).
 
 ### Milestone 4 — student workspace
 
@@ -59,7 +59,7 @@ EduBridge is an international university discovery, scholarship search, and stud
 
 ### Milestone 6 — production deployment and operations
 
-- **Deployment:** standalone Next.js output, a non-root production Docker image, dependency-free liveness and PostgreSQL/configuration readiness checks, and a CI workflow that gates on dependency audit, lint, typecheck, unit/integration tests, formatting, build, and container build.
+- **Deployment:** standalone Next.js output, a non-root production Docker image, dependency-free liveness and PostgreSQL/configuration readiness checks, and CI workflows that gate on dependency audit, lint, typecheck, unit/integration tests, formatting, build, container build, Gitleaks secret scanning, CodeQL SAST, pull-request dependency review, and a Trivy image scan. Actions are pinned to commit SHAs; host-side branch protection and scanner settings remain operator tasks.
 - **Monitoring:** structured allowlisted JSON logs redact error messages and sensitive request/user data; Next.js request errors are captured and OpenTelemetry request spans export to a configured collector. Authentication failures, rate-limit failures/denials, storage processing/download failures, and health failures emit operational events.
 - **Reliability and security:** production readiness requires HTTPS app URL, PostgreSQL, auth, SMTP, S3, ClamAV, and telemetry configuration. Rate limits fail closed on database failure. Existing owner checks, private/no-store file responses, same-origin mutations, and production security headers remain in place.
 - **Performance:** removed a redundant dashboard deadline count query by deriving the metric from already-loaded deadline rows. No shared cache was added for student data; catalog pagination and per-user deadline indexes are retained.
@@ -133,19 +133,20 @@ Open <http://localhost:3000>. The development email transport writes messages (i
 
 ### Becoming an administrator
 
-There is no sign-up role selector. To create the first administrator locally, add your account email to `BOOTSTRAP_ADMIN_EMAILS` in `.env.local` (comma-separated if there are several):
+There is no public administrator registration or role selector. To create the first Super Admin locally, add your account email to `BOOTSTRAP_ADMIN_EMAILS` in `.env.local` (comma-separated if there are several):
 
 ```bash
 BOOTSTRAP_ADMIN_EMAILS="you@example.com"
 ```
 
-Register or sign in with that exact email. The account is promoted to `ADMIN` and the grant is written to the audit log. Restart the dev server after changing the variable. Once an administrator exists, remove the bootstrap value and use `/dashboard/admin/users` for further role changes. A listed email is re-promoted on every sign-in, so remove it before demoting that account.
+Register or sign in with that exact email. The account is promoted to `SUPER_ADMIN`, the grant is written to the audit log, and `/admin` becomes available after the email is verified. Restart the dev server after changing the variable. Once a Super Admin exists, remove the bootstrap value and use `/admin/access` for role and permission changes. A listed email is re-promoted on every sign-in, so remove it before demoting that account.
 
 ### Local database notes
 
 - `npm run db:start` runs PGlite, a PostgreSQL build compiled to WebAssembly, and exposes it on `127.0.0.1:5432`. Data is stored in `.data/pglite`, which is git-ignored.
 - The development `DATABASE_URL` includes `&pgbouncer=true`. This tells Prisma to use simple queries because PGlite keeps prepared statements across client reconnects. **Remove that parameter when pointing at a managed PostgreSQL instance.**
 - Stop the database with `Ctrl+C`. Do not force-kill the process: abrupt termination can corrupt the PGlite data directory. If that happens, delete `.data/pglite`, start the database again, and re-run `npm run db:migrate`.
+- If Next.js reports `Can't reach database server at 127.0.0.1:5432`, the `npm run db:start` process is not running; it must stay up alongside `npm run dev`. Restart it and reload the page. After an abrupt stop that left `.data/pglite/postmaster.pid` behind, remove that stale PID file before starting the database again, then confirm that `/dashboard` loads and the catalog benchmarks appear.
 - Integration tests start their own PGlite process on a random free port with `.data/pglite-test`; they do not use the development database.
 
 ### Scripts
@@ -190,9 +191,15 @@ src/
       scholarships/       # Scholarship list and detail
     (auth)/               # Register, login, verify, reset, guardian consent
       actions.ts          # Auth Server Actions (cookies, rate limits, redirects)
+    admin/                # Separate administration surface (own shell + RBAC gates)
+      actions.ts          # Admin Server Actions (same-origin + permission checks)
+      users/              # Account search, roles, session revocation
+      access/             # Super Admin role and capability management
+      universities/       # Catalog status overrides
+    admin-access-denied/  # Friendly gate page (unverified / insufficient role)
     dashboard/            # Protected student and staff workspace
       actions.ts          # Profile, password, session, consent, deletion actions
-      admin/              # Staff overview and administrator user management (RBAC)
+      admin/              # Legacy admin URLs (redirect to /admin/*)
       advisor/            # AI Advisor page and history actions
       review/             # Catalog review queue, import, record detail, actions
       guardian-consent/   # Resend guardian request
@@ -210,7 +217,7 @@ src/
     ui/                   # Reusable primitives
   lib/
     actions/              # Serialisable form state
-    admin/                # Staff overview queries
+    admin/                # Admin context, permissions, grants, users, overview, catalog status
     advisor/              # Provider adapters, tools, orchestration, sanitizing, persistence
     auth/                 # Service layer, sessions, tokens, DAL, roles, audit
     catalog/              # Public reads, filters, provenance, review service, seed data
@@ -232,21 +239,21 @@ docs/
 
 Copy `.env.example` to `.env.local` and `.env`. Never commit either file.
 
-| Variable                                                              | Purpose                                                                                    |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_APP_URL`                                                 | Canonical app URL used in email links and origin checks                                    |
-| `DATABASE_URL`                                                        | PostgreSQL connection string (PGlite locally, managed PostgreSQL in production)            |
-| `AUTH_SECRET`                                                         | 32+ random bytes; peppers rate-limit hashes                                                |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                            | Server-only Google OAuth credentials; see the [Google sign-in setup](docs/GOOGLE-OAUTH.md) |
-| `EMAIL_TRANSPORT`                                                     | `console` (development outbox) or `smtp` (required in production)                          |
-| `EMAIL_FROM`                                                          | Sender address for verification and reset emails                                           |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE` | SMTP delivery settings                                                                     |
-| `STORAGE_ENDPOINT`, `STORAGE_REGION`, `STORAGE_BUCKET`                | Private S3-compatible document storage                                                     |
-| `STORAGE_BACKUP_BUCKET`, `STORAGE_*` credentials and encryption vars  | Separate private backup bucket and encryption settings                                     |
-| `MALWARE_SCANNER_HOST`, `MALWARE_SCANNER_PORT`                        | Private ClamAV daemon used to scan each upload                                             |
-| `RESTORE_DATABASE_URL`, `RESTORE_DOCUMENT_BUCKET`                     | Explicit recovery targets; restore also requires `BACKUP_ID` and confirmation              |
-| `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL`, `AI_BASE_URL`                | Server-only AI provider/model; see [docs/AI-ADVISOR.md](docs/AI-ADVISOR.md)                |
-| `AI_TIMEOUT_MS`, `AI_MAX_*`, `AI_MESSAGES_PER_MINUTE`, `AI_DAILY_*`   | Advisor safety, context, and cost limits                                                   |
+| Variable                                                                 | Purpose                                                                                                     |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`                                                    | Canonical app URL used in email links and origin checks                                                     |
+| `DATABASE_URL`                                                           | PostgreSQL connection string (PGlite locally, managed PostgreSQL in production)                             |
+| `AUTH_SECRET`                                                            | 32+ random bytes; peppers rate-limit hashes                                                                 |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                               | Server-only Google OAuth credentials; see the [Google sign-in setup](docs/GOOGLE-OAUTH.md)                  |
+| `EMAIL_TRANSPORT`                                                        | `console` (development outbox) or `smtp` (required in production)                                           |
+| `EMAIL_FROM`                                                             | Sender address for verification and reset emails                                                            |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE`    | SMTP delivery settings                                                                                      |
+| `STORAGE_ENDPOINT`, `STORAGE_REGION`, `STORAGE_BUCKET`                   | Private S3-compatible document storage                                                                      |
+| `STORAGE_BACKUP_BUCKET`, `STORAGE_*` credentials and encryption vars     | Separate private backup bucket and encryption settings                                                      |
+| `MALWARE_SCANNER_HOST`, `MALWARE_SCANNER_PORT`                           | Private ClamAV daemon used to scan each upload                                                              |
+| `RESTORE_TARGET_NAME`, `RESTORE_DATABASE_URL`, `RESTORE_DOCUMENT_BUCKET` | Explicit recovery targets; restore also requires `BACKUP_ID`, confirmation, and an empty destination bucket |
+| `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL`, `AI_BASE_URL`                   | Server-only AI provider/model; see [docs/AI-ADVISOR.md](docs/AI-ADVISOR.md)                                 |
+| `AI_TIMEOUT_MS`, `AI_MAX_*`, `AI_MESSAGES_PER_MINUTE`, `AI_DAILY_*`      | Advisor safety, context, and cost limits                                                                    |
 
 `EMAIL_TRANSPORT=console` is rejected in production so verification and reset mail cannot be silently dropped. `.gitignore` excludes `.env*` and `.data/`.
 
@@ -273,8 +280,8 @@ Read the public-facing methodology at `/data-sources` and [docs/DATABASE.md](doc
 - Registration returns an explicit "email already registered" response and sends an account-exists email. Login and password reset keep generic responses to avoid account enumeration. This trade-off is documented in [docs/SECURITY.md](docs/SECURITY.md).
 - Every mutation re-checks the session and origin on the server. `src/proxy.ts` only performs a fast cookie-presence redirect; it is not the authorization boundary.
 - Student document uploads are size/MIME/signature-validated, held outside `public`, served only by an owner-checked route with `nosniff` and `no-store`, and never executed by the application.
-- Catalog review pages and Server Actions require `REVIEWER` or `ADMIN` on every request. Reviewer pages are `noindex, nofollow`, and no catalog write is reachable from a public route.
-- Account deletion is a soft delete: sessions and tokens are revoked, workspace records and private document bytes are removed, and email, name, password hash, and date of birth are scrubbed.
+- Catalog review pages and Server Actions require `REVIEWER`, `ADMIN`, or `SUPER_ADMIN` on every request. Reviewer and `/admin` pages are `noindex, nofollow`, and no catalog write is reachable from a public route. Admin pages re-read role, email verification, and grants from PostgreSQL on every request.
+- Account deletion is a soft delete: sessions, tokens, MFA data, Google links, consent records, workspace rows, and private document bytes are removed; admin grants are dropped or detached; and the retained row is anonymised and reset to `STUDENT`.
 - AI Advisor requests are same-origin and authenticated; the browser cannot choose the provider, model, tools, or user scope. Tools are read-only, external answer links are restricted to real catalog sources, and advisor logs contain metrics but no prompts or answers.
 
 ## Milestone 5 verification boundary

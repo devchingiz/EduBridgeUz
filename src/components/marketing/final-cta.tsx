@@ -1,11 +1,11 @@
 import { ArrowRight, Award, Sparkles } from "lucide-react";
-import Link from "next/link";
 
 import { SectionLink } from "@/components/layout/section-link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { FinalCtaContent } from "@/lib/cms/homepage-content";
 
-export function FinalCta() {
+export function FinalCta({ content }: { content: FinalCtaContent }) {
   return (
     <section aria-labelledby="cta-heading" className="pb-20 sm:pb-28">
       <div className="site-container">
@@ -44,25 +44,23 @@ export function FinalCta() {
           <div className="max-w-2xl">
             <Badge className="border border-white/15 bg-white/10 text-white/85">
               <Sparkles className="size-3" aria-hidden="true" />
-              Pre-launch · built in public
+              {content.badge}
             </Badge>
             <h2
               id="cta-heading"
               className="mt-5 text-[2rem] leading-[1.05] font-semibold tracking-[-0.035em] text-balance text-white sm:text-4xl lg:text-[2.9rem]"
             >
-              Build your bridge to the right university.
+              {content.title}
             </h2>
             <p className="mt-4 max-w-xl text-[14px] leading-6 text-slate-300 sm:text-[15px] sm:leading-7">
-              Start with better information: source-linked universities,
-              scholarships you can actually investigate, and one calm workspace
-              for the application ahead.
+              {content.description}
             </p>
             <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">
               <Button asChild size="lg" variant="inverse">
-                <Link href="/register">
-                  Get Started
+                <SectionLink href={content.primaryCta.href}>
+                  {content.primaryCta.label}
                   <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
+                </SectionLink>
               </Button>
               <Button
                 asChild
@@ -70,16 +68,13 @@ export function FinalCta() {
                 variant="outline"
                 className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
               >
-                <SectionLink href="#scholarships">
+                <SectionLink href={content.secondaryCta.href}>
                   <Award className="size-4" aria-hidden="true" />
-                  Find Scholarships
+                  {content.secondaryCta.label}
                 </SectionLink>
               </Button>
             </div>
-            <p className="mt-5 text-[11px] text-slate-400">
-              No invented outcomes. No guaranteed admissions. Just better
-              information.
-            </p>
+            <p className="mt-5 text-[11px] text-slate-400">{content.note}</p>
           </div>
         </div>
       </div>

@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { KeyRound, MonitorSmartphone, ShieldAlert } from "lucide-react";
+import {
+  KeyRound,
+  MonitorSmartphone,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
 
 import {
   Card,
@@ -9,11 +14,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth/dal";
+import { getMfaStatus } from "@/lib/auth/mfa";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { listSessions } from "@/lib/auth/session";
 import { formatDate } from "@/lib/format";
 import { ChangePasswordForm } from "./change-password-form";
 import { DeleteAccountForm } from "./delete-account-form";
+import { MfaSettings } from "./mfa-settings";
 import { SessionList } from "./session-list";
 
 export const metadata: Metadata = {
@@ -23,7 +30,10 @@ export const metadata: Metadata = {
 
 export default async function SettingsPage() {
   const session = await requireUser();
-  const sessions = await listSessions(session.user.id);
+  const [sessions, mfa] = await Promise.all([
+    listSessions(session.user.id),
+    getMfaStatus(session.user.id),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -91,6 +101,26 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent>
           <ChangePasswordForm />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShieldCheck aria-hidden="true" className="size-4" />
+            Two-factor authentication
+          </CardTitle>
+          <CardDescription>
+            Require a code from an authenticator app in addition to your
+            password when signing in.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <MfaSettings
+            enabled={mfa.enabled}
+            enabledAt={mfa.enabledAt ? formatDate(mfa.enabledAt) : null}
+            recoveryCodesRemaining={mfa.recoveryCodesRemaining}
+          />
         </CardContent>
       </Card>
 

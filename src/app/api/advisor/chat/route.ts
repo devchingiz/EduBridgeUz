@@ -1,5 +1,6 @@
 import { getWorkspaceStatus } from "@/lib/auth/dal";
 import { getSession } from "@/lib/auth/session";
+import { getVerificationRequirement } from "@/lib/auth/verification-policy";
 import { handleAdvisorChat } from "@/lib/advisor/chat";
 import {
   advisorErrorStatus,
@@ -61,6 +62,10 @@ export async function POST(request: Request): Promise<Response> {
   const session = await getSession();
   if (!session) {
     return jsonError("unauthorized", "Sign in to use the advisor.", 401);
+  }
+
+  if (getVerificationRequirement(session.user).state === "required") {
+    return jsonError("blocked", "Verify your email to use the advisor.", 403);
   }
 
   const status = await getWorkspaceStatus(session.user);

@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { countryName } from "@/lib/data/countries";
 import { formatDate } from "@/lib/format";
+import { plainText } from "@/lib/catalog/format";
+import { availableText } from "@/lib/catalog/fact-groups";
 import type { UniversityDetail } from "@/lib/catalog/queries";
 
 function Stat({
@@ -50,10 +52,23 @@ export function UniversityHero({
   programCount: number;
   signedIn: boolean;
 }) {
+  const city = plainText(university.city)
+    ?.replace(/[,;]+$/, "")
+    .trim();
   const location =
-    [university.city, countryName(university.countryCode)]
-      .filter(Boolean)
-      .join(", ") || "Location unavailable";
+    [city, countryName(university.countryCode)].filter(Boolean).join(", ") ||
+    null;
+  const ranking = university.rankingDisplay?.trim() || null;
+  const websiteUrl = university.websiteUrl?.trim() || null;
+  const description = plainText(university.description);
+  const institutionType = availableText(university.institutionType);
+  const lastChecked = university.provenance.verifiedAt
+    ? formatDate(university.provenance.verifiedAt, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
 
   return (
     <section className="border-border/70 relative overflow-hidden rounded-3xl border shadow-[0_30px_90px_-60px_rgb(49_46_129/0.65)]">
@@ -93,10 +108,12 @@ export function UniversityHero({
             )}
 
             <div className="min-w-0">
-              <p className="eyebrow flex flex-wrap items-center gap-1.5">
-                <MapPin aria-hidden="true" className="size-3" />
-                {location}
-              </p>
+              {location ? (
+                <p className="eyebrow flex flex-wrap items-center gap-1.5">
+                  <MapPin aria-hidden="true" className="size-3" />
+                  {location}
+                </p>
+              ) : null}
               <h1 className="mt-2 text-[2rem] leading-[1.08] font-semibold tracking-[-0.04em] text-balance sm:text-[2.6rem]">
                 {university.name}
               </h1>
@@ -109,47 +126,37 @@ export function UniversityHero({
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-2">
-            {university.rankingDisplay ? (
+            {ranking ? (
               <Badge variant="brand" className="gap-1.5">
                 <Trophy aria-hidden="true" className="size-3" />
-                QS 2027 · {university.rankingDisplay}
+                {university.rankingOrganization ?? "QS"} 2027 · {ranking}
               </Badge>
-            ) : (
-              <Badge variant="outline">QS 2027 rank unavailable</Badge>
-            )}
+            ) : null}
             {university.continent ? (
               <Badge variant="muted">{university.continent}</Badge>
             ) : null}
-            {university.institutionType ? (
-              <Badge variant="outline">{university.institutionType}</Badge>
+            {institutionType ? (
+              <Badge variant="outline">{institutionType}</Badge>
             ) : null}
             <VerificationBadge status={university.provenance.status} />
           </div>
 
-          <p className="text-muted-foreground mt-5 max-w-2xl text-[14px] leading-7 sm:text-[15px]">
-            {university.description ??
-              `${university.name} is listed in the EduBridge catalog with source-linked records. This profile shows what our sources confirm today, and marks anything they do not.`}
-          </p>
+          {description ? (
+            <p className="text-muted-foreground mt-5 max-w-2xl text-[14px] leading-7 sm:text-[15px]">
+              {description}
+            </p>
+          ) : null}
 
           <div className="mt-6 flex flex-wrap items-center gap-2.5">
-            {university.websiteUrl ? (
+            {websiteUrl ? (
               <Button asChild size="sm">
-                <a
-                  href={university.websiteUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
+                <a href={websiteUrl} target="_blank" rel="noreferrer noopener">
                   <Globe aria-hidden="true" className="size-4" />
                   Visit official website
                   <ArrowUpRight aria-hidden="true" className="size-3.5" />
                 </a>
               </Button>
-            ) : (
-              <Button size="sm" variant="outline" disabled>
-                <Globe aria-hidden="true" className="size-4" />
-                Official website unavailable
-              </Button>
-            )}
+            ) : null}
             <FavoriteButton
               entityType="UNIVERSITY"
               id={university.id}
@@ -163,34 +170,28 @@ export function UniversityHero({
         <aside className="bg-card/85 border-border/70 relative rounded-2xl border p-4 shadow-sm backdrop-blur-sm sm:p-5">
           <p className="eyebrow">At a glance</p>
           <div className="mt-3 grid grid-cols-2 gap-2.5">
-            <Stat
-              icon={Trophy}
-              label="QS World 2027"
-              value={university.rankingDisplay ?? "Unavailable"}
-            />
+            {ranking ? (
+              <Stat
+                icon={Trophy}
+                label={`${university.rankingOrganization ?? "QS"} World 2027`}
+                value={ranking}
+              />
+            ) : null}
             <Stat
               icon={BookOpen}
               label="Published programs"
               value={String(programCount)}
             />
-            <Stat
-              icon={CalendarCheck2}
-              label="Last checked"
-              value={
-                university.provenance.verifiedAt
-                  ? formatDate(university.provenance.verifiedAt, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  : "Not checked"
-              }
-            />
-            <Stat
-              icon={MapPin}
-              label="Location"
-              value={university.city || countryName(university.countryCode)}
-            />
+            {lastChecked ? (
+              <Stat
+                icon={CalendarCheck2}
+                label="Last checked"
+                value={lastChecked}
+              />
+            ) : null}
+            {location ? (
+              <Stat icon={MapPin} label="Location" value={location} />
+            ) : null}
           </div>
 
           <div className="border-border/70 mt-4 space-y-1.5 border-t pt-4">

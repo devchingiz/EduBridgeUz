@@ -25,6 +25,19 @@ export function rateLimitKey(scope: string, identifier: string): string {
   return `${scope}:${hashIdentifier(identifier)}`;
 }
 
+function currentWindow(windowSeconds: number) {
+  const windowMs = windowSeconds * 1000;
+  const startMs = Math.floor(Date.now() / windowMs) * windowMs;
+  return {
+    windowStart: new Date(startMs),
+    expiresAt: new Date(startMs + windowMs * 2),
+    retryAfterSeconds: Math.max(
+      1,
+      Math.ceil((startMs + windowMs - Date.now()) / 1000),
+    ),
+  };
+}
+
 /**
  * Fixed-window rate limiting backed by PostgreSQL.
  *
@@ -40,9 +53,8 @@ export async function rateLimit({
   windowSeconds,
 }: RateLimitOptions): Promise<RateLimitResult> {
   const key = rateLimitKey(scope, identifier);
-  const windowMs = windowSeconds * 1000;
-  const windowStart = new Date(Math.floor(Date.now() / windowMs) * windowMs);
-  const expiresAt = new Date(windowStart.getTime() + windowMs * 2);
+  const { windowStart, expiresAt, retryAfterSeconds } =
+    currentWindow(windowSeconds);
 
   try {
     const rows = await db.$queryRaw<Array<{ count: number }>>`
@@ -66,17 +78,11 @@ export async function rateLimit({
 
     const count = Number(rows[0]?.count ?? 1);
     const allowed = count <= limit;
-    const retryAfterSeconds = allowed
-      ? 0
-      : Math.max(
-          1,
-          Math.ceil((windowStart.getTime() + windowMs - Date.now()) / 1000),
-        );
 
     return {
       allowed,
       remaining: Math.max(0, limit - count),
-      retryAfterSeconds,
+      retryAfterSeconds: allowed ? 0 : retryAfterSeconds,
       limit,
     };
   } catch (error) {
@@ -85,6 +91,54 @@ export async function rateLimit({
     logError("security.rate_limit_store_failed", error, { scope });
     return { allowed: false, remaining: 0, retryAfterSeconds: 30, limit };
   }
+}
+
+/**
+ * Reads counters without incrementing them. Used by sign-in to stop repeated
+ * password guesses before the expensive hash verification while still counting
+ * only failed attempts. Like `rateLimit`, it fails closed.
+ */
+export async function checkRateLimits(
+  limits: RateLimitOptions[],
+): Promise<RateLimitResult | null> {
+  for (const limit of limits) {
+    const { windowStart, retryAfterSeconds } = currentWindow(
+      limit.windowSeconds,
+    );
+
+    try {
+      const counter = await db.rateLimitCounter.findUnique({
+        where: { key: rateLimitKey(limit.scope, limit.identifier) },
+        select: { count: true, windowStart: true },
+      });
+
+      if (
+        counter &&
+        counter.windowStart >= windowStart &&
+        counter.count > limit.limit
+      ) {
+        logWarn("security.rate_limit_denied", { scope: limit.scope });
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfterSeconds,
+          limit: limit.limit,
+        };
+      }
+    } catch (error) {
+      logError("security.rate_limit_check_failed", error, {
+        scope: limit.scope,
+      });
+      return {
+        allowed: false,
+        remaining: 0,
+        retryAfterSeconds: 30,
+        limit: limit.limit,
+      };
+    }
+  }
+
+  return null;
 }
 
 /** Applies several limits in sequence and returns the first denial. */

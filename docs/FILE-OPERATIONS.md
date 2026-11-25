@@ -95,18 +95,24 @@ in the restored database do not exactly match the manifest.
 ## Restore and verify
 
 Restore only into a new isolated recovery database and an empty private
-document bucket. Verify both targets before running the restore; the CLI refuses
-the configured primary `DATABASE_URL`, but operators must still ensure the
-recovery URL and bucket are the intended isolated targets.
+document bucket. Verify both targets before running the restore. The CLI now
+normalises both PostgreSQL URLs (scheme, host case, default port, trailing
+slash) and refuses a target whose identity or database name matches the
+configured primary `DATABASE_URL`. It also requires `RESTORE_TARGET_NAME` to
+match the recovery database name exactly and refuses a destination bucket that
+already contains objects. These are application-side guards: two different
+hostnames could still resolve to the same database, so provider IAM and network
+separation remain mandatory.
 
-1. Set `BACKUP_ID`, `RESTORE_CONFIRM=RESTORE`,
+1. Set `BACKUP_ID`, `RESTORE_CONFIRM=RESTORE`, `RESTORE_TARGET_NAME`,
    `RESTORE_DATABASE_URL`, and `RESTORE_DOCUMENT_BUCKET`, along with the normal
    storage settings. Do not put the production database URL in
    `RESTORE_DATABASE_URL`.
-2. Run `npm run db:restore`. The script validates the versioned manifest and
-   UUID object keys, checks hashes and byte lengths while copying objects,
-   verifies the database dump checksum, and runs `pg_restore` with
-   `--exit-on-error`.
+2. Run `npm run db:restore`. The script validates the guards above, validates
+   the versioned manifest and UUID object keys, checks hashes and byte lengths
+   while copying objects, verifies the database dump checksum, and runs
+   `pg_restore` with `--exit-on-error`. The restore job needs list permission
+   on the empty destination bucket in addition to object-write permission.
 3. It compares all restored `StudentDocument.storageKey` values against the
    manifest and fails on missing or extra object references.
 4. Start the application against the recovery targets and verify representative
@@ -118,4 +124,5 @@ recovery URL and bucket are the intended isolated targets.
 
 Define and approve RPO/RTO, key-recovery procedures, and retention before
 production. A successful local unit test is not a substitute for a periodic
-restore drill against the production provider and managed PostgreSQL.
+restore drill against the production provider and managed PostgreSQL. Coordinate
+this drill with [managed PostgreSQL staging verification](STAGING-DATABASE-VERIFICATION.md).

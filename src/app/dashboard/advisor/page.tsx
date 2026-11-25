@@ -12,6 +12,7 @@ import { GateBanner } from "@/components/dashboard/gate-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getWorkspaceStatus, requireUser } from "@/lib/auth/dal";
+import { requireEmailVerification } from "@/lib/auth/verification-policy";
 
 export const metadata: Metadata = {
   title: "AI Advisor",
@@ -38,6 +39,7 @@ const comingSoon = [
 
 export default async function AdvisorPage() {
   const session = await requireUser();
+  requireEmailVerification(session.user);
   const workspaceStatus = await getWorkspaceStatus(session.user);
 
   return (

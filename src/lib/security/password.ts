@@ -3,6 +3,10 @@ import "server-only";
 import { hash, verify } from "@node-rs/argon2";
 
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/lib/auth/constants";
+import {
+  isPasswordBreached,
+  shouldCheckBreaches,
+} from "@/lib/security/breached-password";
 
 /**
  * OWASP-recommended Argon2id baseline: 19 MiB memory, 2 iterations,
@@ -20,9 +24,8 @@ const ARGON2_OPTIONS = {
 } as const;
 
 /**
- * A deliberately small local denylist. A full breached-password check using
- * the Have I Been Pwned k-anonymity range API is a launch gate documented in
- * docs/SECURITY.md; it is not called at runtime yet.
+ * A deliberately small local denylist. It runs before the network-backed
+ * breached-password check and covers obvious choices even when offline.
  */
 const COMMON_PASSWORDS = new Set([
   "123456789012",
@@ -88,6 +91,42 @@ export function checkPassword(
   }
 
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
+}
+
+/** Fails closed in production when the breached-password provider is unreachable. */
+export async function enforceBreachedPasswordPolicy(
+  password: string,
+): Promise<PasswordCheck> {
+  if (!shouldCheckBreaches()) return { ok: true };
+
+  const result = await isPasswordBreached(password);
+  if (!result.ok) {
+    return {
+      ok: false,
+      errors: [
+        "We could not verify this password right now. Please try again.",
+      ],
+    };
+  }
+  if (result.breached) {
+    return {
+      ok: false,
+      errors: [
+        "This password has appeared in a known data breach. Choose a different one.",
+      ],
+    };
+  }
+  return { ok: true };
+}
+
+/** Local rules plus the breached-password check, used at validation boundaries. */
+export async function enforcePasswordPolicy(
+  password: string,
+  context: { email?: string; name?: string } = {},
+): Promise<PasswordCheck> {
+  const local = checkPassword(password, context);
+  if (!local.ok) return local;
+  return enforceBreachedPasswordPolicy(password);
 }
 
 export async function hashPassword(password: string): Promise<string> {

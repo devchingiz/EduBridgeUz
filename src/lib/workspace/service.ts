@@ -462,7 +462,7 @@ export async function listWorkspaceNotifications(userId: string) {
           type: StudentNotificationType.SCHOLARSHIP_ANNOUNCEMENT,
           title: "New scholarship in the catalog",
           body: `${scholarship.name} · ${scholarship.providerName}.`,
-          href: `/scholarships/${scholarship.slug}`,
+          href: `/dashboard/scholarships/${scholarship.slug}`,
           readAt: null,
           createdAt: new Date(),
         }))

@@ -1,21 +1,18 @@
 import "server-only";
 
-import type { VerificationStatus } from "@prisma/client";
-
-import { recordAuditEvent } from "@/lib/auth/audit";
 import {
-  VERIFICATION_STATUSES,
-  type VerificationStatusValue,
-} from "@/lib/catalog/constants";
+  isoDayString,
+  universityMissingInfo,
+} from "@/lib/admin/catalog-management";
+import type { VerificationStatusValue } from "@/lib/catalog/constants";
 import { db } from "@/lib/db";
 
 export const ADMIN_UNIVERSITY_PAGE_SIZE = 20;
 
-export const ASSIGNABLE_UNIVERSITY_STATUSES = VERIFICATION_STATUSES;
-
 export type AdminUniversityFilters = {
   query: string;
   status: VerificationStatusValue | null;
+  featured?: boolean | null;
   page: number;
 };
 
@@ -26,6 +23,9 @@ export type AdminUniversityItem = {
   city: string;
   countryCode: string;
   status: VerificationStatusValue;
+  featured: boolean;
+  sourceVerifiedAt: string | null;
+  warningCount: number;
   rankingDisplay: string | null;
   programCount: number;
   updatedAt: string;
@@ -52,6 +52,9 @@ export async function listAdminUniversities(
         }
       : {}),
     ...(filters.status ? { verificationStatus: filters.status } : {}),
+    ...(typeof filters.featured === "boolean"
+      ? { featured: filters.featured }
+      : {}),
   };
 
   const total = await db.university.count({ where });
@@ -66,81 +69,53 @@ export async function listAdminUniversities(
       city: true,
       countryCode: true,
       verificationStatus: true,
+      featured: true,
       rankingDisplay: true,
+      description: true,
+      websiteUrl: true,
+      continent: true,
+      institutionType: true,
+      lastVerifiedAt: true,
+      nextReviewAt: true,
       updatedAt: true,
+      primarySource: { select: { verifiedAt: true } },
       _count: { select: { programs: true } },
     },
-    orderBy: { name: "asc" },
+    orderBy: [{ featured: "desc" }, { name: "asc" }],
     skip: (page - 1) * ADMIN_UNIVERSITY_PAGE_SIZE,
     take: ADMIN_UNIVERSITY_PAGE_SIZE,
   });
 
   return {
-    items: rows.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      city: row.city,
-      countryCode: row.countryCode,
-      status: row.verificationStatus,
-      rankingDisplay: row.rankingDisplay,
-      programCount: row._count.programs,
-      updatedAt: row.updatedAt.toISOString().slice(0, 10),
-    })),
+    items: rows.map((row) => {
+      const sourceVerifiedAt = isoDayString(row.primarySource.verifiedAt);
+      return {
+        id: row.id,
+        slug: row.slug,
+        name: row.name,
+        city: row.city,
+        countryCode: row.countryCode,
+        status: row.verificationStatus,
+        featured: row.featured,
+        sourceVerifiedAt,
+        warningCount: universityMissingInfo({
+          status: row.verificationStatus,
+          sourceVerifiedAt,
+          nextReviewAt: isoDayString(row.nextReviewAt),
+          websiteUrl: row.websiteUrl,
+          description: row.description,
+          continent: row.continent,
+          institutionType: row.institutionType,
+          rankingDisplay: row.rankingDisplay,
+          programCount: row._count.programs,
+        }).length,
+        rankingDisplay: row.rankingDisplay,
+        programCount: row._count.programs,
+        updatedAt: row.updatedAt.toISOString().slice(0, 10),
+      };
+    }),
     total,
     page,
     pageCount,
-  };
-}
-
-export type StatusChangeResult =
-  | { ok: true; changed: boolean; previousStatus: VerificationStatusValue }
-  | { ok: false; reason: "not_found" | "invalid_status" | "unchanged" };
-
-/**
- * ADMIN-only status override. Unlike the reviewer workflow this does not claim
- * a source or verification date; it exists to correct catalog state and is
- * always written to the audit trail. Reviewers should use the review queue.
- */
-export async function setAdminUniversityStatus(input: {
-  actorId: string;
-  universityId: string;
-  status: VerificationStatusValue;
-  ip?: string;
-}): Promise<StatusChangeResult> {
-  if (!ASSIGNABLE_UNIVERSITY_STATUSES.includes(input.status)) {
-    return { ok: false, reason: "invalid_status" };
-  }
-
-  const existing = await db.university.findUnique({
-    where: { id: input.universityId },
-    select: { verificationStatus: true },
-  });
-  if (!existing) return { ok: false, reason: "not_found" };
-  if (existing.verificationStatus === input.status) {
-    return { ok: false, reason: "unchanged" };
-  }
-
-  await db.university.update({
-    where: { id: input.universityId },
-    data: { verificationStatus: input.status as VerificationStatus },
-  });
-
-  await recordAuditEvent({
-    actorId: input.actorId,
-    action: "admin.university_status_changed",
-    entityType: "UNIVERSITY",
-    entityId: input.universityId,
-    metadata: {
-      fromStatus: existing.verificationStatus,
-      toStatus: input.status,
-    },
-    ip: input.ip,
-  });
-
-  return {
-    ok: true,
-    changed: true,
-    previousStatus: existing.verificationStatus,
   };
 }

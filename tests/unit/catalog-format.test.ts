@@ -8,6 +8,7 @@ import {
   formatMonthDay,
   formatMoney,
   formatStart,
+  plainText,
   verificationBadgeVariant,
 } from "@/lib/catalog/format";
 
@@ -22,6 +23,48 @@ describe("formatMoney", () => {
 
   it("falls back to the raw amount for an invalid currency", () => {
     expect(formatMoney(123400, "EURO")).toBe("1,234 EURO");
+  });
+});
+
+describe("plainText", () => {
+  it("removes rich-text markup and decodes named entities", () => {
+    expect(
+      plainText(
+        "<div style=\"font-family: 'Segoe UI'\"><p>The <b>University</b> of Oxford &amp; Cambridge</p></div>",
+      ),
+    ).toBe("The University of Oxford & Cambridge");
+  });
+
+  it("drops script, style, and comment content", () => {
+    expect(
+      plainText(
+        "<p>Keep</p><style>.x{color:red}</style><!-- drop --><script>alert(1)</script>",
+      ),
+    ).toBe("Keep");
+  });
+
+  it("decodes numeric entities", () => {
+    expect(plainText("L&#39;Ecole &#x2014; campus")).toBe("L'Ecole — campus");
+  });
+
+  it("collapses whitespace and returns null for markup-only values", () => {
+    expect(plainText("  <p>\n One&nbsp; <br/> two   </p> ")).toBe("One two");
+    expect(plainText("<p></p>")).toBeNull();
+    expect(plainText(null)).toBeNull();
+  });
+
+  it("keeps a literal less-than sign that is not a tag", () => {
+    expect(plainText("Footscray < 3 miles away")).toBe(
+      "Footscray < 3 miles away",
+    );
+  });
+
+  it("drops a tag truncated at the end of a source snippet", () => {
+    expect(
+      plainText(
+        'Campus highlights <p paraeid="{abc}{191}" style="font-family: "Segoe UI"',
+      ),
+    ).toBe("Campus highlights");
   });
 });
 

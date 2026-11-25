@@ -1,16 +1,11 @@
 import { Award, Check, CircleHelp, Clock3, Info, Sparkles } from "lucide-react";
 
+import { SectionLink } from "@/components/layout/section-link";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionHeading } from "@/components/marketing/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const benefits = [
-  "Fully funded and partial awards in one search",
-  "Nationality, degree, and field eligibility",
-  "Deadline reminders before it is too late",
-  "Save, shortlist, and add to your tracker",
-];
+import type { ScholarshipsContent } from "@/lib/cms/homepage-content";
 
 const criteria = [
   {
@@ -45,17 +40,7 @@ const criteria = [
   },
 ] as const;
 
-const filterChips = [
-  "Fully funded",
-  "Partial funding",
-  "Bachelor's",
-  "Master's",
-  "PhD",
-  "No IELTS required",
-  "Deadline this month",
-];
-
-export function Scholarships() {
+export function Scholarships({ content }: { content: ScholarshipsContent }) {
   return (
     <section
       id="scholarships"
@@ -67,17 +52,13 @@ export function Scholarships() {
           <Reveal>
             <div>
               <SectionHeading
-                eyebrow="Scholarship discovery"
-                title={
-                  <span id="scholarships-heading">
-                    Funding shouldn&apos;t be a guessing game.
-                  </span>
-                }
-                description="Search scholarships by funding level, nationality eligibility, degree, field, and deadline. See exactly which criteria match your profile — and which ones remain unknown."
+                eyebrow={content.eyebrow}
+                title={<span id="scholarships-heading">{content.title}</span>}
+                description={content.description}
               />
 
               <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-                {benefits.map((benefit) => (
+                {content.benefits.map((benefit) => (
                   <li
                     key={benefit}
                     className="text-foreground/80 flex items-start gap-2.5 text-[13px] leading-5"
@@ -92,10 +73,10 @@ export function Scholarships() {
 
               <div className="mt-7">
                 <p className="text-muted-foreground font-mono text-[9.5px] font-medium tracking-[0.14em] uppercase">
-                  Filters at launch
+                  {content.filtersNote}
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {filterChips.map((chip) => (
+                  {content.filterChips.map((chip) => (
                     <span
                       key={chip}
                       className="border-border bg-card text-muted-foreground inline-flex h-6 items-center rounded-full border px-2.5 text-[10.5px]"
@@ -108,14 +89,14 @@ export function Scholarships() {
 
               <div className="mt-7 flex flex-wrap items-center gap-3">
                 <Button asChild variant="outline" size="sm">
-                  <a href="#advisor">
+                  <SectionLink href={content.ctaHref}>
                     <Sparkles className="size-3.5" />
-                    Ask the advisor
-                  </a>
+                    {content.ctaLabel}
+                  </SectionLink>
                 </Button>
                 <span className="text-muted-foreground inline-flex items-center gap-1.5 text-[11px]">
                   <Clock3 className="size-3" aria-hidden="true" />
-                  Live catalog opens with verified records
+                  {content.liveNote}
                 </span>
               </div>
             </div>

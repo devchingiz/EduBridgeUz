@@ -1,10 +1,10 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 import { executeAdvisorTool } from "@/lib/advisor/tools";
+import { applyUniversityStatusAction } from "@/lib/admin/university-management";
 import {
   ADMIN_UNIVERSITY_PAGE_SIZE,
   listAdminUniversities,
-  setAdminUniversityStatus,
 } from "@/lib/admin/universities";
 import type { VerificationStatusValue } from "@/lib/catalog/constants";
 import { getUniversityBySlug } from "@/lib/catalog/queries";
@@ -393,62 +393,72 @@ describe("administrative university management", () => {
     expect(ADMIN_UNIVERSITY_PAGE_SIZE).toBe(20);
   });
 
-  it("audits a status override and rejects invalid or unchanged changes", async () => {
-    const changed = await setAdminUniversityStatus({
+  it("audits a controlled unpublish and rejects invalid lifecycle actions", async () => {
+    const changed = await applyUniversityStatusAction({
+      id: universityIds.target,
+      action: "UNPUBLISH",
+      note: "Administrator removed this record from public discovery.",
       actorId: adminId,
-      universityId: universityIds.target,
-      status: "NEEDS_REVIEW",
       ip: "127.0.0.1",
     });
-    expect(changed).toEqual({
-      ok: true,
-      changed: true,
-      previousStatus: "VERIFIED",
-    });
+    expect(changed).toEqual({ ok: true, id: universityIds.target });
 
     const row = await db.university.findUniqueOrThrow({
       where: { id: universityIds.target },
     });
-    expect(row.verificationStatus).toBe("NEEDS_REVIEW");
+    expect(row.verificationStatus).toBe("UNVERIFIED");
 
     const audit = await db.auditEvent.findFirst({
       where: {
         actorId: adminId,
         entityId: universityIds.target,
-        action: "admin.university_status_changed",
+        action: "admin.university_request_changes",
       },
     });
     expect(audit?.metadata).toEqual({
       fromStatus: "VERIFIED",
-      toStatus: "NEEDS_REVIEW",
+      toStatus: "UNVERIFIED",
     });
     expect(audit?.ipHash).toBeTruthy();
 
+    const review = await db.catalogReview.findFirst({
+      where: {
+        entityId: universityIds.target,
+        decision: "REQUEST_CHANGES",
+      },
+    });
+    expect(review?.note).toBe(
+      "Administrator removed this record from public discovery.",
+    );
+
     expect(
-      await setAdminUniversityStatus({
+      await applyUniversityStatusAction({
+        id: universityIds.target,
+        action: "RESTORE",
         actorId: adminId,
-        universityId: universityIds.target,
-        status: "NEEDS_REVIEW",
       }),
-    ).toEqual({ ok: false, reason: "unchanged" });
+    ).toMatchObject({ ok: false, reason: "invalid_state" });
     expect(
-      await setAdminUniversityStatus({
+      await applyUniversityStatusAction({
+        id: "missing-university",
+        action: "PUBLISH",
         actorId: adminId,
-        universityId: "missing-university",
-        status: "VERIFIED",
       }),
-    ).toEqual({ ok: false, reason: "not_found" });
+    ).toMatchObject({ ok: false, reason: "not_found" });
     expect(
-      await setAdminUniversityStatus({
+      await applyUniversityStatusAction({
+        id: universityIds.target,
+        action: "NOT_AN_ACTION" as never,
         actorId: adminId,
-        universityId: universityIds.target,
-        status: "NOT_A_STATUS" as VerificationStatusValue,
       }),
-    ).toEqual({ ok: false, reason: "invalid_status" });
+    ).toMatchObject({ ok: false, reason: "invalid_action" });
 
     expect(
       await db.auditEvent.count({
-        where: { action: "admin.university_status_changed" },
+        where: {
+          action: "admin.university_request_changes",
+          entityId: universityIds.target,
+        },
       }),
     ).toBe(1);
   });

@@ -95,7 +95,7 @@ function sourceErrors(error: z.ZodError): Record<string, string> {
 }
 
 async function reviewerContext(): Promise<Reviewer> {
-  const session = await requireRole(["REVIEWER", "ADMIN"]);
+  const session = await requireRole(["REVIEWER", "ADMIN", "SUPER_ADMIN"]);
   const context = await getRequestContext();
   return { id: session.user.id, ip: context.ip };
 }
@@ -592,7 +592,7 @@ export async function removeFactAction(formData: FormData): Promise<void> {
 
 export async function runSweepAction(): Promise<void> {
   await assertSameOrigin();
-  const session = await requireRole(["REVIEWER", "ADMIN"]);
+  const session = await requireRole(["REVIEWER", "ADMIN", "SUPER_ADMIN"]);
   await runExpirySweep(session.user.id);
   revalidatePath("/dashboard/review");
   revalidatePath("/universities");

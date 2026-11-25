@@ -2,7 +2,9 @@ type LogFields = Record<string, string | number | boolean | undefined>;
 
 const SAFE_FIELDS = new Set([
   "action",
+  "attempt",
   "completionTokens",
+  "delayMs",
   "digest",
   "entityType",
   "estimatedCostMicros",

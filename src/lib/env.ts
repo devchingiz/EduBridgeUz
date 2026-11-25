@@ -29,6 +29,83 @@ function isValidProductionAppUrl(value: string | undefined): boolean {
   }
 }
 
+type ProductionDatabaseUrlChecks = {
+  valid: boolean;
+  tls: boolean;
+  timeouts: boolean;
+  pool: boolean;
+};
+
+function hasPositiveIntegerParam(url: URL, name: string): boolean {
+  const raw = url.searchParams.get(name);
+  if (raw === null || raw.trim() === "") return false;
+  const value = Number(raw);
+  return Number.isInteger(value) && value > 0 && value <= 2_147_483_647;
+}
+
+/**
+ * Production may not fall back to an unencrypted connection, an unbounded wait,
+ * or an unbounded pool. Issue names are reported rather than values so a bad URL
+ * cannot leak credentials into readiness output or logs.
+ */
+function checkProductionDatabaseUrl(
+  value: string | undefined,
+): ProductionDatabaseUrlChecks {
+  const invalid: ProductionDatabaseUrlChecks = {
+    valid: false,
+    tls: false,
+    timeouts: false,
+    pool: false,
+  };
+  if (!value) return invalid;
+
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return invalid;
+  }
+  if (!["postgres:", "postgresql:"].includes(url.protocol) || !url.hostname) {
+    return invalid;
+  }
+  try {
+    const database = decodeURIComponent(
+      url.pathname.replace(/^\//, "").replace(/\/$/, ""),
+    );
+    if (!database) return invalid;
+  } catch {
+    return invalid;
+  }
+
+  const sslmode = url.searchParams.get("sslmode")?.toLowerCase();
+  return {
+    valid: true,
+    tls:
+      sslmode === "require" ||
+      sslmode === "verify-ca" ||
+      sslmode === "verify-full",
+    timeouts:
+      hasPositiveIntegerParam(url, "connect_timeout") &&
+      hasPositiveIntegerParam(url, "pool_timeout"),
+    pool: hasPositiveIntegerParam(url, "connection_limit"),
+  };
+}
+
+/** Rejects placeholders and reserved domains so production cannot ship a contact that cannot receive mail. */
+function isDeliverableEmail(value: string | undefined): boolean {
+  if (!value) return false;
+
+  const match = value.match(/<([^\s@]+@[^\s@]+\.[^\s@]{2,})>/) ?? [
+    ,
+    value.trim(),
+  ];
+  const address = match[1];
+  if (!address || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(address)) return false;
+
+  const domain = address.split("@")[1]?.toLowerCase() ?? "";
+  return !/(^|\.)(example|invalid|test|localhost)$/.test(domain);
+}
+
 export function getAppUrl(): string {
   const url = read("NEXT_PUBLIC_APP_URL");
   if (isProduction() && !isValidProductionAppUrl(url)) {
@@ -60,10 +137,35 @@ export function getAuthSecret(): string {
 }
 
 /**
+ * Fixed timestamp that starts email-verification enforcement. This is read at
+ * request time rather than baked into a build, but it must be set once for the
+ * rollout and then left unchanged so redeploys do not reset legacy grace.
+ */
+export function getVerificationEnforcementStart(): Date | null {
+  const value = read("EMAIL_VERIFICATION_ENFORCEMENT_START");
+  if (!value) return null;
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? null : new Date(timestamp);
+}
+
+/** Missing and malformed values are both invalid; callers must fail closed. */
+export function hasValidVerificationEnforcementStart(): boolean {
+  return getVerificationEnforcementStart() !== null;
+}
+
+/**
  * Comma-separated account emails that a trusted operator wants to promote to
- * administrator on their next successful sign-in. This is bootstrap-only: the
+ * Super Admin on their next successful sign-in. This is bootstrap-only: the
  * panel cannot set it, and an empty value disables the path entirely.
  */
+/**
+ * MFA seeds are encrypted with a dedicated key so rotating AUTH_SECRET does not
+ * silently lock enrolled accounts out. It must be high-entropy and stable.
+ */
+export function getMfaEncryptionKey(): string {
+  return read("MFA_ENCRYPTION_KEY") ?? getAuthSecret();
+}
+
 export function getBootstrapAdminEmails(): string[] {
   const configured = read("BOOTSTRAP_ADMIN_EMAILS");
   if (!configured) return [];
@@ -75,6 +177,26 @@ export function getBootstrapAdminEmails(): string[] {
         .filter(Boolean),
     ),
   );
+}
+
+export function hasInvalidBootstrapAdminEmails(): boolean {
+  const configured = read("BOOTSTRAP_ADMIN_EMAILS");
+  if (!configured) return false;
+  return configured
+    .split(/[,\n]/)
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean)
+    .some((email) => !isDeliverableEmail(email));
+}
+
+export function getSecurityContactEmail(): string | null {
+  const email = read("SECURITY_CONTACT_EMAIL");
+  return email && isDeliverableEmail(email) ? email : null;
+}
+
+export function getPrivacyContactEmail(): string | null {
+  const email = read("PRIVACY_CONTACT_EMAIL");
+  return email && isDeliverableEmail(email) ? email : null;
 }
 
 export function getGoogleOAuthConfig(): {
@@ -173,24 +295,33 @@ export function productionConfigurationIssues(): string[] {
   const appUrl = read("NEXT_PUBLIC_APP_URL");
   if (!isValidProductionAppUrl(appUrl)) issues.push("NEXT_PUBLIC_APP_URL");
 
-  const databaseUrl = read("DATABASE_URL");
-  try {
-    if (
-      !databaseUrl ||
-      !["postgres:", "postgresql:"].includes(new URL(databaseUrl).protocol)
-    ) {
-      issues.push("DATABASE_URL");
-    }
-  } catch {
+  const database = checkProductionDatabaseUrl(read("DATABASE_URL"));
+  if (!database.valid) {
     issues.push("DATABASE_URL");
+  } else {
+    if (!database.tls) issues.push("DATABASE_URL_TLS");
+    if (!database.timeouts) issues.push("DATABASE_URL_TIMEOUTS");
+    if (!database.pool) issues.push("DATABASE_URL_POOL");
   }
 
   const authSecret = read("AUTH_SECRET");
   if (!authSecret || authSecret.length < 32) issues.push("AUTH_SECRET");
 
+  if (!hasValidVerificationEnforcementStart()) {
+    issues.push("EMAIL_VERIFICATION_ENFORCEMENT_START");
+  }
+
   if (read("EMAIL_TRANSPORT") !== "smtp" || !read("SMTP_HOST")) {
     issues.push("EMAIL_TRANSPORT/SMTP_HOST");
   }
+  if (!isDeliverableEmail(read("EMAIL_FROM"))) issues.push("EMAIL_FROM");
+  const mfaEncryptionKey = read("MFA_ENCRYPTION_KEY");
+  if (!mfaEncryptionKey || mfaEncryptionKey.length < 32) {
+    issues.push("MFA_ENCRYPTION_KEY");
+  }
+  if (!getSecurityContactEmail()) issues.push("SECURITY_CONTACT_EMAIL");
+  if (!getPrivacyContactEmail()) issues.push("PRIVACY_CONTACT_EMAIL");
+  if (hasInvalidBootstrapAdminEmails()) issues.push("BOOTSTRAP_ADMIN_EMAILS");
   if (!read("GOOGLE_CLIENT_ID") || !read("GOOGLE_CLIENT_SECRET")) {
     issues.push("GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET");
   }
@@ -198,6 +329,9 @@ export function productionConfigurationIssues(): string[] {
   if (!Number.isInteger(smtpPort) || smtpPort < 1 || smtpPort > 65535) {
     issues.push("SMTP_PORT");
   }
+
+  const storageDriver = read("STORAGE_DRIVER") ?? "s3";
+  if (storageDriver !== "s3") issues.push("STORAGE_DRIVER");
 
   const region = read("STORAGE_REGION");
   const bucket = read("STORAGE_BUCKET");
@@ -232,6 +366,9 @@ export function productionConfigurationIssues(): string[] {
       issues.push("STORAGE_ENDPOINT");
     }
   }
+
+  const scannerDriver = read("MALWARE_SCANNER_DRIVER") ?? "clamd";
+  if (scannerDriver !== "clamd") issues.push("MALWARE_SCANNER_DRIVER");
 
   const scannerHost = read("MALWARE_SCANNER_HOST");
   const scannerPort = Number(read("MALWARE_SCANNER_PORT") ?? "3310");

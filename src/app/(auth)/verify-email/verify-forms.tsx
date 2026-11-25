@@ -1,17 +1,22 @@
 "use client";
 
-import { useActionState } from "react";
+import { useEffect, useActionState } from "react";
 
 import { verifyEmailAction } from "@/app/(auth)/actions";
 import { FormMessage } from "@/components/auth/form-message";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { initialFormState } from "@/lib/actions/state";
+import { removeVerificationTokenFromHistory } from "@/lib/auth/verification-url";
 
 export function VerifyTokenForm({ token }: { token: string }) {
   const [state, formAction] = useActionState(
     verifyEmailAction,
     initialFormState,
   );
+
+  useEffect(() => {
+    removeVerificationTokenFromHistory(window.location, window.history);
+  }, []);
 
   return (
     <form action={formAction} className="space-y-4">

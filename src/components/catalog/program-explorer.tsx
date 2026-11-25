@@ -14,6 +14,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 
 import { VerificationBadge } from "@/components/catalog/verification";
 import type { VerificationStatusValue } from "@/lib/catalog/constants";
+import { availableText } from "@/lib/catalog/fact-groups";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { degreeLabel } from "@/lib/data/fields";
@@ -53,10 +54,11 @@ export function ProgramExplorer({
     const needle = deferredQuery.trim().toLowerCase();
     return programs.filter((program) => {
       const matchesDegree = degree === "ALL" || program.degreeLevel === degree;
+      const field = availableText(program.field) ?? "";
       const matchesQuery =
         needle.length === 0 ||
         program.name.toLowerCase().includes(needle) ||
-        program.field.toLowerCase().includes(needle);
+        field.toLowerCase().includes(needle);
       return matchesDegree && matchesQuery;
     });
   }, [programs, deferredQuery, degree]);
@@ -122,6 +124,9 @@ export function ProgramExplorer({
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePrograms.map((program) => {
             const href = `/universities/${universitySlug}/programs/${program.slug}`;
+            const field = availableText(program.field);
+            const language = availableText(program.language);
+            const degree = availableText(degreeLabel(program.degreeLevel));
             return (
               <article
                 key={program.id}
@@ -144,28 +149,28 @@ export function ProgramExplorer({
                 </h3>
 
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  <Badge variant="brand">
-                    {degreeLabel(program.degreeLevel)}
-                  </Badge>
-                  <Badge variant="muted">{program.field}</Badge>
+                  {degree ? <Badge variant="brand">{degree}</Badge> : null}
+                  {field ? <Badge variant="muted">{field}</Badge> : null}
                 </div>
 
                 <div className="text-muted-foreground mt-4 grid gap-2 text-[12px]">
-                  <p className="inline-flex items-center gap-2">
-                    <GraduationCap aria-hidden="true" className="size-3.5" />
-                    {degreeLabel(program.degreeLevel)}
-                    {program.credits ? ` · ${program.credits} credits` : ""}
-                  </p>
+                  {degree ? (
+                    <p className="inline-flex items-center gap-2">
+                      <GraduationCap aria-hidden="true" className="size-3.5" />
+                      {degree}
+                      {program.credits ? ` · ${program.credits} credits` : ""}
+                    </p>
+                  ) : null}
                   {program.durationMonths ? (
                     <p className="inline-flex items-center gap-2">
                       <Clock3 aria-hidden="true" className="size-3.5" />
                       {program.durationMonths} months
                     </p>
                   ) : null}
-                  {program.language ? (
+                  {language ? (
                     <p className="inline-flex items-center gap-2">
                       <Languages aria-hidden="true" className="size-3.5" />
-                      {program.language}
+                      {language}
                     </p>
                   ) : null}
                 </div>

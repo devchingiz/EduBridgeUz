@@ -13,9 +13,11 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { SectionLink } from "@/components/layout/section-link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/marketing/section-heading";
+import type { UniversitySearchContent } from "@/lib/cms/homepage-content";
 import {
   ALL_FILTER,
   emptyUniversityFilters,
@@ -101,7 +103,11 @@ function FilterChip({
   );
 }
 
-export function UniversitySearch() {
+export function UniversitySearch({
+  content,
+}: {
+  content: UniversitySearchContent;
+}) {
   const [filters, setFilters] = useState<UniversityFilterState>(
     emptyUniversityFilters,
   );
@@ -133,21 +139,17 @@ export function UniversitySearch() {
       <div className="site-container">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
-            eyebrow="University discovery"
-            title={
-              <span id="universities-heading">
-                Find a university that fits the life you want.
-              </span>
-            }
-            description="Search by destination, degree, and field. Every live record will show its official source, verification date, and review status — so you can check before you act."
+            eyebrow={content.eyebrow}
+            title={<span id="universities-heading">{content.title}</span>}
+            description={content.description}
           />
-          <a
-            href="#verification"
+          <SectionLink
+            href={content.linkHref}
             className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1.5 text-[13px] font-medium transition-colors"
           >
-            How we verify data
+            {content.linkLabel}
             <ArrowUpRight className="size-3.5" />
-          </a>
+          </SectionLink>
         </div>
 
         <div className="border-border bg-card mt-9 overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgb(15_23_42/0.03)]">

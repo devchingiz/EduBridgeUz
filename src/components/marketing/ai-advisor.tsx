@@ -14,35 +14,11 @@ import {
 import { LogoMark } from "@/components/brand/logo";
 import { Reveal } from "@/components/marketing/reveal";
 import { Badge } from "@/components/ui/badge";
+import type { AdvisorContent } from "@/lib/cms/homepage-content";
 
-const capabilities = [
-  {
-    icon: UserRound,
-    title: "Built from your profile",
-    description:
-      "Uses your education, scores, budget, destinations, and intended degree.",
-  },
-  {
-    icon: CircleHelp,
-    title: "Uncertainty is stated",
-    description:
-      "Separates verified facts, general guidance, and what still needs checking.",
-  },
-  {
-    icon: Link2,
-    title: "Sources stay attached",
-    description:
-      "Points back to official university and scholarship pages whenever available.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Checklists, not decisions",
-    description:
-      "Turns requirements into next steps. It does not make admission decisions.",
-  },
-];
+const capabilityIcons = [UserRound, CircleHelp, Link2, ClipboardCheck] as const;
 
-export function AiAdvisor() {
+export function AiAdvisor({ content }: { content: AdvisorContent }) {
   return (
     <section
       id="advisor"
@@ -62,39 +38,39 @@ export function AiAdvisor() {
             <div>
               <Badge variant="brand" className="h-6 px-2.5 text-[10.5px]">
                 <Sparkles className="size-3" aria-hidden="true" />
-                AI University Advisor
+                {content.badge}
               </Badge>
               <h2
                 id="advisor-heading"
                 className="mt-4 text-[1.85rem] leading-[1.08] font-semibold tracking-[-0.035em] text-balance sm:text-4xl lg:text-[2.7rem]"
               >
-                Ask better questions.
+                {content.titleLine1}
                 <br />
-                Get source-aware answers.
+                {content.titleLine2}
               </h2>
               <p className="text-muted-foreground mt-4 max-w-xl text-[15px] leading-7">
-                Your advisor understands your academic profile, explains
-                admission requirements, finds gaps in your documents, and helps
-                you organize a plan — with the limits of its knowledge made
-                explicit.
+                {content.description}
               </p>
 
               <ul className="mt-7 space-y-4">
-                {capabilities.map((capability) => (
-                  <li key={capability.title} className="flex gap-3">
-                    <span className="border-primary/10 bg-accent text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border">
-                      <capability.icon className="size-4" aria-hidden="true" />
-                    </span>
-                    <div>
-                      <p className="text-[13px] font-medium">
-                        {capability.title}
-                      </p>
-                      <p className="text-muted-foreground mt-0.5 text-[12px] leading-5">
-                        {capability.description}
-                      </p>
-                    </div>
-                  </li>
-                ))}
+                {content.capabilities.map((capability, index) => {
+                  const Icon = capabilityIcons[index];
+                  return (
+                    <li key={capability.title} className="flex gap-3">
+                      <span className="border-primary/10 bg-accent text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border">
+                        <Icon className="size-4" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <p className="text-[13px] font-medium">
+                          {capability.title}
+                        </p>
+                        <p className="text-muted-foreground mt-0.5 text-[12px] leading-5">
+                          {capability.description}
+                        </p>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="border-border bg-card mt-7 flex items-start gap-2.5 rounded-xl border p-3.5">
@@ -104,11 +80,9 @@ export function AiAdvisor() {
                 />
                 <p className="text-muted-foreground text-[11px] leading-5">
                   <span className="text-foreground font-medium">
-                    AI can make mistakes.
+                    {content.disclaimerLead}
                   </span>{" "}
-                  EduBridge never guarantees admission or funding, and does not
-                  make final admissions decisions. Always confirm details with
-                  the official institution.
+                  {content.disclaimerBody}
                 </p>
               </div>
             </div>

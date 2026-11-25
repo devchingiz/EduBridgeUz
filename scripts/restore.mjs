@@ -10,11 +10,16 @@ import { pipeline } from "node:stream/promises";
 import {
   CopyObjectCommand,
   GetObjectCommand,
+  ListObjectsV2Command,
   S3Client,
 } from "@aws-sdk/client-s3";
 import { PrismaClient } from "@prisma/client";
 
 import { postgresClientEnvironment } from "./postgres-client-env.mjs";
+import {
+  assertEmptyRestoreBucket,
+  assertRestoreTargetIsIsolated,
+} from "./restore-guards.mjs";
 import {
   restoreDocumentObjects,
   verifyDocumentReferences,
@@ -134,14 +139,12 @@ async function main() {
   }
   const backupId = required("BACKUP_ID");
   const restoreDatabaseUrl = required("RESTORE_DATABASE_URL");
-  if (
-    process.env.DATABASE_URL &&
-    restoreDatabaseUrl === process.env.DATABASE_URL
-  ) {
-    throw new Error(
-      "RESTORE_DATABASE_URL must target a separate recovery database, not DATABASE_URL.",
-    );
-  }
+  const targetName = required("RESTORE_TARGET_NAME");
+  assertRestoreTargetIsIsolated({
+    databaseUrl: process.env.DATABASE_URL,
+    restoreUrl: restoreDatabaseUrl,
+    targetName,
+  });
   const documentBucket = required("RESTORE_DOCUMENT_BUCKET");
   const backupBucket = required("STORAGE_BACKUP_BUCKET");
   if (documentBucket === backupBucket) {
@@ -165,6 +168,12 @@ async function main() {
   try {
     tempDir = await mkdtemp(path.join(os.tmpdir(), "edubridge-restore-"));
     const dumpPath = path.join(tempDir, "database.dump");
+    // A restore must never overwrite documents already in the destination.
+    // Provider IAM should additionally deny writes outside this empty bucket.
+    await assertEmptyRestoreBucket(
+      (Bucket) => client.send(new ListObjectsV2Command({ Bucket, MaxKeys: 1 })),
+      documentBucket,
+    );
     const manifestBytes = await store.get(
       backupBucket,
       `backups/${backupId}/manifest.json`,

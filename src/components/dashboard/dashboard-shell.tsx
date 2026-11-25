@@ -1,9 +1,10 @@
 import { Logo } from "@/components/brand/logo";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import { EmailVerificationBanner } from "@/components/dashboard/email-verification-banner";
 import { LogoutButton } from "@/components/dashboard/logout-button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { isStaff, ROLE_LABELS } from "@/lib/auth/roles";
+import { isAdminPanelRole, isStaff, ROLE_LABELS } from "@/lib/auth/roles";
 import type { SessionUser } from "@/lib/auth/session";
 import type { WorkspaceStatus } from "@/lib/auth/dal";
 
@@ -17,6 +18,7 @@ export function DashboardShell({
   children: React.ReactNode;
 }) {
   const staff = isStaff(user.role);
+  const canAccessAdmin = isAdminPanelRole(user.role);
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
@@ -28,7 +30,7 @@ export function DashboardShell({
         <div className="px-3 py-2">
           <DashboardNav
             staff={staff}
-            admin={user.role === "ADMIN"}
+            admin={canAccessAdmin}
             minor={status.isMinor}
           />
         </div>
@@ -67,11 +69,13 @@ export function DashboardShell({
         <div className="border-border scrollbar-none overflow-x-auto border-b px-3 py-2 lg:hidden">
           <DashboardNav
             staff={staff}
-            admin={user.role === "ADMIN"}
+            admin={canAccessAdmin}
             minor={status.isMinor}
             orientation="horizontal"
           />
         </div>
+
+        {user.emailVerifiedAt ? null : <EmailVerificationBanner />}
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="mx-auto w-full max-w-5xl">{children}</div>

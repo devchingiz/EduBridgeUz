@@ -10,8 +10,10 @@ import {
 } from "@/lib/catalog/constants";
 import {
   formatCheckedOn,
+  plainText,
   verificationBadgeVariant,
 } from "@/lib/catalog/format";
+import { filterAvailableFacts } from "@/lib/catalog/fact-groups";
 import type { CitationDto } from "@/lib/catalog/provenance";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -71,13 +73,7 @@ export function SourceLine({
   className?: string;
   showChecked?: boolean;
 }) {
-  if (!citation) {
-    return (
-      <p className={cn("text-muted-foreground text-[12px]", className)}>
-        No source citation recorded.
-      </p>
-    );
-  }
+  if (!citation?.url) return null;
 
   return (
     <p className={cn("text-muted-foreground text-[12px] leading-5", className)}>
@@ -160,24 +156,21 @@ export type FieldFactView = {
   note?: string | null;
 };
 
-/** Renders sourced, field-level facts with an explicit unavailable state. */
+/** Renders only sourced, usable field-level facts. */
 export function FieldFactPanel({ facts }: { facts: FieldFactView[] }) {
-  if (facts.length === 0) return null;
+  const availableFacts = filterAvailableFacts(facts);
+  if (availableFacts.length === 0) return null;
 
   return (
     <dl className="divide-border divide-y">
-      {facts.map((fact) => (
+      {availableFacts.map((fact) => (
         <div key={fact.label} className="py-3 first:pt-0 last:pb-0">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <dt className="text-[13px] font-medium">{fact.label}</dt>
             <FieldStatusBadge status={fact.status} />
           </div>
           <dd className="mt-1 text-[13px] leading-6">
-            {fact.value ?? (
-              <span className="text-muted-foreground italic">
-                Information unavailable
-              </span>
-            )}
+            {plainText(fact.value)}
             {fact.currency || fact.unit || fact.academicYear || fact.intake ? (
               <span className="text-muted-foreground ml-1 text-[12px]">
                 {[fact.academicYear, fact.intake, fact.currency, fact.unit]
@@ -201,9 +194,9 @@ export function FieldFactPanel({ facts }: { facts: FieldFactView[] }) {
                 {formatCheckedOn(fact.verifiedAt)}
               </span>
             ) : null}
-            {fact.note ? (
+            {plainText(fact.note) ? (
               <p className="text-muted-foreground mt-0.5 text-[12px]">
-                {fact.note}
+                {plainText(fact.note)}
               </p>
             ) : null}
           </dd>

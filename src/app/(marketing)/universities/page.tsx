@@ -92,7 +92,7 @@ export default async function UniversitiesPage({
                 : `${result.total} universit${result.total === 1 ? "y" : "ies"}`}
             </h2>
             <p className="text-muted-foreground text-[11.5px]">
-              Ordered by name. Sorted ranking is not published.
+              Featured first, then by name. Sorted ranking is not published.
             </p>
           </div>
 

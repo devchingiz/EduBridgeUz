@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
 import { AiAdvisor } from "@/components/marketing/ai-advisor";
 import { Faq } from "@/components/marketing/faq";
@@ -10,6 +11,7 @@ import { Scholarships } from "@/components/marketing/scholarships";
 import { Testimonials } from "@/components/marketing/testimonials";
 import { UniversitySearch } from "@/components/marketing/university-search";
 import { Verification } from "@/components/marketing/verification";
+import { getPublishedHomepageContent } from "@/lib/cms/homepage";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -33,7 +35,12 @@ const websiteJsonLd = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  // The CMS read is request-time data; the cached loader is invalidated by the
+  // admin save action. Stop prerendering before touching the database.
+  await connection();
+  const content = await getPublishedHomepageContent();
+
   return (
     <>
       <script
@@ -42,16 +49,16 @@ export default function HomePage() {
           __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <Hero />
-      <UniversitySearch />
-      <HowItWorks />
-      <Features />
-      <Scholarships />
-      <AiAdvisor />
-      <Verification />
-      <Testimonials />
-      <Faq />
-      <FinalCta />
+      <Hero content={content.hero} />
+      <UniversitySearch content={content.universitySearch} />
+      <HowItWorks content={content.howItWorks} />
+      <Features content={content.features} />
+      <Scholarships content={content.scholarships} />
+      <AiAdvisor content={content.advisor} />
+      <Verification content={content.verification} />
+      <Testimonials content={content.testimonials} />
+      <Faq content={content.faq} />
+      <FinalCta content={content.finalCta} />
     </>
   );
 }

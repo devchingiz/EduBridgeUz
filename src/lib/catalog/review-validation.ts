@@ -30,11 +30,14 @@ const slug = z
   );
 
 const optionalText = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max)
-    .transform((value) => (value.length > 0 ? value : null));
+  z.preprocess(
+    (value) => (value === undefined || value === null ? "" : value),
+    z
+      .string()
+      .trim()
+      .max(max)
+      .transform((value) => (value.length > 0 ? value : null)),
+  );
 
 const optionalInt = (max: number) =>
   z.preprocess(

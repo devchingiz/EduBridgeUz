@@ -4,6 +4,7 @@ import Link from "next/link";
 import { GateBanner } from "@/components/dashboard/gate-banner";
 import { Button } from "@/components/ui/button";
 import { getWorkspaceStatus, requireUser } from "@/lib/auth/dal";
+import { requireEmailVerification } from "@/lib/auth/verification-policy";
 import { ProfileForm } from "./profile-form";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function ProfilePage() {
   const session = await requireUser();
+  requireEmailVerification(session.user);
   const status = await getWorkspaceStatus(session.user);
   const profile = status.profile;
 

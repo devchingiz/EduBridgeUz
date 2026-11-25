@@ -37,8 +37,8 @@ function money(amountMinor: number, currency: string): string {
 
 function tuitionText(
   benchmark: CatalogBenchmarks["tuition"][number] | undefined,
-): string {
-  if (!benchmark) return "No catalog tuition average available";
+): string | null {
+  if (!benchmark) return null;
   return `${money(benchmark.averageMinor, benchmark.currency)} ${benchmark.period}`;
 }
 
@@ -49,7 +49,7 @@ function tuitionText(
 export function catalogTuitionSummary(
   benchmarks: CatalogBenchmarks,
   currency?: string,
-): string {
+): string | null {
   const normalized = currency?.trim().toUpperCase();
   const matching = normalized
     ? benchmarks.tuition.filter((row) => row.currency === normalized)
@@ -61,11 +61,10 @@ export function catalogTuitionSummary(
     benchmarks.annualTuition[0] ??
     benchmarks.tuition[0];
 
-  if (!selected) return "No catalog tuition average available";
+  if (!selected) return null;
+  if (normalized && selected.currency !== normalized) return null;
   const base = tuitionText(selected);
-  if (normalized && selected.currency !== normalized) {
-    return `${base} (no ${normalized} average in the catalog)`;
-  }
+  if (!base) return null;
   return `${base} · ${selected.sampleSize} sourced record${selected.sampleSize === 1 ? "" : "s"}`;
 }
 
@@ -74,13 +73,7 @@ function SourceLine({
 }: {
   source: BenchmarkSource | null | undefined;
 }) {
-  if (!source?.url) {
-    return (
-      <p className="text-muted-foreground text-[11px]">
-        Source evidence unavailable
-      </p>
-    );
-  }
+  if (!source?.url) return null;
 
   return (
     <p className="text-muted-foreground text-[11px] leading-4">
@@ -135,6 +128,36 @@ function Metric({
   );
 }
 
+export type BenchmarkStripKind =
+  "tuition" | "scholarship" | "program" | "deadline";
+
+export function hasCatalogBenchmarkData(
+  benchmarks: CatalogBenchmarks,
+): boolean {
+  return Boolean(
+    benchmarks.tuition.length ||
+    benchmarks.fundingMix.length ||
+    benchmarks.languages.length ||
+    benchmarks.intakeMonths.length ||
+    benchmarks.averageDurationMonths !== null,
+  );
+}
+
+export function hasBenchmarkForKind(
+  benchmarks: CatalogBenchmarks,
+  kind: BenchmarkStripKind,
+): boolean {
+  if (kind === "tuition") return benchmarks.tuition.length > 0;
+  if (kind === "scholarship") return benchmarks.fundingMix.length > 0;
+  if (kind === "program") {
+    return (
+      benchmarks.languages.length > 0 ||
+      benchmarks.averageDurationMonths !== null
+    );
+  }
+  return benchmarks.intakeMonths.length > 0;
+}
+
 export function CatalogBenchmarkPanel({
   benchmarks,
   variant = "full",
@@ -146,10 +169,13 @@ export function CatalogBenchmarkPanel({
   currency?: string;
   className?: string;
 }) {
+  if (!hasCatalogBenchmarkData(benchmarks)) return null;
+
   const tuitionRows = currency
     ? benchmarks.tuition.filter((row) => row.currency === currency)
     : benchmarks.tuition;
   const shownTuition = tuitionRows.length ? tuitionRows : benchmarks.tuition;
+  const tuitionSummary = catalogTuitionSummary(benchmarks, currency);
   const topLanguage = benchmarks.languages[0];
   const topIntake = benchmarks.intakeMonths[0];
   const topFunding = benchmarks.fundingMix[0];
@@ -179,64 +205,71 @@ export function CatalogBenchmarkPanel({
       <CardContent className={compact ? "space-y-3 p-0" : "space-y-4"}>
         {compact ? (
           <div className="grid gap-3 sm:grid-cols-3">
-            <div>
-              <p className="text-muted-foreground text-[11px] font-medium uppercase">
-                Tuition context
-              </p>
-              <p className="mt-1 text-sm font-medium">
-                {catalogTuitionSummary(benchmarks, currency)}
-              </p>
-              {benchmarks.tuition[0] ? (
-                <SourceLine
-                  source={{
-                    url: benchmarks.tuition[0].sourceUrl,
-                    title: benchmarks.tuition[0].sourceTitle,
-                    verifiedAt: benchmarks.tuition[0].verifiedAt,
-                  }}
-                />
-              ) : null}
-            </div>
-            <div>
-              <p className="text-muted-foreground text-[11px] font-medium uppercase">
-                Scholarship mix
-              </p>
-              <p className="mt-1 text-sm font-medium">
-                {topFunding
-                  ? `${FUNDING_LABELS[topFunding.value as FundingTypeValue] ?? topFunding.value}: ${topFunding.count}/${benchmarks.scholarshipRecords} sourced records`
-                  : "No sourced scholarship records"}
-              </p>
-              <p className="text-muted-foreground mt-1 text-[11px]">
-                No award amounts are stored.
-              </p>
-            </div>
-            <div>
-              <p className="text-muted-foreground text-[11px] font-medium uppercase">
-                Program shape
-              </p>
-              <p className="mt-1 text-sm font-medium">
-                {topLanguage
-                  ? `${topLanguage.value}: ${topLanguage.count}/${benchmarks.languageRecords} recorded programs`
-                  : "Language not recorded"}
-              </p>
-              <p className="text-muted-foreground mt-1 text-[11px]">
-                {benchmarks.averageDurationMonths
-                  ? `Average duration: ${benchmarks.averageDurationMonths} months (${benchmarks.durationRecords} records)`
-                  : "Average duration unavailable"}
-              </p>
-            </div>
+            {tuitionSummary ? (
+              <div>
+                <p className="text-muted-foreground text-[11px] font-medium uppercase">
+                  Tuition context
+                </p>
+                <p className="mt-1 text-sm font-medium">{tuitionSummary}</p>
+                {benchmarks.tuition[0] ? (
+                  <SourceLine
+                    source={{
+                      url: benchmarks.tuition[0].sourceUrl,
+                      title: benchmarks.tuition[0].sourceTitle,
+                      verifiedAt: benchmarks.tuition[0].verifiedAt,
+                    }}
+                  />
+                ) : null}
+              </div>
+            ) : null}
+            {topFunding ? (
+              <div>
+                <p className="text-muted-foreground text-[11px] font-medium uppercase">
+                  Scholarship mix
+                </p>
+                <p className="mt-1 text-sm font-medium">
+                  {FUNDING_LABELS[topFunding.value as FundingTypeValue] ??
+                    topFunding.value}{" "}
+                  : {topFunding.count}/{benchmarks.scholarshipRecords} sourced
+                  records
+                </p>
+                <p className="text-muted-foreground mt-1 text-[11px]">
+                  No award amounts are stored.
+                </p>
+              </div>
+            ) : null}
+            {topLanguage || benchmarks.averageDurationMonths ? (
+              <div>
+                <p className="text-muted-foreground text-[11px] font-medium uppercase">
+                  Program shape
+                </p>
+                {topLanguage ? (
+                  <p className="mt-1 text-sm font-medium">
+                    {topLanguage.value}: {topLanguage.count}/
+                    {benchmarks.languageRecords} recorded programs
+                  </p>
+                ) : null}
+                {benchmarks.averageDurationMonths ? (
+                  <p className="text-muted-foreground mt-1 text-[11px]">
+                    Average duration: {benchmarks.averageDurationMonths} months
+                    ({benchmarks.durationRecords} records)
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         ) : (
           <>
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="bg-card rounded-xl border p-4">
-                <p className="text-[13px] font-semibold">Tuition averages</p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Arithmetic mean of published amounts, grouped by currency and
-                  stated period. No currency conversion is applied.
-                </p>
-                <div className="mt-3 space-y-3">
-                  {shownTuition.length ? (
-                    shownTuition.map((row) => (
+              {shownTuition.length ? (
+                <div className="bg-card rounded-xl border p-4">
+                  <p className="text-[13px] font-semibold">Tuition averages</p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Arithmetic mean of published amounts, grouped by currency
+                    and stated period. No currency conversion is applied.
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    {shownTuition.map((row) => (
                       <div key={`${row.currency}-${row.period}`}>
                         <p className="text-sm font-medium">
                           {tuitionText(row)} · {row.sampleSize} sourced record
@@ -250,25 +283,21 @@ export function CatalogBenchmarkPanel({
                           }}
                         />
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-sm">
-                      No sourced tuition amounts are available.
-                    </p>
-                  )}
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              <div className="bg-card rounded-xl border p-4">
-                <p className="text-[13px] font-semibold">
-                  Scholarship funding mix
-                </p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Counts of sourced scholarship records by stated funding type.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {benchmarks.fundingMix.length ? (
-                    benchmarks.fundingMix.map((row) => (
+              ) : null}
+              {topFunding ? (
+                <div className="bg-card rounded-xl border p-4">
+                  <p className="text-[13px] font-semibold">
+                    Scholarship funding mix
+                  </p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Counts of sourced scholarship records by stated funding
+                    type.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {benchmarks.fundingMix.map((row) => (
                       <span
                         key={row.value}
                         className="rounded-full border px-2.5 py-1 text-xs"
@@ -277,46 +306,42 @@ export function CatalogBenchmarkPanel({
                           row.value}{" "}
                         · {row.count}
                       </span>
-                    ))
-                  ) : (
-                    <span className="text-muted-foreground text-sm">
-                      No sourced scholarship records.
-                    </span>
-                  )}
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mt-3 text-xs leading-5">
+                    The catalog does not store scholarship award amounts, so no
+                    numerical scholarship average is calculated.
+                  </p>
+                  <SourceLine source={benchmarks.scholarshipSource} />
                 </div>
-                <p className="text-muted-foreground mt-3 text-xs leading-5">
-                  The catalog does not store scholarship award amounts, so no
-                  numerical scholarship average is calculated.
-                </p>
-                <SourceLine source={benchmarks.scholarshipSource} />
-              </div>
+              ) : null}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Metric
-                label="Recorded language"
-                value={
-                  topLanguage
-                    ? `${topLanguage.value} · ${topLanguage.count}/${benchmarks.languageRecords}`
-                    : "Information unavailable"
-                }
-                detail={`${benchmarks.programRecords} sourced program records were checked.`}
-                source={benchmarks.programSource}
-              />
-              <Metric
-                label="Duration and intake"
-                value={
-                  benchmarks.averageDurationMonths
-                    ? `${benchmarks.averageDurationMonths} months average`
-                    : "Duration unavailable"
-                }
-                detail={
-                  topIntake
-                    ? `${MONTH_NAMES[topIntake.month - 1]}: ${topIntake.count} program start records · ${benchmarks.durationRecords} duration records`
-                    : `No numeric intake months recorded · ${benchmarks.durationRecords} duration records`
-                }
-                source={benchmarks.programSource}
-              />
+              {topLanguage ? (
+                <Metric
+                  label="Recorded language"
+                  value={`${topLanguage.value} · ${topLanguage.count}/${benchmarks.languageRecords}`}
+                  detail={`${benchmarks.programRecords} sourced program records were checked.`}
+                  source={benchmarks.programSource}
+                />
+              ) : null}
+              {benchmarks.averageDurationMonths ? (
+                <Metric
+                  label="Average duration"
+                  value={`${benchmarks.averageDurationMonths} months average`}
+                  detail={`${benchmarks.durationRecords} duration records were checked.`}
+                  source={benchmarks.programSource}
+                />
+              ) : null}
+              {topIntake ? (
+                <Metric
+                  label="Common intake month"
+                  value={MONTH_NAMES[topIntake.month - 1]}
+                  detail={`${topIntake.count} program start records were checked.`}
+                  source={benchmarks.programSource}
+                />
+              ) : null}
             </div>
           </>
         )}
@@ -330,9 +355,6 @@ export function CatalogBenchmarkPanel({
   );
 }
 
-export type BenchmarkStripKind =
-  "tuition" | "scholarship" | "program" | "deadline";
-
 /** Small, clearly-labelled context line for a specific detail section. */
 export function BenchmarkStrip({
   benchmarks,
@@ -341,6 +363,8 @@ export function BenchmarkStrip({
   benchmarks: CatalogBenchmarks;
   kind: BenchmarkStripKind;
 }) {
+  if (!hasBenchmarkForKind(benchmarks, kind)) return null;
+
   const text = (() => {
     if (kind === "tuition") {
       return catalogTuitionSummary(benchmarks);
@@ -349,7 +373,7 @@ export function BenchmarkStrip({
       const top = benchmarks.fundingMix[0];
       return top
         ? `${FUNDING_LABELS[top.value as FundingTypeValue] ?? top.value} is the most common recorded type (${top.count}/${benchmarks.scholarshipRecords}); no award amounts are stored.`
-        : "No sourced scholarship records are available for an average.";
+        : null;
     }
     if (kind === "program") {
       const language = benchmarks.languages[0];
@@ -364,14 +388,16 @@ export function BenchmarkStrip({
             : null,
         ]
           .filter(Boolean)
-          .join(" · ") || "No program language or duration benchmark available."
+          .join(" · ") || null
       );
     }
     const month = benchmarks.intakeMonths[0];
     return month
       ? `${MONTH_NAMES[month.month - 1]} appears in ${month.count} program start records. Deadlines are not averaged because they are cycle-specific.`
-      : "No numeric intake months recorded; deadlines are not averaged.";
+      : null;
   })();
+
+  if (!text) return null;
 
   return (
     <p className="bg-accent/40 text-muted-foreground mt-3 rounded-lg border px-3 py-2 text-[12px] leading-5">

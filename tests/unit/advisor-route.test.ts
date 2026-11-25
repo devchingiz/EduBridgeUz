@@ -64,7 +64,13 @@ describe("advisor chat route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.assertSameOrigin.mockResolvedValue(undefined);
-    mocks.getSession.mockResolvedValue({ user: { id: "user-1" } });
+    mocks.getSession.mockResolvedValue({
+      user: {
+        id: "user-1",
+        emailVerifiedAt: new Date("2026-01-02T00:00:00.000Z"),
+        createdAt: new Date("2025-12-01T00:00:00.000Z"),
+      },
+    });
     mocks.getWorkspaceStatus.mockResolvedValue({ canUseWorkspace: true });
     mocks.handleAdvisorChat.mockResolvedValue(success);
   });
@@ -92,6 +98,23 @@ describe("advisor chat route", () => {
     const gated = await POST(post({ message: "hello" }));
     expect(gated.status).toBe(403);
     expect((await json(gated)).error).toMatchObject({ code: "blocked" });
+    expect(mocks.handleAdvisorChat).not.toHaveBeenCalled();
+  });
+
+  it("blocks an unverified new account before reading the body", async () => {
+    mocks.getSession.mockResolvedValueOnce({
+      user: {
+        id: "user-1",
+        emailVerifiedAt: null,
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      },
+    });
+
+    const response = await POST(post({ message: "hello" }));
+
+    expect(response.status).toBe(403);
+    expect((await json(response)).error).toMatchObject({ code: "blocked" });
+    expect(mocks.getWorkspaceStatus).not.toHaveBeenCalled();
     expect(mocks.handleAdvisorChat).not.toHaveBeenCalled();
   });
 

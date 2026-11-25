@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { findToken } from "@/lib/auth/tokens";
+import { AuthSecurityNote } from "@/components/auth/auth-security-note";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { ResetPasswordForm } from "./reset-password-form";
 
 export const metadata: Metadata = {
@@ -25,21 +27,19 @@ export default async function ResetPasswordPage({
         title="This reset link is not valid"
         description="The link has expired or has already been used. Request a new one to continue."
         footer={
-          <p className="text-muted-foreground text-[13px] leading-6">
-            Reset links expire after 30 minutes and can be used once.
-          </p>
+          <AuthSecurityNote>
+            Reset links expire after 30 minutes and can be used once. No
+            password has been changed from this link.
+          </AuthSecurityNote>
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-5">
           <Alert variant="warning">
             No password has been changed from this link.
           </Alert>
-          <Link
-            href="/forgot-password"
-            className="text-foreground text-[13px] font-medium underline underline-offset-2"
-          >
-            Request a new reset link
-          </Link>
+          <Button asChild size="lg" className="w-full">
+            <Link href="/forgot-password">Request a new reset link</Link>
+          </Button>
         </div>
       </AuthShell>
     );
@@ -50,10 +50,10 @@ export default async function ResetPasswordPage({
       title="Choose a new password"
       description={`Resetting the password for ${record.user.email}.`}
       footer={
-        <p className="text-muted-foreground text-[12px] leading-5">
+        <AuthSecurityNote>
           Saving a new password signs out every existing session, including on
-          other devices.
-        </p>
+          other devices. Reset links cannot be reused.
+        </AuthSecurityNote>
       }
     >
       <ResetPasswordForm token={token} />

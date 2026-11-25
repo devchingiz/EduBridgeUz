@@ -35,12 +35,12 @@ import {
   revokeUserSessions,
 } from "@/lib/admin/users";
 
-const adminActor = { role: "ADMIN", deletedAt: null };
+const superAdminActor = { role: "SUPER_ADMIN", deletedAt: null };
 
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.userCount.mockResolvedValue(1);
-  mocks.userFindUnique.mockResolvedValue(adminActor);
+  mocks.userFindUnique.mockResolvedValue(superAdminActor);
   mocks.userFindMany.mockResolvedValue([]);
   mocks.userUpdate.mockResolvedValue({ count: 1 });
   mocks.sessionGroupBy.mockResolvedValue([]);
@@ -101,10 +101,44 @@ describe("administrator user management", () => {
     expect(mocks.userUpdate).not.toHaveBeenCalled();
   });
 
+  it("rejects an ordinary Admin actor from changing roles", async () => {
+    mocks.userFindUnique
+      .mockResolvedValueOnce({ role: "ADMIN", deletedAt: null })
+      .mockResolvedValueOnce({ role: "STUDENT", deletedAt: null });
+
+    const result = await changeUserRole({
+      actorId: "admin-1",
+      userId: "student-1",
+      role: "CONTENT_MANAGER",
+    });
+
+    expect(result).toEqual({ ok: false, reason: "forbidden" });
+    expect(mocks.userUpdate).not.toHaveBeenCalled();
+  });
+
+  it("refuses to grant an administrator role to an unverified account", async () => {
+    mocks.userFindUnique
+      .mockResolvedValueOnce(superAdminActor)
+      .mockResolvedValueOnce({
+        role: "STUDENT",
+        deletedAt: null,
+        emailVerifiedAt: null,
+      });
+
+    const result = await changeUserRole({
+      actorId: "owner-1",
+      userId: "student-1",
+      role: "ADMIN",
+    });
+
+    expect(result).toEqual({ ok: false, reason: "email_unverified" });
+    expect(mocks.userUpdate).not.toHaveBeenCalled();
+  });
+
   it("refuses self-demotion", async () => {
     mocks.userFindUnique
-      .mockResolvedValueOnce(adminActor)
-      .mockResolvedValueOnce(adminActor);
+      .mockResolvedValueOnce(superAdminActor)
+      .mockResolvedValueOnce(superAdminActor);
 
     const result = await changeUserRole({
       actorId: "admin-1",
@@ -118,7 +152,7 @@ describe("administrator user management", () => {
 
   it("refuses to remove the last administrator", async () => {
     mocks.userFindUnique
-      .mockResolvedValueOnce(adminActor)
+      .mockResolvedValueOnce(superAdminActor)
       .mockResolvedValueOnce({ role: "ADMIN", deletedAt: null });
     mocks.userCount.mockResolvedValue(1);
 
@@ -134,7 +168,7 @@ describe("administrator user management", () => {
 
   it("changes a role, audits it, and reports no-op changes", async () => {
     mocks.userFindUnique
-      .mockResolvedValueOnce(adminActor)
+      .mockResolvedValueOnce(superAdminActor)
       .mockResolvedValueOnce({ role: "STUDENT", deletedAt: null });
 
     const result = await changeUserRole({
@@ -166,7 +200,7 @@ describe("administrator user management", () => {
     );
 
     mocks.userFindUnique
-      .mockResolvedValueOnce(adminActor)
+      .mockResolvedValueOnce(superAdminActor)
       .mockResolvedValueOnce({ role: "REVIEWER", deletedAt: null });
     const noOp = await changeUserRole({
       actorId: "admin-1",
@@ -182,7 +216,7 @@ describe("administrator user management", () => {
 
   it("revokes another account's sessions and audits the count", async () => {
     mocks.userFindUnique
-      .mockResolvedValueOnce(adminActor)
+      .mockResolvedValueOnce(superAdminActor)
       .mockResolvedValueOnce({ id: "student-1", deletedAt: null });
 
     const result = await revokeUserSessions({

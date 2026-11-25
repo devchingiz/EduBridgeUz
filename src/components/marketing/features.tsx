@@ -12,9 +12,11 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { SectionLink } from "@/components/layout/section-link";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionHeading } from "@/components/marketing/section-heading";
 import { Badge } from "@/components/ui/badge";
+import type { FeaturesContent } from "@/lib/cms/homepage-content";
 
 const kanbanColumns = [
   {
@@ -109,7 +111,7 @@ function FeatureHeading({
   );
 }
 
-export function Features() {
+export function Features({ content }: { content: FeaturesContent }) {
   return (
     <section
       id="features"
@@ -120,21 +122,17 @@ export function Features() {
         <Reveal>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <SectionHeading
-              eyebrow="The workspace"
-              title={
-                <span id="features-heading">
-                  One workspace for the whole journey.
-                </span>
-              }
-              description="Not another folder of links. EduBridge keeps applications, requirements, documents, and deadlines connected — with the source of every important fact close at hand."
+              eyebrow={content.eyebrow}
+              title={<span id="features-heading">{content.title}</span>}
+              description={content.description}
             />
-            <a
-              href="#advisor"
+            <SectionLink
+              href={content.linkHref}
               className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1.5 text-[13px] font-medium transition-colors"
             >
-              Meet the AI advisor
+              {content.linkLabel}
               <Sparkles className="size-3.5" />
-            </a>
+            </SectionLink>
           </div>
         </Reveal>
 

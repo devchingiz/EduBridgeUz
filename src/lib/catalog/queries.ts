@@ -156,6 +156,7 @@ export type UniversityListItem = {
   rankingDisplay: string | null;
   rankingPosition: number | null;
   rankingTied: boolean;
+  featured: boolean;
   status: VerificationStatusValue;
   lastVerifiedAt: string | null;
   nextReviewAt: string | null;
@@ -211,7 +212,7 @@ export async function listUniversities(
     db.university.count({ where }),
     db.university.findMany({
       where,
-      orderBy: { name: "asc" },
+      orderBy: [{ featured: "desc" }, { name: "asc" }],
       skip: (filters.page - 1) * CATALOG_PAGE_SIZE,
       take: CATALOG_PAGE_SIZE,
       include: {
@@ -254,6 +255,7 @@ export async function listUniversities(
       rankingDisplay: row.rankingDisplay,
       rankingPosition: row.rankingPosition,
       rankingTied: row.rankingTied,
+      featured: row.featured,
       status: row.verificationStatus,
       lastVerifiedAt: isoDate(row.lastVerifiedAt),
       nextReviewAt: isoDate(row.nextReviewAt),
@@ -536,6 +538,7 @@ export type ScholarshipListItem = {
   fields: string[];
   summary: string;
   status: VerificationStatusValue;
+  featured: boolean;
   lastVerifiedAt: string | null;
   nextReviewAt: string | null;
   deadlineCount: number;
@@ -592,7 +595,7 @@ export async function listScholarships(
     db.scholarship.count({ where }),
     db.scholarship.findMany({
       where,
-      orderBy: { name: "asc" },
+      orderBy: [{ featured: "desc" }, { name: "asc" }],
       skip: (filters.page - 1) * CATALOG_PAGE_SIZE,
       take: CATALOG_PAGE_SIZE,
       include: {
@@ -631,6 +634,7 @@ export async function listScholarships(
       fields: row.fields,
       summary: row.summary,
       status: row.verificationStatus,
+      featured: row.featured,
       lastVerifiedAt: isoDate(row.lastVerifiedAt),
       nextReviewAt: isoDate(row.nextReviewAt),
       deadlineCount: row._count.deadlineFacts,

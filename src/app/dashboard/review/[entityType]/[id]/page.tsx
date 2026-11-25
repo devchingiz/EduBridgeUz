@@ -123,7 +123,7 @@ function RemoveFactForm({
 }
 
 export default async function ReviewRecordPage({ params }: PageProps) {
-  await requireRole(["REVIEWER", "ADMIN"]);
+  await requireRole(["REVIEWER", "ADMIN", "SUPER_ADMIN"]);
 
   const { entityType: rawType, id } = await params;
   const entityType = parseEntityType(rawType);

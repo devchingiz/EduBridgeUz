@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import type { Role } from "@prisma/client";
 
 import { db } from "@/lib/db";
+import { loadAdminContext } from "@/lib/admin/context";
+import type { Permission } from "@/lib/admin/permissions";
 import { getSession, type SessionUser } from "@/lib/auth/session";
+import { requireEmailVerification } from "@/lib/auth/verification-policy";
 import { isMinor } from "@/lib/auth/age";
 
 /**
@@ -28,6 +31,33 @@ export async function requireRole(allowed: readonly Role[]) {
   const session = await requireUser();
   if (!allowed.includes(session.user.role)) redirect("/dashboard");
   return session;
+}
+
+/**
+ * Administration gate. The admin role, email verification state, and explicit
+ * permission grants are re-read from the database on every request, so a stale
+ * session DTO or a hidden UI control can never authorize access.
+ */
+export async function requireAdminPermission(
+  permission: Permission = "ADMIN_ACCESS",
+) {
+  const session = await requireUser();
+  const admin = await loadAdminContext(session.user.id);
+
+  if (!admin) {
+    // The null context is the authorization decision. The reason only selects
+    // an accurate message: an unverified email can fix itself, a non-admin
+    // role cannot.
+    if (!session.user.emailVerifiedAt) {
+      redirect("/admin-access-denied?reason=unverified");
+    }
+    redirect("/admin-access-denied?reason=account");
+  }
+  if (!admin.permissions.has(permission)) {
+    redirect("/admin-access-denied?reason=permission");
+  }
+
+  return { ...session, admin };
 }
 
 export type WorkspaceProfile = {
@@ -112,6 +142,7 @@ export const getWorkspaceStatus = cache(
  */
 export async function requireWorkspace() {
   const session = await requireUser();
+  requireEmailVerification(session.user);
   const status = await getWorkspaceStatus(session.user);
 
   if (status.guardianConsentRequired) {

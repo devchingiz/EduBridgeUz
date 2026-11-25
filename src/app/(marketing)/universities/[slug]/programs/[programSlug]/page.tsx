@@ -6,19 +6,18 @@ import { ArrowLeft, CalendarClock, CheckCircle2, Wallet } from "lucide-react";
 import {
   ReviewBanner,
   SourceLine,
-  UnknownValue,
   VerificationBadge,
   VerificationNote,
 } from "@/components/catalog/verification";
 import { Badge } from "@/components/ui/badge";
 import {
   deadlineState,
-  formatDeadlineLabel,
   formatDeadlineWindow,
   formatMoney,
   formatStart,
 } from "@/lib/catalog/format";
 import { REQUIREMENT_LABELS } from "@/lib/catalog/constants";
+import { availableText } from "@/lib/catalog/fact-groups";
 import { getProgramDetail } from "@/lib/catalog/queries";
 import { degreeLabel } from "@/lib/data/fields";
 import { siteConfig } from "@/lib/site";
@@ -57,13 +56,39 @@ const DEADLINE_BADGE = {
   unknown: { label: "Check source", variant: "outline" as const },
 };
 
+type OverviewFact = { label: string; value: string };
+
 export default async function ProgramPage({ params }: PageProps) {
   const { slug, programSlug } = await params;
   const detail = await getProgramDetail(slug, programSlug);
   if (!detail) notFound();
 
   const { program, university, requirements, tuition, deadlines } = detail;
-  const start = formatStart(program.startMonths, program.startNote);
+  const start = availableText(
+    formatStart(program.startMonths, program.startNote),
+  );
+  const language = availableText(program.language);
+  const field = availableText(program.field);
+  const degree = availableText(degreeLabel(program.degreeLevel));
+  const overviewFacts = [
+    program.durationMonths
+      ? { label: "Duration", value: `${program.durationMonths} months` }
+      : null,
+    program.credits
+      ? { label: "Credits", value: `${program.credits} credits` }
+      : null,
+    language ? { label: "Language", value: language } : null,
+    start ? { label: "Starts", value: start } : null,
+    field ? { label: "Field", value: field } : null,
+    degree ? { label: "Degree", value: degree } : null,
+  ].filter((fact): fact is OverviewFact => fact !== null);
+  const visibleRequirements = requirements.flatMap((requirement) => {
+    const summary = availableText(requirement.summary);
+    return summary ? [{ ...requirement, summary }] : [];
+  });
+  const visibleDeadlines = deadlines.filter((deadline) =>
+    Boolean(formatDeadlineWindow(deadline)),
+  );
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -119,9 +144,11 @@ export default async function ProgramPage({ params }: PageProps) {
       <header className="surface-card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="eyebrow">
-              {degreeLabel(program.degreeLevel)} · {program.field}
-            </p>
+            {[degree, field].filter(Boolean).length > 0 ? (
+              <p className="eyebrow">
+                {[degree, field].filter(Boolean).join(" · ")}
+              </p>
+            ) : null}
             <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-balance sm:text-4xl">
               {program.name}
             </h1>
@@ -138,58 +165,14 @@ export default async function ProgramPage({ params }: PageProps) {
         </div>
 
         <dl className="border-border mt-6 grid gap-x-6 gap-y-4 border-t pt-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <dt className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
-              Duration
-            </dt>
-            <dd className="mt-1 text-[13.5px]">
-              {program.durationMonths ? (
-                `${program.durationMonths} months`
-              ) : (
-                <UnknownValue />
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
-              Credits
-            </dt>
-            <dd className="mt-1 text-[13.5px]">
-              {program.credits ? (
-                `${program.credits} credits`
-              ) : (
-                <UnknownValue />
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
-              Language
-            </dt>
-            <dd className="mt-1 text-[13.5px]">
-              {program.language ?? <UnknownValue />}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
-              Starts
-            </dt>
-            <dd className="mt-1 text-[13.5px]">{start ?? <UnknownValue />}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
-              Field
-            </dt>
-            <dd className="mt-1 text-[13.5px]">{program.field}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
-              Degree
-            </dt>
-            <dd className="mt-1 text-[13.5px]">
-              {degreeLabel(program.degreeLevel)}
-            </dd>
-          </div>
+          {overviewFacts.map((fact) => (
+            <div key={fact.label}>
+              <dt className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
+                {fact.label}
+              </dt>
+              <dd className="mt-1 text-[13.5px]">{fact.value}</dd>
+            </div>
+          ))}
         </dl>
 
         <div className="border-border mt-5 space-y-1.5 border-t pt-4">
@@ -209,27 +192,16 @@ export default async function ProgramPage({ params }: PageProps) {
         />
       </div>
 
-      <section aria-labelledby="requirements" className="mt-10">
-        <h2
-          id="requirements"
-          className="text-xl font-semibold tracking-[-0.02em]"
-        >
-          Admission requirements
-        </h2>
-        {requirements.length === 0 ? (
-          <div className="surface-card mt-4 px-6 py-8">
-            <p className="text-[13px] font-medium">
-              No requirements have been published yet
-            </p>
-            <p className="text-muted-foreground mt-1.5 max-w-xl text-[12.5px] leading-6">
-              This does not mean there are none. It means a reviewer has not
-              recorded a source-backed requirement for this program. Check the
-              official program page before applying.
-            </p>
-          </div>
-        ) : (
+      {visibleRequirements.length > 0 ? (
+        <section aria-labelledby="requirements" className="mt-10">
+          <h2
+            id="requirements"
+            className="text-xl font-semibold tracking-[-0.02em]"
+          >
+            Admission requirements
+          </h2>
           <ul className="mt-4 space-y-3">
-            {requirements.map((requirement) => (
+            {visibleRequirements.map((requirement) => (
               <li key={requirement.id} className="surface-card p-4 sm:p-5">
                 <div className="flex flex-wrap items-start gap-2">
                   <Badge variant="muted">
@@ -246,29 +218,23 @@ export default async function ProgramPage({ params }: PageProps) {
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : null}
 
-      <section aria-labelledby="tuition" className="mt-10">
-        <div className="flex items-center gap-2">
-          <Wallet aria-hidden="true" className="text-muted-foreground size-4" />
-          <h2 id="tuition" className="text-xl font-semibold tracking-[-0.02em]">
-            Tuition
-          </h2>
-        </div>
-        {tuition.length === 0 ? (
-          <div className="surface-card mt-4 px-6 py-8">
-            <p className="text-[13px] font-medium">
-              No tuition amount has been verified
-            </p>
-            <p className="text-muted-foreground mt-1.5 max-w-xl text-[12.5px] leading-6">
-              The official pages we checked do not state a single amount for
-              this program, or the amount depends on a group we could not
-              confirm. We leave it blank rather than estimate. Fees can differ
-              by nationality and campus, so check the provider&apos;s fee page.
-            </p>
+      {tuition.length > 0 ? (
+        <section aria-labelledby="tuition" className="mt-10">
+          <div className="flex items-center gap-2">
+            <Wallet
+              aria-hidden="true"
+              className="text-muted-foreground size-4"
+            />
+            <h2
+              id="tuition"
+              className="text-xl font-semibold tracking-[-0.02em]"
+            >
+              Tuition
+            </h2>
           </div>
-        ) : (
           <div className="surface-card divide-border mt-4 divide-y">
             {tuition.map((fact) => (
               <div key={fact.id} className="p-4 sm:p-5">
@@ -283,9 +249,9 @@ export default async function ProgramPage({ params }: PageProps) {
                     <Badge variant="brand">{fact.applicantGroup}</Badge>
                   ) : null}
                 </div>
-                {fact.note ? (
+                {availableText(fact.note) ? (
                   <p className="text-muted-foreground mt-1 text-[12.5px] leading-5">
-                    {fact.note}
+                    {availableText(fact.note)}
                   </p>
                 ) : null}
                 <SourceLine
@@ -295,36 +261,25 @@ export default async function ProgramPage({ params }: PageProps) {
               </div>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      ) : null}
 
-      <section aria-labelledby="deadlines" className="mt-10">
-        <div className="flex items-center gap-2">
-          <CalendarClock
-            aria-hidden="true"
-            className="text-muted-foreground size-4"
-          />
-          <h2
-            id="deadlines"
-            className="text-xl font-semibold tracking-[-0.02em]"
-          >
-            Deadlines
-          </h2>
-        </div>
-        {deadlines.length === 0 ? (
-          <div className="surface-card mt-4 px-6 py-8">
-            <p className="text-[13px] font-medium">
-              No deadline has been verified
-            </p>
-            <p className="text-muted-foreground mt-1.5 max-w-xl text-[12.5px] leading-6">
-              Deadlines change every cycle. We only show a date when an official
-              page states it, so check the provider&apos;s admissions page for
-              the current round.
-            </p>
+      {visibleDeadlines.length > 0 ? (
+        <section aria-labelledby="deadlines" className="mt-10">
+          <div className="flex items-center gap-2">
+            <CalendarClock
+              aria-hidden="true"
+              className="text-muted-foreground size-4"
+            />
+            <h2
+              id="deadlines"
+              className="text-xl font-semibold tracking-[-0.02em]"
+            >
+              Deadlines
+            </h2>
           </div>
-        ) : (
           <ul className="mt-4 space-y-3">
-            {deadlines.map((deadline) => {
+            {visibleDeadlines.map((deadline) => {
               const state = DEADLINE_BADGE[deadlineState(deadline)];
               const window = formatDeadlineWindow(deadline);
               return (
@@ -340,15 +295,13 @@ export default async function ProgramPage({ params }: PageProps) {
                           </span>
                         ) : null}
                       </p>
-                      <p className="mt-1 text-[13px]">
-                        {window ?? formatDeadlineLabel(deadline)}
-                      </p>
+                      <p className="mt-1 text-[13px]">{window}</p>
                     </div>
                     <Badge variant={state.variant}>{state.label}</Badge>
                   </div>
-                  {deadline.note ? (
+                  {availableText(deadline.note) ? (
                     <p className="text-muted-foreground mt-2 text-[12.5px] leading-5">
-                      {deadline.note}
+                      {availableText(deadline.note)}
                     </p>
                   ) : null}
                   <SourceLine
@@ -359,8 +312,8 @@ export default async function ProgramPage({ params }: PageProps) {
               );
             })}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : null}
 
       <aside className="surface-card mt-10 flex gap-3 p-4">
         <CheckCircle2

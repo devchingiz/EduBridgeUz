@@ -482,7 +482,7 @@ async function searchUniversities(
         take: 4,
       },
     },
-    orderBy: { name: "asc" },
+    orderBy: [{ featured: "desc" }, { name: "asc" }],
     take: limit,
   });
 
@@ -520,6 +520,7 @@ async function searchUniversities(
           slug: link.scholarship.slug,
           name: link.scholarship.name,
           summary: safeText(link.scholarship.summary, 300),
+          featured: link.scholarship.featured,
           source: sourceFrom(link.scholarship.primarySource),
         };
       });
@@ -541,6 +542,7 @@ async function searchUniversities(
       city: row.city,
       country: countryName(row.countryCode),
       countryCode: row.countryCode,
+      featured: row.featured,
       status: row.verificationStatus,
       lastVerifiedAt: row.lastVerifiedAt?.toISOString().slice(0, 10) ?? null,
       source: sourceFrom(row.primarySource),

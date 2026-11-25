@@ -17,25 +17,26 @@ The authoritative source is [`prisma/schema.prisma`](../prisma/schema.prisma).
 
 ### Enumerations
 
-| Enum                      | Values                                                                                                                                   |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `Role`                    | `STUDENT`, `REVIEWER`, `ADMIN`                                                                                                           |
-| `TokenPurpose`            | `EMAIL_VERIFICATION`, `PASSWORD_RESET`, `GUARDIAN_CONSENT`                                                                               |
-| `ConsentType`             | `TERMS`, `PRIVACY`, `GUARDIAN`, `MARKETING`                                                                                              |
-| `DegreeLevel`             | `BACHELOR`, `MASTER`, `PHD`, `DIPLOMA`, `CERTIFICATE`                                                                                    |
-| `VerificationStatus`      | `VERIFIED`, `PARTIALLY_VERIFIED`, `INFORMATION_UNAVAILABLE`, `NEEDS_REVIEW`, `UNVERIFIED`, `EXPIRED`, `ARCHIVED`                         |
-| `FieldVerificationStatus` | `VERIFIED`, `PARTIALLY_VERIFIED`, `NOT_VERIFIED`, `INFORMATION_UNAVAILABLE`                                                              |
-| `FundingType`             | `FULLY_FUNDED`, `PARTIAL`, `TUITION_WAIVER`, `STIPEND`, `OTHER`                                                                          |
-| `EligibilityScope`        | `ALL`, `LISTED`, `UNKNOWN`                                                                                                               |
-| `RequirementKind`         | `ACADEMIC`, `ENGLISH_LANGUAGE`, `DOCUMENT`, `PORTFOLIO`, `WORK_EXPERIENCE`, `OTHER`                                                      |
-| `CatalogEntityType`       | `UNIVERSITY`, `PROGRAM`, `SCHOLARSHIP`                                                                                                   |
-| `ReviewDecision`          | `IMPORT`, `EDIT`, `APPROVE`, `REQUEST_CHANGES`, `EXPIRE`, `RESTORE`, `ARCHIVE`, `MARK_PARTIAL`, `MARK_UNAVAILABLE`, `FLAG_STALE`         |
-| `ApplicationStatus`       | `INTERESTED`, `RESEARCHING`, `PREPARING_DOCUMENTS`, `READY_TO_APPLY`, `SUBMITTED`, `INTERVIEW`, `ACCEPTED`, `REJECTED`, `WAITLISTED`     |
-| `StudentDocumentCategory` | `PASSPORT`, `ACADEMIC_TRANSCRIPT`, `IELTS_CERTIFICATE`, `SAT_SCORE_REPORT`, `RECOMMENDATION_LETTER`, `PERSONAL_STATEMENT`, `CV`, `OTHER` |
-| `StudentNotificationType` | `DEADLINE`, `APPLICATION_STATUS`, `MISSING_DOCUMENT`, `SCHOLARSHIP_ANNOUNCEMENT`                                                         |
-| `AdvisorMessageRole`      | `USER`, `ASSISTANT`                                                                                                                      |
-| `AdvisorFeedback`         | `HELPFUL`, `UNHELPFUL`                                                                                                                   |
-| `AdvisorRequestOutcome`   | `SUCCESS`, `PROVIDER_ERROR`, `TIMEOUT`, `RATE_LIMITED`, `BLOCKED`                                                                        |
+| Enum                      | Values                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Role`                    | `STUDENT`, `REVIEWER`, `ADMIN`, `SUPER_ADMIN`, `CONTENT_MANAGER`, `UNIVERSITY_MANAGER`, `SCHOLARSHIP_MANAGER`, `SUPPORT_MANAGER`                                                                                                                                                                                                                 |
+| `AdminPermission`         | `ADMIN_ACCESS`, `USERS_READ`, `USERS_MANAGE`, `CONTENT_READ`, `CONTENT_MANAGE`, `MEDIA_READ`, `MEDIA_MANAGE`, `UNIVERSITIES_READ`, `UNIVERSITIES_MANAGE`, `SCHOLARSHIPS_READ`, `SCHOLARSHIPS_MANAGE`, `APPLICATIONS_READ`, `APPLICATIONS_REVIEW`, `AI_READ`, `AI_MANAGE`, `NOTIFICATIONS_SEND`, `AUDIT_READ`, `SETTINGS_READ`, `SETTINGS_MANAGE` |
+| `TokenPurpose`            | `EMAIL_VERIFICATION`, `PASSWORD_RESET`, `GUARDIAN_CONSENT`, `MFA_CHALLENGE`                                                                                                                                                                                                                                                                      |
+| `ConsentType`             | `TERMS`, `PRIVACY`, `GUARDIAN`, `MARKETING`                                                                                                                                                                                                                                                                                                      |
+| `DegreeLevel`             | `BACHELOR`, `MASTER`, `PHD`, `DIPLOMA`, `CERTIFICATE`                                                                                                                                                                                                                                                                                            |
+| `VerificationStatus`      | `VERIFIED`, `PARTIALLY_VERIFIED`, `INFORMATION_UNAVAILABLE`, `NEEDS_REVIEW`, `UNVERIFIED`, `EXPIRED`, `ARCHIVED`                                                                                                                                                                                                                                 |
+| `FieldVerificationStatus` | `VERIFIED`, `PARTIALLY_VERIFIED`, `NOT_VERIFIED`, `INFORMATION_UNAVAILABLE`                                                                                                                                                                                                                                                                      |
+| `FundingType`             | `FULLY_FUNDED`, `PARTIAL`, `TUITION_WAIVER`, `STIPEND`, `OTHER`                                                                                                                                                                                                                                                                                  |
+| `EligibilityScope`        | `ALL`, `LISTED`, `UNKNOWN`                                                                                                                                                                                                                                                                                                                       |
+| `RequirementKind`         | `ACADEMIC`, `ENGLISH_LANGUAGE`, `DOCUMENT`, `PORTFOLIO`, `WORK_EXPERIENCE`, `OTHER`                                                                                                                                                                                                                                                              |
+| `CatalogEntityType`       | `UNIVERSITY`, `PROGRAM`, `SCHOLARSHIP`                                                                                                                                                                                                                                                                                                           |
+| `ReviewDecision`          | `IMPORT`, `EDIT`, `APPROVE`, `REQUEST_CHANGES`, `EXPIRE`, `RESTORE`, `ARCHIVE`, `MARK_PARTIAL`, `MARK_UNAVAILABLE`, `FLAG_STALE`                                                                                                                                                                                                                 |
+| `ApplicationStatus`       | `INTERESTED`, `RESEARCHING`, `PREPARING_DOCUMENTS`, `READY_TO_APPLY`, `SUBMITTED`, `INTERVIEW`, `ACCEPTED`, `REJECTED`, `WAITLISTED`                                                                                                                                                                                                             |
+| `StudentDocumentCategory` | `PASSPORT`, `ACADEMIC_TRANSCRIPT`, `IELTS_CERTIFICATE`, `SAT_SCORE_REPORT`, `RECOMMENDATION_LETTER`, `PERSONAL_STATEMENT`, `CV`, `OTHER`                                                                                                                                                                                                         |
+| `StudentNotificationType` | `DEADLINE`, `APPLICATION_STATUS`, `MISSING_DOCUMENT`, `SCHOLARSHIP_ANNOUNCEMENT`                                                                                                                                                                                                                                                                 |
+| `AdvisorMessageRole`      | `USER`, `ASSISTANT`                                                                                                                                                                                                                                                                                                                              |
+| `AdvisorFeedback`         | `HELPFUL`, `UNHELPFUL`                                                                                                                                                                                                                                                                                                                           |
+| `AdvisorRequestOutcome`   | `SUCCESS`, `PROVIDER_ERROR`, `TIMEOUT`, `RATE_LIMITED`, `BLOCKED`                                                                                                                                                                                                                                                                                |
 
 ### Identity and access
 
@@ -58,6 +59,8 @@ model User {
   tokens       AuthToken[]
   consents     ConsentRecord[]
   auditEvents  AuditEvent[]    @relation("ActorAuditEvents")
+  adminPermissionGrants   AdminPermissionGrant[] @relation("AdminPermissionGrants")
+  grantedAdminPermissions AdminPermissionGrant[] @relation("AdminPermissionGrantsBy")
   universityFavorites UniversityFavorite[]
   scholarshipFavorites ScholarshipFavorite[]
 
@@ -157,7 +160,27 @@ model AuditEvent {
 }
 ```
 
-Actions recorded in Milestone 2 include `auth.register`, `auth.login`, `auth.email_verified`, `auth.verification_resent`, `auth.password_reset_requested`, `auth.password_reset`, `auth.password_changed`, `guardian.consent_granted`, `guardian.consent_declined`, `guardian.consent_resent`, `profile.updated`, and `account.deleted`. Catalog and administration actions include `catalog.import`, `catalog.<decision>`, `catalog.flag_stale`, `admin.user_role_changed`, `admin.user_sessions_revoked`, and `admin.university_status_changed`. Metadata is redacted and never contains passwords, tokens, or document contents.
+Actions recorded in Milestone 2 include `auth.register`, `auth.login`, `auth.email_verified`, `auth.verification_resent`, `auth.password_reset_requested`, `auth.password_reset`, `auth.password_changed`, `guardian.consent_granted`, `guardian.consent_declined`, `guardian.consent_resent`, `profile.updated`, and `account.deleted`. Catalog and administration actions include `catalog.import`, `catalog.<decision>`, `catalog.flag_stale`, `admin.user_role_changed`, `admin.user_sessions_revoked`, `admin.university_status_changed`, `admin.permission_granted`, and `admin.permission_revoked`. Metadata is redacted and never contains passwords, tokens, or document contents.
+
+### Administration grants
+
+```prisma
+model AdminPermissionGrant {
+  id          String          @id @default(cuid())
+  userId      String
+  permission  AdminPermission
+  grantedById String?
+  createdAt   DateTime        @default(now())
+
+  user      User @relation("AdminPermissionGrants", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User? @relation("AdminPermissionGrantsBy", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@unique([userId, permission])
+  @@index([userId])
+}
+```
+
+Role defaults live in `src/lib/admin/permissions.ts`. A grant only **adds** a capability on top of the role; it never removes role defaults and can never grant Super Admin role management. Applied by migration `20261121000000_admin_rbac`.
 
 ### Student profile
 
@@ -213,20 +236,40 @@ model RateLimitCounter {
 
 ## Migrations
 
-| Migration                                     | Purpose                                                                                       |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `20261113000000_init`                         | Identity, sessions, tokens, consent, audit, student profile, rate limits                      |
-| `20261113000100_budget_amount`                | Rename `StudentProfile.budgetAmountMinor` to `budgetAmount`                                   |
-| `20261113000200_catalog`                      | Source-linked catalog: citations, universities, programs, scholarships, facts, review history |
-| `20261113000300_catalog_fact_context`         | Add `Program.startNote` and `TuitionFact.applicantGroup`                                      |
-| `20261116000000_review_decision_edit`         | Add `EDIT` to the `ReviewDecision` enum (`ALTER TYPE ... ADD VALUE`)                          |
-| `20261116000100_catalog_favorites_archive`    | Add private university/scholarship favorites and the auditable `ARCHIVE` decision             |
-| `20261116000200_student_workspace`            | Add applications, status history, private document metadata/links, notifications/preferences  |
-| `20261116000300_google_oauth`                 | Add Google account linkage and OAuth-related identity fields                                  |
-| `20261117000100_university_discovery_details` | Add verified university discovery detail fields and indexes                                   |
-| `20261117000200_advisor`                      | Add advisor conversations, messages, usage ledger, and enums                                  |
+The 17 committed migrations are additive. There are no `DROP TABLE`, `TRUNCATE`, destructive `UPDATE`, or data-rewriting statements.
+
+| Migration                                            | Purpose                                                                                       |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `20261113000000_init`                                | Identity, sessions, tokens, consent, audit, student profile, rate limits                      |
+| `20261113000100_budget_amount`                       | Rename `StudentProfile.budgetAmountMinor` to `budgetAmount`                                   |
+| `20261113000200_catalog`                             | Source-linked catalog: citations, universities, programs, scholarships, facts, review history |
+| `20261113000300_catalog_fact_context`                | Add `Program.startNote` and `TuitionFact.applicantGroup`                                      |
+| `20261116000000_review_decision_edit`                | Add `EDIT` to the `ReviewDecision` enum (`ALTER TYPE ... ADD VALUE`)                          |
+| `20261116000100_catalog_favorites_archive`           | Add private university/scholarship favorites and the auditable `ARCHIVE` decision             |
+| `20261116000200_student_workspace`                   | Add applications, status history, private document metadata/links, notifications/preferences  |
+| `20261116000300_google_oauth`                        | Add Google account linkage and OAuth-related identity fields                                  |
+| `20261117000100_university_discovery_details`        | Add verified university discovery detail fields and indexes                                   |
+| `20261117000200_advisor`                             | Add advisor conversations, messages, usage ledger, and enums                                  |
+| `20261119000000_global_university_catalog`           | Extend the global university catalog and field-level facts                                    |
+| `20261119010000_catalog_field_fact_university`       | Align `CatalogFieldFact.universityId` with the typed university back-relation                 |
+| `20261119020000_review_decision_partial_unavailable` | Add `MARK_PARTIAL` and `MARK_UNAVAILABLE` review decisions                                    |
+| `20261121000000_admin_rbac`                          | Add administration roles, `AdminPermission`, and `AdminPermissionGrant` (additive only)       |
+| `20261121010000_catalog_featured`                    | Add administrator-managed featured flags and discovery indexes                                |
+| `20261123010000_homepage_content`                    | Add the revisioned homepage CMS document                                                      |
+| `20261124000000_mfa`                                 | Add opt-in MFA secrets, recovery codes, and `MFA_CHALLENGE` tokens                            |
+
+Enum additions use `ALTER TYPE ... ADD VALUE` (with `IF NOT EXISTS` on later additions). They are safe on PostgreSQL 16+ because no value added in a migration is used by DDL or data writes in that same migration. Replay all 17 migrations in order on a disposable database before upgrading a production instance that may have drifted.
 
 `UniversityFavorite` and `ScholarshipFavorite` each use a unique `(userId, entityId)` pair, with cascading foreign keys to both the student and catalog record. This enforces one favorite per user/record and removes favorites when either side is physically deleted. Catalog records are archived rather than hard-deleted so their sources and append-only review history remain available.
+
+### Migration-managed CHECK constraints
+
+Two database constraints exist only in SQL, not in the Prisma schema, because Prisma does not express `CHECK`:
+
+- `Application_progress_check`: `progress >= 0 AND progress <= 100` (`20261116000200_student_workspace`).
+- `StudentDocument_sizeBytes_check`: `sizeBytes > 0 AND sizeBytes <= 5242880` (`20261116000200_student_workspace`).
+
+They are documented as model comments in `prisma/schema.prisma` and must be preserved manually if either table is rebuilt. A future `prisma migrate dev` will not regenerate them automatically.
 
 Apply committed migrations with:
 
@@ -234,7 +277,13 @@ Apply committed migrations with:
 npm run db:migrate
 ```
 
-Use `prisma migrate dev` only when authoring a new migration locally; use `prisma migrate deploy` in CI and production. No destructive migration ships without a backup and a documented rollback.
+`npm run db:migrate` runs `prisma migrate deploy`, including in production. `npm run db:push` is guarded by `scripts/db-push-guard.mjs`: it refuses `NODE_ENV=production` and any non-loopback `DATABASE_URL`, then delegates to the installed Prisma CLI. Do not bypass it by invoking `prisma db push` directly. Use `prisma migrate dev` only when authoring a new migration locally; use `prisma migrate deploy` in CI and production. No destructive migration ships without a backup and a documented rollback.
+
+### Production connection requirements
+
+Production `DATABASE_URL` must use PostgreSQL, `sslmode=require|verify-ca|verify-full` (prefer `verify-full` with the provider CA), positive integer `connect_timeout`, `pool_timeout`, and `connection_limit`. `src/lib/env.ts` reports only issue names, never URL values, and readiness keeps the instance out of rotation when any check fails. Prisma's client is a per-process singleton in `src/lib/db.ts`; do not create additional clients per request.
+
+These checks verify URL shape, not provider trust. The hosting team must confirm TLS certificate validation, network path, roles/grants, `search_path`, pooler behavior, and the chosen `connection_limit` against replica count and the database's connection budget. See [managed PostgreSQL staging verification](STAGING-DATABASE-VERIFICATION.md) for the provider-side replay, TLS, role, and restore-drill runbook.
 
 ## Local development database
 
@@ -245,10 +294,11 @@ npm run db:start   # PGlite on 127.0.0.1:5432, data in .data/pglite
 npm run db:migrate
 ```
 
-Two PGlite-specific details matter:
+PGlite-specific differences matter:
 
-1. **`&pgbouncer=true` in the local `DATABASE_URL`.** PGlite retains prepared statements across client reconnects. Without the parameter, Prisma's `s0`-style statement names collide after a dev-server restart. The parameter makes Prisma use simple queries. Remove it for managed PostgreSQL.
+1. **`&pgbouncer=true` in the local `DATABASE_URL`.** PGlite retains prepared statements across client reconnects. Without the parameter, Prisma's `s0`-style statement names collide after a dev-server restart. The parameter makes Prisma use simple queries. Remove it for managed PostgreSQL unless the provider's pooler explicitly requires it.
 2. **Graceful shutdown.** Stop the server with `Ctrl+C`. Force-killing the process can corrupt `.data/pglite`. Recovery is to delete that directory, start the server again, and re-run migrations. The directory is git-ignored and contains only disposable local data.
+3. **Not a full managed-PostgreSQL substitute.** PGlite is a single-process WebAssembly build. It does not prove provider TLS trust, real connection pooling, replication/failover, roles and grants, `search_path`, maintained extension behavior, or concurrent-user load. Passing local migrations and tests is necessary but not sufficient for production sign-off.
 
 Integration tests do not use the development database. `tests/integration/global-setup.ts` starts a fresh PGlite process on a random free port with `.data/pglite-test`, waits for its ready line, and runs `prisma migrate deploy` against it. A fresh process per run avoids prepared-statement collisions and keeps the suite repeatable.
 
@@ -482,6 +532,7 @@ model Scholarship {
 
 - `nationalityScope` and `fieldScope` distinguish "open to everyone" (`ALL`) from "a list is published" (`LISTED`) from "not documented" (`UNKNOWN`). An empty array alone cannot tell those apart, and the UI must not imply eligibility it cannot prove.
 - `summary` paraphrases the provider's own description; amounts and eligibility rules stay in `DeadlineFact`/`Requirement` with their source.
+- The researched scholarship batch is imported with `npm run db:import:scholarships`. Its datasets in `data/scholarships-*.json` contain the official page URL, publisher, title, access date, and verification date for every row; `npm run db:verify:scholarships` checks the written rows and detects duplicate name/provider pairs. `--dry-run` validates without writing.
 
 ### Facts
 
@@ -623,6 +674,6 @@ Uploads accept only PDF, JPEG, PNG, and WebP files up to 5 MiB; the server valid
 
 ## Deletion and export
 
-- Account deletion is an immediate soft delete: sessions are revoked, auth tokens, favorites, applications, documents, notifications, preferences, and the student profile are deleted, private document bytes are removed, and the user row is anonymised (`deleted+<id>@edubridge.invalid`, name `Deleted account`, password hash and date of birth cleared).
-- The anonymised user row and its audit events are retained for security and abuse prevention. No profile content, email address, name, or date of birth remains.
-- Advisor conversations and messages are hard-deleted by the student's delete/clear actions and by account deletion; the usage ledger keeps only metadata. A scheduled hard-delete window and a machine-readable export (JSON plus document list) remain planned for a later milestone to satisfy access requests.
+- Account deletion verifies the password, removes private document bytes, then revokes sessions and deletes auth/MFA tokens, recovery codes, Google linkage, consents, favorites, applications, document metadata, notifications, preferences, profile, comparison, study notes, advisor usage, and advisor conversations in one transaction. Grants owned by the user are removed and grants they gave to other users have attribution detached.
+- The user row is anonymised (`deleted+<id>@edubridge.invalid`, name `Deleted account`, password hash, MFA seed/enrollment, date of birth, and verification timestamp cleared, role reset to `STUDENT`). The anonymised row and redacted audit events are retained for security and abuse prevention.
+- Advisor conversations and messages are hard-deleted by the student's delete/clear actions and by account deletion; the usage ledger is deleted with them. A scheduled hard-delete window for anonymised rows and a machine-readable export (JSON plus document list) remain planned for a later milestone to satisfy access requests.

@@ -36,7 +36,7 @@ EduBridge is built milestone by milestone. Each milestone must pass its exit che
 **Delivered**
 
 - PostgreSQL schema and two committed migrations for users, sessions, single-use auth tokens, consent records, student profiles, audit events, and rate-limit counters. Prisma 6.19 targets PostgreSQL; local development and tests run against PGlite over the PostgreSQL wire protocol.
-- Email/password registration, optional email verification, login, logout, and password reset, with Server Actions owning cookies, redirects, and audit. Registration and recovery are rate-limited; sign-in currently is not.
+- Email/password registration, optional email verification, login, logout, and password reset, with Server Actions owning cookies, redirects, and audit. Sign-in, registration, and recovery are rate-limited.
 - Google OAuth sign-in and registration using the authorization-code flow, state validation, PKCE, verified Google email, and the same database-backed sessions.
 - Argon2id hashing (OWASP baseline), password policy, generic login/reset errors, and an explicit duplicate-registration response with an account-exists email.
 - Opaque sessions: 32-byte tokens, SHA-256 at rest, httpOnly `SameSite=Lax` cookie, 7-day idle expiry with sliding renewal, 30-day absolute cap, and revocation from account settings.
@@ -65,8 +65,8 @@ EduBridge is built milestone by milestone. Each milestone must pass its exit che
 
 - No public REST API, live catalog, application tracker, document storage, AI advisor, admin moderation tooling, or data export. These belong to Milestones 3–7.
 - Production PostgreSQL was not available in this environment. Migrations and queries were exercised against PGlite; managed PostgreSQL verification remains a deployment step.
-- No MFA, breached-password lookup, email address change, or Content-Security-Policy yet; each is listed as a launch gate in [SECURITY.md](SECURITY.md).
-- Git was unavailable, so no repository history or CI pipeline was created.
+- No MFA, breached-password lookup, email address change, or Content-Security-Policy during this milestone. MFA, breached-password checks, and a baseline CSP were added in later hardening work; email change remains open. See [SECURITY.md](SECURITY.md).
+- Git was unavailable during this milestone, so the CI pipeline was added later in Milestone 6 (see below).
 
 **Exit criteria met:** auth and ownership integration tests pass; the under-18 flow blocks workspace access without consent; no student route renders without a server-side session check; typecheck, lint, unit/integration tests, formatting, and build are green; the auth surface is reviewed in [SECURITY.md](SECURITY.md).
 
@@ -126,7 +126,7 @@ EduBridge is built milestone by milestone. Each milestone must pass its exit che
 - `/api/health/live` and `/api/health/ready` endpoints; readiness validates production configuration and checks PostgreSQL without exposing error details.
 - Structured, allowlisted JSON logs; Next.js request-error capture and OpenTelemetry request tracing; explicit events for authentication, rate limiting, storage, and health failures.
 - Production readiness validation for HTTPS origin, PostgreSQL, auth secret, SMTP, private object storage, ClamAV, and OTLP export.
-- GitHub Actions checks for dependency audit, lint, TypeScript, unit/integration tests, formatting, production build, and Docker image build.
+- GitHub Actions checks for dependency audit, lint, TypeScript, unit/integration tests, formatting, production build, Docker image build, Gitleaks secret scanning, CodeQL SAST, pull-request dependency review, and a Trivy image scan with SARIF upload. Actions are pinned to commit SHAs and Dependabot proposes weekly npm/action updates; branch protection and host scanner settings remain operator tasks.
 - Fail-closed rate limiting when the database counter cannot be updated and removal of a redundant dashboard query.
 - Deployment, environment, monitoring, health-check, and recovery guidance in [DEPLOYMENT.md](DEPLOYMENT.md).
 
@@ -163,13 +163,75 @@ The repository does not provision a cloud account, DNS/TLS, managed PostgreSQL, 
 
 - Playwright E2E: registration, verification, guardian consent, authorization boundaries, uploads, search, AI failure states.
 - Accessibility audit (keyboard, screen reader, contrast, reduced motion) and fixes; Lighthouse targets reviewed.
-- CSP with nonces and report-only rollout; dependency and secret scanning in CI.
+- Strict CSP with nonces, report-only rollout, and a violation collector. A baseline enforcing CSP and CI dependency, secret, SAST, and container scans are already in place.
 - Uzbek and Russian localization with `next-intl`, localized metadata, dates, and currency; English fallback.
 - Performance budgets, image/video optimization, cache headers, error monitoring.
 - Legal review (GDPR/UK GDPR/Uzbek requirements), published security contact and disclosure policy, final privacy notice.
 - Deployment runbook, backups, restore test, and incident response contacts.
 
 **Exit criteria:** E2E suite green in CI; accessibility issues closed or documented; CSP enforced without breakage; localization reviewed by native speakers; legal sign-off; rollback plan tested.
+
+## Administration panel program (new, in progress)
+
+The complete administration system is delivered as eleven separate milestones on the **existing PostgreSQL/Prisma stack**. MongoDB is deliberately not introduced: all current accounts, catalog records, applications, AI usage, and migrations already live in PostgreSQL, and preserving them takes priority over changing databases.
+
+**Milestone 1 — Admin authentication, Super Admin initialization, and permissions (complete)**
+
+- Expanded the existing `Role` enum with `SUPER_ADMIN` and the scoped `CONTENT_MANAGER`, `UNIVERSITY_MANAGER`, `SCHOLARSHIP_MANAGER`, and `SUPPORT_MANAGER` roles; existing `STUDENT`, `REVIEWER`, and `ADMIN` rows are untouched.
+- Added `AdminPermission` and `AdminPermissionGrant` so a Super Admin can grant individual capabilities on top of role defaults. Role management itself can never be granted through a capability grant.
+- Added a separate `/admin` surface with its own shell, navigation, and `noindex` pages. Legacy `/dashboard/admin/*` routes redirect to `/admin/*`.
+- `requireAdminPermission()` re-reads role, verified-email state, deletion state, and grants from the database on every request. Every admin Server Action re-checks its own capability and origin.
+- `BOOTSTRAP_ADMIN_EMAILS` now promotes to `SUPER_ADMIN`. Only a Super Admin can change roles or grant/revoke capabilities; self-changes, last-admin/last-Super-Admin removal, and admin roles for unverified emails are rejected.
+- Initial screens: `/admin` overview, `/admin/users`, `/admin/access`, `/admin/universities`, and the `/admin-access-denied` gate. The overview shows real database counts; no demo statistics are used.
+
+**Verification:** formatting, lint, TypeScript, 288 unit tests, 85 integration tests, and the production build pass. Browser QA covered all admin pages, role/capability boundaries, distinct denial reasons, legacy redirects with query preservation, role changes, permission grant/revoke, university status overrides with audit events, and zero console errors. QA-only accounts were removed; original accounts remain unchanged.
+
+**Milestone 2 — live overview analytics and charts (complete)**
+
+- Replaced the read-only overview with database-derived platform totals: universities, scholarships, programs, applications, AI conversations/requests, and estimated AI cost.
+- Added pure aggregation helpers that zero-fill a continuous 90-day UTC daily series. Quiet days stay at zero; no sample, cached, or fabricated statistics are rendered.
+- Added an interactive Recharts activity chart with 7/30/90-day ranges and toggleable real series (new accounts, applications, audit events, AI requests).
+- Added interactive status breakdown charts for universities, scholarships, and applications, with selectable bars, count details, and a filtered university link.
+- Gated every metric and chart behind the same server-read permissions as the rest of the admin panel. Audit events and the AI series require `AUDIT_READ` and `AI_READ`; manager roles see only their own domains.
+- No new tables or migrations: all data is recalculated from existing PostgreSQL rows on every request, and public catalog changes flow through the same queries.
+
+**Verification:** formatting, lint, TypeScript, 292 unit tests, 86 integration tests across 11 files, and the production build pass. Browser QA covered Super Admin range/series toggles, bar selection and the filtered university link, Content Manager scoping, Student denial with reason, and zero console errors. Temporary QA accounts were removed; original accounts were not modified.
+
+**Milestone 3 — university management (complete)**
+
+- Added `/admin/universities`, `/admin/universities/new`, `/admin/universities/[id]`, and `/admin/universities/export` behind `UNIVERSITIES_READ`/`UNIVERSITIES_MANAGE`. The raw verification-status override action and its UI were retired; all status changes now use controlled publish/unpublish/archive/restore transitions with review and audit events.
+- Full university editor with server-side validation for every field, source verification details, duplicate detection on normalized name + city + country, and a missing-information warning panel.
+- Lifecycle rules reuse existing `VerificationStatus`: publish requires a verified primary source, unpublish clears the featured flag, and restore from archived returns to unpublished rather than silently republishing.
+- Feature/unfeature is explicit and server-enforced: only published, sourced records can be featured. `featured` is exposed to public catalog ordering, dashboard discovery, and AI university search.
+- CSV export with spreadsheet-formula neutralization and CSV import with all-row validation, a 200-row cap, and duplicate checks before any write.
+- One additive migration added `featured` fields and indexes to `University` and `Scholarship`; no records were rewritten or removed.
+
+**Verification:** formatting, lint, TypeScript, 304 unit tests across 41 files, 92 integration tests across 12 files, and the production build pass. A fresh PGlite setup applied all 15 migrations cleanly. Browser QA covered create/publish, warning counts, feature/unfeature plus blocking of featuring unpublished records, unpublish/archive/restore state transitions, duplicate rejection, CSV import, public featured badge, University Manager scoped access, Scholarship Manager and Student denial reasons, and no relevant console errors. Temporary QA accounts and catalog rows were removed; original accounts remain unchanged.
+
+**Milestone 4 — scholarship management (complete)**
+
+- Added `/admin/scholarships`, `/admin/scholarships/new`, `/admin/scholarships/[id]`, and `/admin/scholarships/export` behind `SCHOLARSHIPS_READ`/`SCHOLARSHIPS_MANAGE`, with a scoped nav item and an overview management card.
+- Full scholarship editor reusing the shared reviewer field and source contracts, with server-side validation for every stored profile field, normalized multi-value inputs, duplicate detection on normalized name + provider, source verification details, and a missing-information warning panel.
+- Lifecycle controls reuse existing `VerificationStatus`: publish requires a verified primary source and passes provenance checks, unpublish clears the featured flag, and restore from archived returns to unpublished rather than silently republishing.
+- Feature/unfeature is explicit and server-enforced: only published, sourced scholarships can be featured. Public and dashboard scholarship lists order featured records first and display a `Featured` badge; AI-facing scholarship snippets expose `featured`.
+- CSV export with spreadsheet-formula neutralization and CSV import with all-row validation, a 200-row cap, duplicate checks, and support for omitted optional country columns. No new migration was needed.
+
+**Verification:** formatting, lint, TypeScript, 308 unit tests across 42 files, 99 integration tests across 13 files, and the production build pass. A fresh PGlite setup applied all 15 migrations cleanly. Browser QA covered create/publish, warnings, feature/unfeature plus blocking of featuring unpublished records, unpublish/archive/restore state transitions, duplicate rejection, CSV import/export, public and dashboard featured reflection, scoped University Manager denial, Student denial reasons, and no relevant console errors. Temporary QA accounts and catalog rows were removed; original accounts remain unchanged.
+
+**Milestone 5 — CMS and homepage editor (complete)**
+
+- Added an additive `HomepageContent` singleton with a strict Zod contract for hero, search, process, features, scholarship and AI sections, calls to action, and metadata. Arbitrary HTML, scripts, and styles are rejected; only controlled values reach public components.
+- Added `/admin/content` behind `CONTENT_READ`/`CONTENT_MANAGE`, with a save Server Action, revision counter, audit events, and cache-tag invalidation for immediate public reflection.
+- Refactored ten marketing sections to read the cached published configuration with `unstable_cache` tagged `homepage-content`; the homepage route awaits `connection()` before the cached read.
+- Reused `VerificationStatus` for lifecycle: `VERIFIED` is published, `UNVERIFIED` is unpublished, and `ARCHIVED` is archived. `siteConfig` navigation, footer, and SEO are deliberately unchanged and belong to Milestone 6.
+- Added a no-network, source-validating scholarship import pipeline. Five official-source batches added 100 real scholarships (102 catalog total), each with a required `SourceCitation`, `VERIFIED` status, an `IMPORT` review row, and an audit event. Closed and archived programs state that explicitly in their public summaries.
+- Added `npm run db:import:scholarships` and `npm run db:verify:scholarships`; the verifier confirmed 100/100 written rows, no missing rows, no mismatches, and no duplicate name/provider pairs.
+
+**Verification:** formatting, lint, TypeScript, 315 unit tests across 43 files, 103 integration tests across 14 files, and the production build pass. Browser QA covered Content Manager save, revision increments, immediate public reflection, markup rejection without revision change, and zero console errors. Authorization QA confirmed University Manager and Scholarship Manager receive `?reason=permission`, Student receives `?reason=account`, and unverified Admin receives `?reason=unverified`. The final scholarship dry run validated 100 records with zero errors and zero duplicates.
+
+**Remaining milestones:** (6) branding, navigation, footer, and SEO; (7) media library and educational content; (8) user and application management; (9) AI Advisor management; (10) notifications, audit logs, and global settings; (11) security/integration testing and deployment preparation.
+
+Each milestone must pass typecheck, lint, formatting, unit tests, integration tests, and a production build before the next begins.
 
 ## Cross-cutting rules
 

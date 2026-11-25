@@ -3,14 +3,9 @@ import { Check, Quote } from "lucide-react";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionHeading } from "@/components/marketing/section-heading";
 import { Badge } from "@/components/ui/badge";
+import type { TestimonialsContent } from "@/lib/cms/homepage-content";
 
-const commitments = [
-  "Published only with explicit permission",
-  "Context included, including country and degree",
-  "No promised outcomes or edited results",
-];
-
-export function Testimonials() {
+export function Testimonials({ content }: { content: TestimonialsContent }) {
   return (
     <section
       aria-labelledby="testimonials-heading"
@@ -19,13 +14,9 @@ export function Testimonials() {
       <div className="site-container">
         <Reveal>
           <SectionHeading
-            eyebrow="Student stories"
-            title={
-              <span id="testimonials-heading">
-                Real experiences, only when they&apos;re real.
-              </span>
-            }
-            description="We are not publishing invented testimonials to make the product look finished. This space is reserved for students who choose to share their story after launch."
+            eyebrow={content.eyebrow}
+            title={<span id="testimonials-heading">{content.title}</span>}
+            description={content.description}
           />
         </Reveal>
 
@@ -34,17 +25,15 @@ export function Testimonials() {
             <figure className="border-border bg-card relative h-full overflow-hidden rounded-2xl border p-6 sm:p-8">
               <Quote className="text-primary/20 size-8" aria-hidden="true" />
               <blockquote className="text-foreground/90 mt-4 max-w-2xl text-[17px] leading-8 font-medium tracking-[-0.015em] sm:text-lg">
-                &ldquo;We don&apos;t publish testimonials we can&apos;t verify.
-                When students share their stories here, you&apos;ll see them
-                with permission and context — not as marketing copy.&rdquo;
+                &ldquo;{content.quote}&rdquo;
               </blockquote>
               <figcaption className="border-border/70 mt-5 flex flex-wrap items-center gap-2 border-t pt-4">
                 <Badge variant="warning" className="gap-1.5">
                   <span className="size-1.5 rounded-full bg-amber-500" />
-                  Development placeholder
+                  {content.placeholderLabel}
                 </Badge>
                 <span className="text-muted-foreground text-[11px]">
-                  No student testimonial has been published.
+                  {content.placeholderNote}
                 </span>
               </figcaption>
             </figure>
@@ -53,10 +42,10 @@ export function Testimonials() {
           <Reveal delay={0.08}>
             <div className="border-border bg-card h-full rounded-2xl border p-6">
               <p className="text-muted-foreground font-mono text-[9.5px] font-medium tracking-[0.14em] uppercase">
-                Our commitment
+                {content.commitmentLabel}
               </p>
               <ul className="mt-4 space-y-3">
-                {commitments.map((commitment) => (
+                {content.commitments.map((commitment) => (
                   <li
                     key={commitment}
                     className="text-foreground/80 flex items-start gap-2.5 text-[12px] leading-5"

@@ -31,7 +31,7 @@ export default async function ImportRecordPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requireRole(["REVIEWER", "ADMIN"]);
+  await requireRole(["REVIEWER", "ADMIN", "SUPER_ADMIN"]);
   const params = await searchParams;
   const requested = Array.isArray(params.type) ? params.type[0] : params.type;
   const entityType: EntityType = (TYPES as readonly string[]).includes(
